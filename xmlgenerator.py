@@ -12,6 +12,16 @@ CONST = {
 
 def administrativeData(adm_df):
 
+    """
+    administrativeData():
+    
+    recibe: data frame administrativo
+
+    retorna el xml administrativo
+    
+    
+    """
+    
     administrativeData_ = dcc.administrativeDataType()
 
     dccSoftware = dcc.softwareListType()
@@ -322,32 +332,93 @@ def administrativeData(adm_df):
 
 def measurementResults(res_df):
 
+    """
+    measurementResults():
+    
+    recibe: data frame resultados
+
+    retorna return measurementResults_
+    
+    
+    name.add_prueba
+    
+    
+    """    
+    #El día que lo presentemos va a ser lo mejor usar una jupyter notebook.
+    #
+    #https://www.ptb.de/dcc/v2.4.0/en/measurementResult/#tree-structure
+    #
+    #alrazonar las estructuras, hay que tener en cuenta que los métodos
+    #ya saben a que padre tiene que linkearse y no hace falta referenciarlos.
+    #
+    
+    
     measurementResults_ = dcc.measurementResultListType()
+    #creo un dcc:measurementResults
 
-    usedMethods = dcc.usedMethodListType()
-    usedSoftware = dcc.softwareListType()
-    influenceConditions = dcc.influenceConditionListType()
-    influenceCondition = dcc.conditionType()
-    results = dcc.resultListType()
     measurementResult = dcc.measurementResultType()
-
+    #creo un dcc:measurementResult
+    
+    usedMethods = dcc.usedMethodListType()
+    #creo un dcc:usedMethods
+    
+    usedSoftware = dcc.softwareListType()
+    #creo un dcc:usedSoftware
+    
+    influenceConditions = dcc.influenceConditionListType()
+    #genero el influence conditions    
+    
+    influenceCondition = dcc.conditionType()
+    #genero el influence condition
+    
+    results = dcc.resultListType()
+    #genero el results
+    
+    #
+    #arriba genero todos los elementos ppales
+    #
+    
     res_data = {}
+    #genero un dic de resultados ¿para qué?
+    
     cell = res_df.iloc
+    #modifico el df para leer las columnas con números y no letras desde cell[]
+    
     table = {item:idx for idx,item in enumerate(cell[:,0]) if item in CONST}
+    #asigno una tabla de índices(row-1) respecto a cada asignación {índice = [número|letra]}
+    
     for name, idx in table.items():
+        #itero todos los items de la tabla uqe generé antes: 0A, 0B, 0C ...
         if name == '0A':
+            
             for key,value in {"Metodología_Empleada":cell[idx, 3],
                            "Procedimiento":cell[idx+1,3]}.items():
-
+            # este harcoddeo no me gusta, y la frase tiene que estar
+            #entera, unir las dos rows fijarse del excel   
+            #crear un solo usedMethod
+            #con cell leo [row,column]
+            
                 usedMethod_name = dcc.textType(id=key)
+                #?
+                #agrego dcc:name a usedMethod y le asigno el id=Metod...
+                #el id es palabra reservada y puedo agregarlo así
+                
                 usedMethod_name.add_content(
+                #al name que cree le agrego el dcc:content
                     dcc.stringWithLangType(
                         lang="es",
+                        #no tiene que estar harcodeado, tiene que estar leido
+                        #idioma que le asigné en el administrativo
+                        #para cuando haya mas de un idioma. 
+                        #el idioma debería ser un vector.
                         valueOf_=key
+                        #agrega el valor de "Met..." dentro del contenido
                     )
                 )
 
                 usedMethod_description = dcc.textType()
+                #agrego dcc:description al method a usedMethod
+                                
                 usedMethod_description.add_content(
                     dcc.stringWithLangType(
                         lang="es",
