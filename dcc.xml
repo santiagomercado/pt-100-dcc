@@ -19,12 +19,6 @@
       <dcc:endPerformanceDate>2020-03-16</dcc:endPerformanceDate>
     </dcc:coreData>
     <dcc:items>
-      <dcc:name>
-        <dcc:content>some_name</dcc:content>
-      </dcc:name>
-      <dcc:description>
-        <dcc:content>some_description</dcc:content>
-      </dcc:description>
       <dcc:item>
         <dcc:name>
           <dcc:content lang="es">qwerty</dcc:content>
@@ -48,98 +42,6 @@
           </dcc:identification>
         </dcc:identifications>
       </dcc:item>
-      <dcc:item>
-        <dcc:name>
-          <dcc:content lang="es">qwerty</dcc:content>
-        </dcc:name>
-        <dcc:description>
-          <dcc:content lang="es">Pt100</dcc:content>
-        </dcc:description>
-        <dcc:manufacturer>
-          <dcc:name>
-            <dcc:content>---</dcc:content>
-          </dcc:name>
-        </dcc:manufacturer>
-        <dcc:model>#</dcc:model>
-        <dcc:identifications>
-          <dcc:identification>
-            <dcc:issuer>manufacturer</dcc:issuer>
-            <dcc:value>#</dcc:value>
-            <dcc:description>
-              <dcc:content lang="es">Numero de serie</dcc:content>
-            </dcc:description>
-          </dcc:identification>
-        </dcc:identifications>
-      </dcc:item>
-      <dcc:item>
-        <dcc:name>
-          <dcc:content lang="es">qwerty</dcc:content>
-        </dcc:name>
-        <dcc:description>
-          <dcc:content lang="es">Pt100</dcc:content>
-        </dcc:description>
-        <dcc:manufacturer>
-          <dcc:name>
-            <dcc:content>---</dcc:content>
-          </dcc:name>
-        </dcc:manufacturer>
-        <dcc:model>#</dcc:model>
-        <dcc:identifications>
-          <dcc:identification>
-            <dcc:issuer>manufacturer</dcc:issuer>
-            <dcc:value>#</dcc:value>
-            <dcc:description>
-              <dcc:content lang="es">Numero de serie</dcc:content>
-            </dcc:description>
-          </dcc:identification>
-        </dcc:identifications>
-      </dcc:item>
-      <dcc:item>
-        <dcc:name>
-          <dcc:content lang="es">qwerty</dcc:content>
-        </dcc:name>
-        <dcc:description>
-          <dcc:content lang="es">Pt100</dcc:content>
-        </dcc:description>
-        <dcc:manufacturer>
-          <dcc:name>
-            <dcc:content>---</dcc:content>
-          </dcc:name>
-        </dcc:manufacturer>
-        <dcc:model>#</dcc:model>
-        <dcc:identifications>
-          <dcc:identification>
-            <dcc:issuer>manufacturer</dcc:issuer>
-            <dcc:value>#</dcc:value>
-            <dcc:description>
-              <dcc:content lang="es">Numero de serie</dcc:content>
-            </dcc:description>
-          </dcc:identification>
-        </dcc:identifications>
-      </dcc:item>
-      <dcc:item>
-        <dcc:name>
-          <dcc:content lang="es">qwerty</dcc:content>
-        </dcc:name>
-        <dcc:description>
-          <dcc:content lang="es">Pt100</dcc:content>
-        </dcc:description>
-        <dcc:manufacturer>
-          <dcc:name>
-            <dcc:content>---</dcc:content>
-          </dcc:name>
-        </dcc:manufacturer>
-        <dcc:model>#</dcc:model>
-        <dcc:identifications>
-          <dcc:identification>
-            <dcc:issuer>manufacturer</dcc:issuer>
-            <dcc:value>#</dcc:value>
-            <dcc:description>
-              <dcc:content lang="es">Numero de serie</dcc:content>
-            </dcc:description>
-          </dcc:identification>
-        </dcc:identifications>
-      </dcc:item>
     </dcc:items>
     <dcc:calibrationLaboratory>
       <dcc:contact id="termo">
@@ -157,7 +59,7 @@
           <dcc:street>Avenida General Paz</dcc:street>
           <dcc:streetNo>#5445</dcc:streetNo>
           <dcc:further>
-            <dcc:content>Depto. De Termodinámica</dcc:content>
+            <dcc:content>Partido de General San Martín</dcc:content>
             <dcc:content>(54 11) 4724 6300</dcc:content>
             <dcc:content>Edificio 3 y 44</dcc:content>
             <dcc:content>GOMYC</dcc:content>
@@ -234,19 +136,11 @@
     <dcc:measurementResult>
       <dcc:usedMethods>
         <dcc:usedMethod>
-          <dcc:name id="Metodología_Empleada">
-            <dcc:content lang="es">Metodología_Empleada</dcc:content>
+          <dcc:name>
+            <dcc:content lang="es">Metodología Empleada</dcc:content>
           </dcc:name>
           <dcc:description>
-            <dcc:content lang="es">Por comparación con termómetros patrones de resistencia de platino, en baños, hornos y cámara climática con temperatura estabilizada, según procedimiento de</dcc:content>
-          </dcc:description>
-        </dcc:usedMethod>
-        <dcc:usedMethod>
-          <dcc:name id="Procedimiento">
-            <dcc:content lang="es">Procedimiento</dcc:content>
-          </dcc:name>
-          <dcc:description>
-            <dcc:content lang="es">PET08C, revisión abril 2019</dcc:content>
+            <dcc:content lang="es">Por comparación con termómetros patrones de resistencia de platino, en baños, hornos y cámara climática con temperatura estabilizada, según procedimiento de PET08C, revisión abril 2019</dcc:content>
           </dcc:description>
         </dcc:usedMethod>
       </dcc:usedMethods>
@@ -294,13 +188,13 @@
             </dcc:quantity>
             <dcc:quantity>
               <dcc:name>
-                <dcc:content lang="es">Humedad Relativa</dcc:content>
+                <dcc:content lang="es">Humedad Relativa menor a</dcc:content>
               </dcc:name>
               <si:real>
                 <si:value>80.0</si:value>
                 <si:unit>\kilogram\tothe{1}\metre\tothe{-3}\kilogram\tothe{-1}\metre\tothe{3}</si:unit>
                 <si:expandedUnc>
-                  <si:uncertainty>0.2</si:uncertainty>
+                  <si:uncertainty>0.8</si:uncertainty>
                   <si:coverageFactor>2</si:coverageFactor>
                   <si:coverageProbability>0.95</si:coverageProbability>
                 </si:expandedUnc>
@@ -322,6 +216,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>-20.01</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -330,7 +225,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -343,6 +238,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>-20.01</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -351,7 +247,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -364,6 +260,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>-20.01</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -372,7 +269,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -385,6 +282,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>-15.01</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -393,7 +291,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -406,6 +304,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>-15.01</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -414,7 +313,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -427,6 +326,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>-15.01</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -435,7 +335,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -448,6 +348,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>-10.01</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -456,7 +357,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -469,6 +370,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>-10.01</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -477,7 +379,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -490,6 +392,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>-10.01</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -498,7 +401,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -511,6 +414,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>-5.02</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -519,7 +423,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -532,6 +436,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>-5.02</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -540,7 +445,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -553,6 +458,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>-5.02</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -561,7 +467,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -574,6 +480,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>-5.02</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -582,7 +489,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.01</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -595,6 +502,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>0.0</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -603,7 +511,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -616,6 +524,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>0.0</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -624,7 +533,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -637,6 +546,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>0.0</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -645,7 +555,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -658,6 +568,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>0.0</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -666,7 +577,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -679,6 +590,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>0.0</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -687,7 +599,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -700,6 +612,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>24.98</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -708,7 +621,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -721,6 +634,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>24.98</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -729,7 +643,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -742,6 +656,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>24.98</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -750,7 +665,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -763,6 +678,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>37.19</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -771,7 +687,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -784,6 +700,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>37.2</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -792,7 +709,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -805,6 +722,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>37.2</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -813,7 +731,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -826,6 +744,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>50.02</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -834,7 +753,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -847,6 +766,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>50.02</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -855,7 +775,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -868,6 +788,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>75.12</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -876,7 +797,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -889,6 +810,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>75.12</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -897,7 +819,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -910,6 +832,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>75.12</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -918,7 +841,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -931,6 +854,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>100.14</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -939,7 +863,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.01</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -952,6 +876,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>100.15</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -960,7 +885,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -973,6 +898,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>100.15</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -981,7 +907,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -994,6 +920,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>100.15</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1002,7 +929,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1015,6 +942,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>100.15</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1023,7 +951,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1036,6 +964,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>100.16</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1044,7 +973,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1057,6 +986,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>125.17</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1065,7 +995,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1078,6 +1008,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>125.17</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1086,7 +1017,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1099,6 +1030,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>125.17</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1107,7 +1039,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1120,6 +1052,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>150.16</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1128,7 +1061,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1141,6 +1074,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>150.16</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1149,7 +1083,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1162,6 +1096,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>150.16</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1170,7 +1105,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1183,6 +1118,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>175.18</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1191,7 +1127,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1204,6 +1140,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>175.18</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1212,7 +1149,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1225,6 +1162,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>175.18</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1233,7 +1171,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.008</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1246,6 +1184,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>200.19</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1254,7 +1193,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1267,6 +1206,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>200.19</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1275,7 +1215,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.009</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
@@ -1288,6 +1228,7 @@
                 </dcc:name>
                 <dcc:noQuantity>
                   <dcc:content>200.2</dcc:content>
+                  <dcc:content>\degreeCelsius</dcc:content>
                 </dcc:noQuantity>
               </dcc:quantity>
               <dcc:quantity>
@@ -1296,7 +1237,7 @@
                   <si:unit>\kilogram\metre\tothe{2}\second\tothe{-3}\ampere\tothe{-2}</si:unit>
                   <si:expandedUnc>
                     <si:uncertainty>0.01</si:uncertainty>
-                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageFactor>2.0</si:coverageFactor>
                     <si:coverageProbability>0.95</si:coverageProbability>
                   </si:expandedUnc>
                 </si:real>
