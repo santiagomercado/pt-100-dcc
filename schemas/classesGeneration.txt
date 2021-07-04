@@ -1,0 +1,2 @@
+python generateDS.py -o dcc.py --external-encoding='utf-8' --export="write etree" dcc.xsd
+python generateDS.py -o SI_Format.py --external-encoding='utf-8' --export="write etree" SI_Format.xsd

@@ -1,5 +1,5 @@
-import dcc
-import SI_Format
+from schemas.dcc.v3_0_0_rc_4 import dcc
+from schemas.SI_Format.v2_0_0 import SI_Format
 import sys
 from lxml import etree
 import xml.etree.ElementTree as ET
@@ -32,7 +32,9 @@ def administrativeData(adm_df):
     administrativeData_ = dcc.administrativeDataType()
 
     dccSoftware = dcc.softwareListType()
-    coreData = dcc.coreDataType()
+    coreData = dcc.coreDataType(
+        performanceLocation=dcc.performanceLocationType(
+            valueOf_=dcc.stringPerformanceLocationType.LABORATORY))
     items = dcc.itemListType()
     calibrationLaboratory = dcc.calibrationLaboratoryType()
     respPersons = dcc.respPersonListType()
@@ -93,7 +95,7 @@ def administrativeData(adm_df):
                     )
                 items.set_name(items_name)
             if not pd.isna(description):
-                items_description = dcc.textType()
+                items_description = dcc.richContentType()
                 items_description.add_content(
                     dcc.stringWithLangType(
                         valueOf_=description
@@ -154,7 +156,7 @@ def administrativeData(adm_df):
                             valueOf_=object
                             )
                         )
-                    item_description = dcc.textType()
+                    item_description = dcc.richContentType()
                     item_description.add_content(
                         dcc.stringWithLangType(
                             lang="es",
@@ -174,20 +176,20 @@ def administrativeData(adm_df):
                     identification = dcc.identificationType(
                         issuer="manufacturer",
                         value=serialNumber)
-                    identification_description = dcc.textType()
-                    identification_description.add_content(
+                    identification_name = dcc.textType()
+                    identification_name.add_content(
                         dcc.stringWithLangType(
                             lang="es",
                             valueOf_="Numero de serie"
                         )
                     )
-                    identification.set_description(identification_description)
+                    identification.set_name(identification_name)
                     identifications.add_identification(identification)
 
                     item = dcc.itemType(name=item_name,manufacturer=manufacturer,
                                         model=model,
                                         identifications=identifications)
-                    item.add_description(item_description)
+                    item.set_description(item_description)
                     items.add_item(item)
         elif name == '0K':
             # Usar para generar el pdf
@@ -244,7 +246,7 @@ def administrativeData(adm_df):
                                       name=contact_name,
                                       eMail=email,phone=phone1,
                                       location=location)
-            calibrationLaboratory.add_contact(contact)
+            calibrationLaboratory.set_contact(contact)
         elif name == '0P':
             responsible,responsibleEmail,technician,\
             technicianEmail,signer,signerEmail = \
@@ -397,6 +399,8 @@ def measurementResults(res_df, administrativeData_):
     #creo un dcc:measurementResults
 
     measurementResult = dcc.measurementResultType(
+        name=dcc.textType(content=[
+            dcc.stringWithLangType(valueOf_="Resultados pt-100")]),
         usedSoftware=administrativeData_.get_dccSoftware())
     #creo un dcc:measurementResult
 
@@ -445,7 +449,7 @@ def measurementResults(res_df, administrativeData_):
                 )
             )
 
-            usedMethod_description = dcc.textType()
+            usedMethod_description = dcc.richContentType()
             #agrego dcc:description al method a usedMethod
 
             usedMethod_description.add_content(
@@ -457,7 +461,7 @@ def measurementResults(res_df, administrativeData_):
 
             usedMethod = dcc.usedMethodType(
                 name=usedMethod_name,
-                description=[usedMethod_description]
+                description=usedMethod_description
                 )
             usedMethods.add_usedMethod(usedMethod)
         elif name == '0B':
@@ -489,10 +493,10 @@ def measurementResults(res_df, administrativeData_):
                         valueOf_=name
                     )
                 )
-                expandedUnc = SI_Format.expandedUnc(uncertainty=uncertainty,
+                expandedUnc = SI_Format.expandedUncType(uncertainty=uncertainty,
                                                     coverageFactor=2,
                                                     coverageProbability=0.95)
-                real = SI_Format.real(value=float(value),
+                real = SI_Format.realQuantityType(value=float(value),
                                       unit=unit,
                                       expandedUnc=expandedUnc)
                 quantity = dcc.quantityType(name=quantity_name,real=real)
@@ -546,15 +550,15 @@ def measurementResults(res_df, administrativeData_):
                 quantity_nominal = dcc.quantityType(name=quantity_nominal_name,
                                                     noQuantity=noQuantity)
 
-                expandedUnc = SI_Format.expandedUnc(uncertainty=uncertainty,
+                expandedUnc = SI_Format.expandedUncType(uncertainty=uncertainty,
                                                     coverageFactor=k,
                                                     coverageProbability=prob)
-                real = SI_Format.real(value=resistance,
+                real = SI_Format.realQuantityType(value=resistance,
                                       unit=OHM,
                                       expandedUnc=expandedUnc)
                 quantity = dcc.quantityType(real=real)
 
-                list_ = dcc.listType()
+                list_ = dcc.listType1()
                 list_.add_quantity(quantity_nominal)
                 list_.add_quantity(quantity)
                 data.add_list(list_)
@@ -612,7 +616,7 @@ def main():
     # Integra toda la informacion del administrativeData y measurementResults
     # para generar el digitalCalibrationCertificate
     digitalCalibrationCertificate = dcc.digitalCalibrationCertificateType(
-        schemaVersion="2.4.0",
+        schemaVersion="3.0.0-rc.4",
         administrativeData=administrativeData_,
         measurementResults=measurementResults_
     )

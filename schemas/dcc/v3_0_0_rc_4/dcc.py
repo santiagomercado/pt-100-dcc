@@ -2,23 +2,22 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Thu Jun 24 21:47:28 2021 by generateDS.py version 2.38.6.
+# Generated Sat Jul  3 13:53:26 2021 by generateDS.py version 2.38.6.
 # Python 3.9.4 (default, Apr  9 2021, 16:34:09)  [GCC 7.3.0]
 #
 # Command line options:
-#   ('-o', 'dcc1.py')
-#   ('-s', 'dcc1_sub.py')
+#   ('-o', 'dcc.py')
 #   ('--external-encoding', 'utf-8')
 #   ('--export', 'write etree')
 #
 # Command line arguments:
-#   ../xsd-dcc-master/dcc.xsd
+#   dcc.xsd
 #
 # Command line:
-#   generateds/generateDS.py -o "dcc1.py" -s "dcc1_sub.py" --external-encoding="utf-8" --export="write etree" ../xsd-dcc-master/dcc.xsd
+#   /home/santiago/Beca/genxsd/generateds/generateDS.py -o "dcc.py" --external-encoding="utf-8" --export="write etree" dcc.xsd
 #
 # Current working directory (os.getcwd()):
-#   genxsd
+#   v3_0_0_rc_4
 #
 
 import sys
@@ -978,14 +977,32 @@ class issuerType(str, Enum):
     OTHER='other'
 
 
-class stateType(str, Enum):
+class statusType(str, Enum):
     BEFORE_ADJUSTMENT='beforeAdjustment'
     AFTER_ADJUSTMENT='afterAdjustment'
     BEFORE_REPAIR='beforeRepair'
     AFTER_REPAIR='afterRepair'
 
 
+class stringConformityStatementStatusType(str, Enum):
+    PASS='pass'
+    FAIL='fail'
+    CONDITIONAL_PASS='conditionalPass'
+    CONDITIONAL_FAIL='conditionalFail'
+    NO_PASS='noPass'
+    NO_FAIL='noFail'
+
+
+class stringPerformanceLocationType(str, Enum):
+    LABORATORY='laboratory'
+    CUSTOMER='customer'
+    LABORATORY_BRANCH='laboratoryBranch'
+    CUSTOMER_BRANCH='customerBranch'
+    OTHER='other'
+
+
 class digitalCalibrationCertificateType(GeneratedsSuper):
+    """The root element that contains the four rings of the DCC."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -1050,7 +1067,7 @@ class digitalCalibrationCertificateType(GeneratedsSuper):
             if not self.gds_validate_simple_patterns(
                     self.validate_schemaVersionType_patterns_, value):
                 self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_schemaVersionType_patterns_, ))
-    validate_schemaVersionType_patterns_ = [['^(2.4.0)$']]
+    validate_schemaVersionType_patterns_ = [['^(3\\.0\\.0-rc\\.4)$']]
     def hasContent_(self):
         if (
             self.administrativeData is not None or
@@ -1169,6 +1186,10 @@ class digitalCalibrationCertificateType(GeneratedsSuper):
 
 
 class administrativeDataType(GeneratedsSuper):
+    """The element administrativeData contains all essential administrative
+    information about the calibration.
+    The entries in this area are basically the same and regulated in all
+    DCCs."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -1381,9 +1402,7 @@ class administrativeDataType(GeneratedsSuper):
 
 
 class softwareListType(GeneratedsSuper):
-    """Clear description of the software-version and the creator of the
-    software used to create and process the
-    DCC"""
+    """A list of software elements."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -1496,10 +1515,12 @@ class softwareListType(GeneratedsSuper):
 
 
 class softwareType(GeneratedsSuper):
+    """Information about a software including its name, version and a
+    description."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, name=None, release=None, description=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refType=None, name=None, release=None, description=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -1507,14 +1528,13 @@ class softwareType(GeneratedsSuper):
         self.ns_prefix_ = "dcc"
         self.id = _cast(None, id)
         self.id_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
         self.name = name
         self.name_nsprefix_ = "dcc"
         self.release = release
         self.release_nsprefix_ = "dcc"
-        if description is None:
-            self.description = []
-        else:
-            self.description = description
+        self.description = description
         self.description_nsprefix_ = "dcc"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
@@ -1543,21 +1563,19 @@ class softwareType(GeneratedsSuper):
         return self.description
     def set_description(self, description):
         self.description = description
-    def add_description(self, value):
-        self.description.append(value)
-    def insert_description_at(self, index, value):
-        self.description.insert(index, value)
-    def replace_description_at(self, index, value):
-        self.description[index] = value
     def get_id(self):
         return self.id
     def set_id(self, id):
         self.id = id
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
     def hasContent_(self):
         if (
             self.name is not None or
             self.release is not None or
-            self.description
+            self.description is not None
         ):
             return True
         else:
@@ -1589,6 +1607,9 @@ class softwareType(GeneratedsSuper):
         if self.id is not None and 'id' not in already_processed:
             already_processed.add('id')
             outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
     def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='softwareType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
@@ -1601,9 +1622,9 @@ class softwareType(GeneratedsSuper):
             namespaceprefix_ = self.release_nsprefix_ + ':' if (UseCapturedNS_ and self.release_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%srelease>%s</%srelease>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.release), input_name='release')), namespaceprefix_ , eol_))
-        for description_ in self.description:
+        if self.description is not None:
             namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
-            description_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
+            self.description.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
     def to_etree(self, parent_element=None, name_='softwareType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
@@ -1611,13 +1632,16 @@ class softwareType(GeneratedsSuper):
             element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
         if self.id is not None:
             element.set('id', self.gds_format_string(self.id))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
         if self.name is not None:
             name_ = self.name
             name_.to_etree(element, name_='name', mapping_=mapping_, nsmap_=nsmap_)
         if self.release is not None:
             release_ = self.release
             etree_.SubElement(element, '{https://ptb.de/dcc}release').text = self.gds_format_string(release_)
-        for description_ in self.description:
+        if self.description is not None:
+            description_ = self.description
             description_.to_etree(element, name_='description', mapping_=mapping_, nsmap_=nsmap_)
         if mapping_ is not None:
             mapping_[id(self)] = element
@@ -1638,6 +1662,10 @@ class softwareType(GeneratedsSuper):
         if value is not None and 'id' not in already_processed:
             already_processed.add('id')
             self.id = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'name':
             obj_ = textType.factory(parent_object_=self)
@@ -1651,15 +1679,15 @@ class softwareType(GeneratedsSuper):
             self.release = value_
             self.release_nsprefix_ = child_.prefix
         elif nodeName_ == 'description':
-            obj_ = textType.factory(parent_object_=self)
+            obj_ = richContentType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
-            self.description.append(obj_)
+            self.description = obj_
             obj_.original_tagname_ = 'description'
 # end class softwareType
 
 
 class measuringEquipmentListType(GeneratedsSuper):
-    """Information about the instruments used"""
+    """List of measuring equipment and instruments"""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -1772,10 +1800,12 @@ class measuringEquipmentListType(GeneratedsSuper):
 
 
 class measuringEquipmentType(GeneratedsSuper):
+    """Information about a measuring equipment or instrument used in the
+    calibration"""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, name=None, equipmentClass=None, description=None, descriptionData=None, certificate=None, manufacturer=None, model=None, identifications=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refType=None, name=None, equipmentClass=None, description=None, certificate=None, manufacturer=None, model=None, identifications=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -1783,20 +1813,14 @@ class measuringEquipmentType(GeneratedsSuper):
         self.ns_prefix_ = "dcc"
         self.id = _cast(None, id)
         self.id_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
         self.name = name
         self.name_nsprefix_ = "dcc"
         self.equipmentClass = equipmentClass
         self.equipmentClass_nsprefix_ = "dcc"
-        if description is None:
-            self.description = []
-        else:
-            self.description = description
+        self.description = description
         self.description_nsprefix_ = "dcc"
-        if descriptionData is None:
-            self.descriptionData = []
-        else:
-            self.descriptionData = descriptionData
-        self.descriptionData_nsprefix_ = "dcc"
         self.certificate = certificate
         self.certificate_nsprefix_ = "dcc"
         self.manufacturer = manufacturer
@@ -1832,22 +1856,6 @@ class measuringEquipmentType(GeneratedsSuper):
         return self.description
     def set_description(self, description):
         self.description = description
-    def add_description(self, value):
-        self.description.append(value)
-    def insert_description_at(self, index, value):
-        self.description.insert(index, value)
-    def replace_description_at(self, index, value):
-        self.description[index] = value
-    def get_descriptionData(self):
-        return self.descriptionData
-    def set_descriptionData(self, descriptionData):
-        self.descriptionData = descriptionData
-    def add_descriptionData(self, value):
-        self.descriptionData.append(value)
-    def insert_descriptionData_at(self, index, value):
-        self.descriptionData.insert(index, value)
-    def replace_descriptionData_at(self, index, value):
-        self.descriptionData[index] = value
     def get_certificate(self):
         return self.certificate
     def set_certificate(self, certificate):
@@ -1868,12 +1876,15 @@ class measuringEquipmentType(GeneratedsSuper):
         return self.id
     def set_id(self, id):
         self.id = id
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
     def hasContent_(self):
         if (
             self.name is not None or
             self.equipmentClass is not None or
-            self.description or
-            self.descriptionData or
+            self.description is not None or
             self.certificate is not None or
             self.manufacturer is not None or
             self.model is not None or
@@ -1909,6 +1920,9 @@ class measuringEquipmentType(GeneratedsSuper):
         if self.id is not None and 'id' not in already_processed:
             already_processed.add('id')
             outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
     def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='measuringEquipmentType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
@@ -1920,12 +1934,9 @@ class measuringEquipmentType(GeneratedsSuper):
         if self.equipmentClass is not None:
             namespaceprefix_ = self.equipmentClass_nsprefix_ + ':' if (UseCapturedNS_ and self.equipmentClass_nsprefix_) else ''
             self.equipmentClass.export(outfile, level, namespaceprefix_, namespacedef_='', name_='equipmentClass', pretty_print=pretty_print)
-        for description_ in self.description:
+        if self.description is not None:
             namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
-            description_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
-        for descriptionData_ in self.descriptionData:
-            namespaceprefix_ = self.descriptionData_nsprefix_ + ':' if (UseCapturedNS_ and self.descriptionData_nsprefix_) else ''
-            descriptionData_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='descriptionData', pretty_print=pretty_print)
+            self.description.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
         if self.certificate is not None:
             namespaceprefix_ = self.certificate_nsprefix_ + ':' if (UseCapturedNS_ and self.certificate_nsprefix_) else ''
             self.certificate.export(outfile, level, namespaceprefix_, namespacedef_='', name_='certificate', pretty_print=pretty_print)
@@ -1946,16 +1957,17 @@ class measuringEquipmentType(GeneratedsSuper):
             element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
         if self.id is not None:
             element.set('id', self.gds_format_string(self.id))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
         if self.name is not None:
             name_ = self.name
             name_.to_etree(element, name_='name', mapping_=mapping_, nsmap_=nsmap_)
         if self.equipmentClass is not None:
             equipmentClass_ = self.equipmentClass
             equipmentClass_.to_etree(element, name_='equipmentClass', mapping_=mapping_, nsmap_=nsmap_)
-        for description_ in self.description:
+        if self.description is not None:
+            description_ = self.description
             description_.to_etree(element, name_='description', mapping_=mapping_, nsmap_=nsmap_)
-        for descriptionData_ in self.descriptionData:
-            descriptionData_.to_etree(element, name_='descriptionData', mapping_=mapping_, nsmap_=nsmap_)
         if self.certificate is not None:
             certificate_ = self.certificate
             certificate_.to_etree(element, name_='certificate', mapping_=mapping_, nsmap_=nsmap_)
@@ -1987,6 +1999,10 @@ class measuringEquipmentType(GeneratedsSuper):
         if value is not None and 'id' not in already_processed:
             already_processed.add('id')
             self.id = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'name':
             obj_ = textType.factory(parent_object_=self)
@@ -1999,15 +2015,10 @@ class measuringEquipmentType(GeneratedsSuper):
             self.equipmentClass = obj_
             obj_.original_tagname_ = 'equipmentClass'
         elif nodeName_ == 'description':
-            obj_ = textType.factory(parent_object_=self)
+            obj_ = richContentType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
-            self.description.append(obj_)
+            self.description = obj_
             obj_.original_tagname_ = 'description'
-        elif nodeName_ == 'descriptionData':
-            obj_ = byteDataType.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.descriptionData.append(obj_)
-            obj_.original_tagname_ = 'descriptionData'
         elif nodeName_ == 'certificate':
             obj_ = hashType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -2033,11 +2044,12 @@ class measuringEquipmentType(GeneratedsSuper):
 
 
 class coreDataType(GeneratedsSuper):
-    """Basic parameters of the Digital Calibration Certificate (DCC)"""
+    """Important metadata for the DCC containing the global unique identifier
+    and other identifications."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, countryCodeISO3166_1=None, usedLangCodeISO639_1=None, mandatoryLangCodeISO639_1=None, uniqueIdentifier=None, identifications=None, receiptDate=None, beginPerformanceDate=None, endPerformanceDate=None, previousReport=None, gds_collector_=None, **kwargs_):
+    def __init__(self, countryCodeISO3166_1=None, usedLangCodeISO639_1=None, mandatoryLangCodeISO639_1=None, uniqueIdentifier=None, identifications=None, receiptDate=None, beginPerformanceDate=None, endPerformanceDate=None, performanceLocation=None, previousReport=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -2078,6 +2090,8 @@ class coreDataType(GeneratedsSuper):
             initvalue_ = endPerformanceDate
         self.endPerformanceDate = initvalue_
         self.endPerformanceDate_nsprefix_ = "dcc"
+        self.performanceLocation = performanceLocation
+        self.performanceLocation_nsprefix_ = "dcc"
         self.previousReport = previousReport
         self.previousReport_nsprefix_ = "dcc"
     def factory(*args_, **kwargs_):
@@ -2139,6 +2153,10 @@ class coreDataType(GeneratedsSuper):
         return self.endPerformanceDate
     def set_endPerformanceDate(self, endPerformanceDate):
         self.endPerformanceDate = endPerformanceDate
+    def get_performanceLocation(self):
+        return self.performanceLocation
+    def set_performanceLocation(self, performanceLocation):
+        self.performanceLocation = performanceLocation
     def get_previousReport(self):
         return self.previousReport
     def set_previousReport(self, previousReport):
@@ -2181,6 +2199,7 @@ class coreDataType(GeneratedsSuper):
             self.receiptDate is not None or
             self.beginPerformanceDate is not None or
             self.endPerformanceDate is not None or
+            self.performanceLocation is not None or
             self.previousReport is not None
         ):
             return True
@@ -2247,6 +2266,9 @@ class coreDataType(GeneratedsSuper):
             namespaceprefix_ = self.endPerformanceDate_nsprefix_ + ':' if (UseCapturedNS_ and self.endPerformanceDate_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sendPerformanceDate>%s</%sendPerformanceDate>%s' % (namespaceprefix_ , self.gds_format_date(self.endPerformanceDate, input_name='endPerformanceDate'), namespaceprefix_ , eol_))
+        if self.performanceLocation is not None:
+            namespaceprefix_ = self.performanceLocation_nsprefix_ + ':' if (UseCapturedNS_ and self.performanceLocation_nsprefix_) else ''
+            self.performanceLocation.export(outfile, level, namespaceprefix_, namespacedef_='', name_='performanceLocation', pretty_print=pretty_print)
         if self.previousReport is not None:
             namespaceprefix_ = self.previousReport_nsprefix_ + ':' if (UseCapturedNS_ and self.previousReport_nsprefix_) else ''
             self.previousReport.export(outfile, level, namespaceprefix_, namespacedef_='', name_='previousReport', pretty_print=pretty_print)
@@ -2277,6 +2299,9 @@ class coreDataType(GeneratedsSuper):
         if self.endPerformanceDate is not None:
             endPerformanceDate_ = self.endPerformanceDate
             etree_.SubElement(element, '{https://ptb.de/dcc}endPerformanceDate').text = self.gds_format_date(endPerformanceDate_)
+        if self.performanceLocation is not None:
+            performanceLocation_ = self.performanceLocation
+            performanceLocation_.to_etree(element, name_='performanceLocation', mapping_=mapping_, nsmap_=nsmap_)
         if self.previousReport is not None:
             previousReport_ = self.previousReport
             previousReport_.to_etree(element, name_='previousReport', mapping_=mapping_, nsmap_=nsmap_)
@@ -2347,6 +2372,11 @@ class coreDataType(GeneratedsSuper):
             dval_ = self.gds_parse_date(sval_)
             self.endPerformanceDate = dval_
             self.endPerformanceDate_nsprefix_ = child_.prefix
+        elif nodeName_ == 'performanceLocation':
+            obj_ = performanceLocationType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.performanceLocation = obj_
+            obj_.original_tagname_ = 'performanceLocation'
         elif nodeName_ == 'previousReport':
             obj_ = hashType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -2356,7 +2386,7 @@ class coreDataType(GeneratedsSuper):
 
 
 class equipmentClassType(GeneratedsSuper):
-    """Clear name(s) of the item(s) and identifier(s)"""
+    """Clear name(s) of the item(s) and identifier(s)."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -2496,7 +2526,8 @@ class equipmentClassType(GeneratedsSuper):
 
 
 class itemListType(GeneratedsSuper):
-    """Clear description of the calibration items"""
+    """This element is a set of calibrated items.
+    Contains one or more item elements."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -2676,7 +2707,7 @@ class itemListType(GeneratedsSuper):
             self.equipmentClass = obj_
             obj_.original_tagname_ = 'equipmentClass'
         elif nodeName_ == 'description':
-            obj_ = textType.factory(parent_object_=self)
+            obj_ = richContentType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.description = obj_
             obj_.original_tagname_ = 'description'
@@ -2699,10 +2730,11 @@ class itemListType(GeneratedsSuper):
 
 
 class itemType(GeneratedsSuper):
+    """A item that is calibrated in this DCC."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, name=None, equipmentClass=None, description=None, descriptionData=None, manufacturer=None, model=None, identifications=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, name=None, equipmentClass=None, description=None, manufacturer=None, model=None, identifications=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -2714,16 +2746,8 @@ class itemType(GeneratedsSuper):
         self.name_nsprefix_ = "dcc"
         self.equipmentClass = equipmentClass
         self.equipmentClass_nsprefix_ = "dcc"
-        if description is None:
-            self.description = []
-        else:
-            self.description = description
+        self.description = description
         self.description_nsprefix_ = "dcc"
-        if descriptionData is None:
-            self.descriptionData = []
-        else:
-            self.descriptionData = descriptionData
-        self.descriptionData_nsprefix_ = "dcc"
         self.manufacturer = manufacturer
         self.manufacturer_nsprefix_ = "dcc"
         self.model = model
@@ -2757,22 +2781,6 @@ class itemType(GeneratedsSuper):
         return self.description
     def set_description(self, description):
         self.description = description
-    def add_description(self, value):
-        self.description.append(value)
-    def insert_description_at(self, index, value):
-        self.description.insert(index, value)
-    def replace_description_at(self, index, value):
-        self.description[index] = value
-    def get_descriptionData(self):
-        return self.descriptionData
-    def set_descriptionData(self, descriptionData):
-        self.descriptionData = descriptionData
-    def add_descriptionData(self, value):
-        self.descriptionData.append(value)
-    def insert_descriptionData_at(self, index, value):
-        self.descriptionData.insert(index, value)
-    def replace_descriptionData_at(self, index, value):
-        self.descriptionData[index] = value
     def get_manufacturer(self):
         return self.manufacturer
     def set_manufacturer(self, manufacturer):
@@ -2793,8 +2801,7 @@ class itemType(GeneratedsSuper):
         if (
             self.name is not None or
             self.equipmentClass is not None or
-            self.description or
-            self.descriptionData or
+            self.description is not None or
             self.manufacturer is not None or
             self.model is not None or
             self.identifications is not None
@@ -2840,12 +2847,9 @@ class itemType(GeneratedsSuper):
         if self.equipmentClass is not None:
             namespaceprefix_ = self.equipmentClass_nsprefix_ + ':' if (UseCapturedNS_ and self.equipmentClass_nsprefix_) else ''
             self.equipmentClass.export(outfile, level, namespaceprefix_, namespacedef_='', name_='equipmentClass', pretty_print=pretty_print)
-        for description_ in self.description:
+        if self.description is not None:
             namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
-            description_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
-        for descriptionData_ in self.descriptionData:
-            namespaceprefix_ = self.descriptionData_nsprefix_ + ':' if (UseCapturedNS_ and self.descriptionData_nsprefix_) else ''
-            descriptionData_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='descriptionData', pretty_print=pretty_print)
+            self.description.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
         if self.manufacturer is not None:
             namespaceprefix_ = self.manufacturer_nsprefix_ + ':' if (UseCapturedNS_ and self.manufacturer_nsprefix_) else ''
             self.manufacturer.export(outfile, level, namespaceprefix_, namespacedef_='', name_='manufacturer', pretty_print=pretty_print)
@@ -2869,10 +2873,9 @@ class itemType(GeneratedsSuper):
         if self.equipmentClass is not None:
             equipmentClass_ = self.equipmentClass
             equipmentClass_.to_etree(element, name_='equipmentClass', mapping_=mapping_, nsmap_=nsmap_)
-        for description_ in self.description:
+        if self.description is not None:
+            description_ = self.description
             description_.to_etree(element, name_='description', mapping_=mapping_, nsmap_=nsmap_)
-        for descriptionData_ in self.descriptionData:
-            descriptionData_.to_etree(element, name_='descriptionData', mapping_=mapping_, nsmap_=nsmap_)
         if self.manufacturer is not None:
             manufacturer_ = self.manufacturer
             manufacturer_.to_etree(element, name_='manufacturer', mapping_=mapping_, nsmap_=nsmap_)
@@ -2913,15 +2916,10 @@ class itemType(GeneratedsSuper):
             self.equipmentClass = obj_
             obj_.original_tagname_ = 'equipmentClass'
         elif nodeName_ == 'description':
-            obj_ = textType.factory(parent_object_=self)
+            obj_ = richContentType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
-            self.description.append(obj_)
+            self.description = obj_
             obj_.original_tagname_ = 'description'
-        elif nodeName_ == 'descriptionData':
-            obj_ = byteDataType.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.descriptionData.append(obj_)
-            obj_.original_tagname_ = 'descriptionData'
         elif nodeName_ == 'manufacturer':
             obj_ = contactNotStrictType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -2942,6 +2940,7 @@ class itemType(GeneratedsSuper):
 
 
 class identificationListType(GeneratedsSuper):
+    """List of additional identifications."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -3054,10 +3053,12 @@ class identificationListType(GeneratedsSuper):
 
 
 class identificationType(GeneratedsSuper):
+    """An additional identification (eg. reference no., serial number,
+    etc.)."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, refType=None, issuer=None, value=None, description=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refType=None, issuer=None, value=None, name=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -3072,8 +3073,8 @@ class identificationType(GeneratedsSuper):
         self.issuer_nsprefix_ = "dcc"
         self.value = value
         self.value_nsprefix_ = "dcc"
-        self.description = description
-        self.description_nsprefix_ = "dcc"
+        self.name = name
+        self.name_nsprefix_ = "dcc"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3097,10 +3098,10 @@ class identificationType(GeneratedsSuper):
         return self.value
     def set_value(self, value):
         self.value = value
-    def get_description(self):
-        return self.description
-    def set_description(self, description):
-        self.description = description
+    def get_name(self):
+        return self.name
+    def set_name(self, name):
+        self.name = name
     def get_id(self):
         return self.id
     def set_id(self, id):
@@ -3124,22 +3125,11 @@ class identificationType(GeneratedsSuper):
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on issuerType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
                 result = False
         return result
-    def validate_stringRefType(self, value):
-        # Validate type dcc:stringRefType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_stringRefType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_stringRefType_patterns_, ))
-    validate_stringRefType_patterns_ = [['^((/[A-Za-z][A-Za-z0-9]+)*)$']]
     def hasContent_(self):
         if (
             self.issuer is not None or
             self.value is not None or
-            self.description is not None
+            self.name is not None
         ):
             return True
         else:
@@ -3187,9 +3177,9 @@ class identificationType(GeneratedsSuper):
             namespaceprefix_ = self.value_nsprefix_ + ':' if (UseCapturedNS_ and self.value_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%svalue>%s</%svalue>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.value), input_name='value')), namespaceprefix_ , eol_))
-        if self.description is not None:
-            namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
-            self.description.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
+        if self.name is not None:
+            namespaceprefix_ = self.name_nsprefix_ + ':' if (UseCapturedNS_ and self.name_nsprefix_) else ''
+            self.name.export(outfile, level, namespaceprefix_, namespacedef_='', name_='name', pretty_print=pretty_print)
     def to_etree(self, parent_element=None, name_='identificationType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
@@ -3205,9 +3195,9 @@ class identificationType(GeneratedsSuper):
         if self.value is not None:
             value_ = self.value
             etree_.SubElement(element, '{https://ptb.de/dcc}value').text = self.gds_format_string(value_)
-        if self.description is not None:
-            description_ = self.description
-            description_.to_etree(element, name_='description', mapping_=mapping_, nsmap_=nsmap_)
+        if self.name is not None:
+            name_ = self.name
+            name_.to_etree(element, name_='name', mapping_=mapping_, nsmap_=nsmap_)
         if mapping_ is not None:
             mapping_[id(self)] = element
         return element
@@ -3231,7 +3221,6 @@ class identificationType(GeneratedsSuper):
         if value is not None and 'refType' not in already_processed:
             already_processed.add('refType')
             self.refType = value
-            self.validate_stringRefType(self.refType)    # validate type stringRefType
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'issuer':
             value_ = child_.text
@@ -3247,16 +3236,165 @@ class identificationType(GeneratedsSuper):
             value_ = self.gds_validate_string(value_, node, 'value')
             self.value = value_
             self.value_nsprefix_ = child_.prefix
-        elif nodeName_ == 'description':
+        elif nodeName_ == 'name':
             obj_ = textType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
-            self.description = obj_
-            obj_.original_tagname_ = 'description'
+            self.name = obj_
+            obj_.original_tagname_ = 'name'
 # end class identificationType
 
 
+class performanceLocationType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, id=None, refId=None, refType=None, valueOf_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "dcc"
+        self.id = _cast(None, id)
+        self.id_nsprefix_ = None
+        self.refId = _cast(None, refId)
+        self.refId_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
+        self.valueOf_ = valueOf_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, performanceLocationType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if performanceLocationType.subclass:
+            return performanceLocationType.subclass(*args_, **kwargs_)
+        else:
+            return performanceLocationType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_id(self):
+        return self.id
+    def set_id(self, id):
+        self.id = id
+    def get_refId(self):
+        return self.refId
+    def set_refId(self, refId):
+        self.refId = refId
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
+    def get_valueOf_(self): return self.valueOf_
+    def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
+    def validate_stringPerformanceLocationType(self, value):
+        result = True
+        # Validate type stringPerformanceLocationType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['laboratory', 'customer', 'laboratoryBranch', 'customerBranch', 'other']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on stringPerformanceLocationType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            (1 if type(self.valueOf_) in [int,float] else self.valueOf_)
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='performanceLocationType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('performanceLocationType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'performanceLocationType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='performanceLocationType')
+        if self.hasContent_():
+            outfile.write('>')
+            outfile.write(self.convert_unicode(self.valueOf_))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='performanceLocationType', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='performanceLocationType'):
+        if self.id is not None and 'id' not in already_processed:
+            already_processed.add('id')
+            outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refId is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            outfile.write(' refId=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refId), input_name='refId')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='performanceLocationType', fromsubclass_=False, pretty_print=True):
+        pass
+    def to_etree(self, parent_element=None, name_='performanceLocationType', mapping_=None, nsmap_=None):
+        if parent_element is None:
+            element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
+        else:
+            element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
+        if self.id is not None:
+            element.set('id', self.gds_format_string(self.id))
+        if self.refId is not None:
+            element.set('refId', self.gds_format_string(self.refId))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
+        if self.hasContent_():
+            element.text = self.gds_format_string(self.get_valueOf_())
+        if mapping_ is not None:
+            mapping_[id(self)] = element
+        return element
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        self.valueOf_ = get_all_text_(node)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('id', node)
+        if value is not None and 'id' not in already_processed:
+            already_processed.add('id')
+            self.id = value
+        value = find_attr_value_('refId', node)
+        if value is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            self.refId = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class performanceLocationType
+
+
 class calibrationLaboratoryType(GeneratedsSuper):
-    """Information about the calibration laboratory"""
+    """Information about the calibration laboratory."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -3268,10 +3406,7 @@ class calibrationLaboratoryType(GeneratedsSuper):
         self.ns_prefix_ = "dcc"
         self.calibrationLaboratoryCode = calibrationLaboratoryCode
         self.calibrationLaboratoryCode_nsprefix_ = "dcc"
-        if contact is None:
-            self.contact = []
-        else:
-            self.contact = contact
+        self.contact = contact
         self.contact_nsprefix_ = "dcc"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
@@ -3296,16 +3431,10 @@ class calibrationLaboratoryType(GeneratedsSuper):
         return self.contact
     def set_contact(self, contact):
         self.contact = contact
-    def add_contact(self, value):
-        self.contact.append(value)
-    def insert_contact_at(self, index, value):
-        self.contact.insert(index, value)
-    def replace_contact_at(self, index, value):
-        self.contact[index] = value
     def hasContent_(self):
         if (
             self.calibrationLaboratoryCode is not None or
-            self.contact
+            self.contact is not None
         ):
             return True
         else:
@@ -3344,9 +3473,9 @@ class calibrationLaboratoryType(GeneratedsSuper):
             namespaceprefix_ = self.calibrationLaboratoryCode_nsprefix_ + ':' if (UseCapturedNS_ and self.calibrationLaboratoryCode_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%scalibrationLaboratoryCode>%s</%scalibrationLaboratoryCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.calibrationLaboratoryCode), input_name='calibrationLaboratoryCode')), namespaceprefix_ , eol_))
-        for contact_ in self.contact:
+        if self.contact is not None:
             namespaceprefix_ = self.contact_nsprefix_ + ':' if (UseCapturedNS_ and self.contact_nsprefix_) else ''
-            contact_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='contact', pretty_print=pretty_print)
+            self.contact.export(outfile, level, namespaceprefix_, namespacedef_='', name_='contact', pretty_print=pretty_print)
     def to_etree(self, parent_element=None, name_='calibrationLaboratoryType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
@@ -3355,7 +3484,8 @@ class calibrationLaboratoryType(GeneratedsSuper):
         if self.calibrationLaboratoryCode is not None:
             calibrationLaboratoryCode_ = self.calibrationLaboratoryCode
             etree_.SubElement(element, '{https://ptb.de/dcc}calibrationLaboratoryCode').text = self.gds_format_string(calibrationLaboratoryCode_)
-        for contact_ in self.contact:
+        if self.contact is not None:
+            contact_ = self.contact
             contact_.to_etree(element, name_='contact', mapping_=mapping_, nsmap_=nsmap_)
         if mapping_ is not None:
             mapping_[id(self)] = element
@@ -3383,13 +3513,13 @@ class calibrationLaboratoryType(GeneratedsSuper):
         elif nodeName_ == 'contact':
             obj_ = contactType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
-            self.contact.append(obj_)
+            self.contact = obj_
             obj_.original_tagname_ = 'contact'
 # end class calibrationLaboratoryType
 
 
 class respPersonListType(GeneratedsSuper):
-    """List of responsible persons for the DCC"""
+    """List of responsible persons for a DCC."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -3502,10 +3632,11 @@ class respPersonListType(GeneratedsSuper):
 
 
 class respPersonType(GeneratedsSuper):
+    """A person responsible for a DCC."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, person=None, description=None, mainSigner=None, cryptElectronicSeal=None, cryptElectronicSignature=None, cryptElectronicTimeStamp=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, person=None, description=None, role=None, mainSigner=None, cryptElectronicSeal=None, cryptElectronicSignature=None, cryptElectronicTimeStamp=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -3517,6 +3648,8 @@ class respPersonType(GeneratedsSuper):
         self.person_nsprefix_ = "dcc"
         self.description = description
         self.description_nsprefix_ = "dcc"
+        self.role = role
+        self.role_nsprefix_ = "dcc"
         self.mainSigner = mainSigner
         self.mainSigner_nsprefix_ = "dcc"
         self.cryptElectronicSeal = cryptElectronicSeal
@@ -3548,6 +3681,10 @@ class respPersonType(GeneratedsSuper):
         return self.description
     def set_description(self, description):
         self.description = description
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
     def get_mainSigner(self):
         return self.mainSigner
     def set_mainSigner(self, mainSigner):
@@ -3572,6 +3709,7 @@ class respPersonType(GeneratedsSuper):
         if (
             self.person is not None or
             self.description is not None or
+            self.role is not None or
             self.mainSigner is not None or
             self.cryptElectronicSeal is not None or
             self.cryptElectronicSignature is not None or
@@ -3618,6 +3756,10 @@ class respPersonType(GeneratedsSuper):
         if self.description is not None:
             namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
             self.description.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
+        if self.role is not None:
+            namespaceprefix_ = self.role_nsprefix_ + ':' if (UseCapturedNS_ and self.role_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%srole>%s</%srole>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.role), input_name='role')), namespaceprefix_ , eol_))
         if self.mainSigner is not None:
             namespaceprefix_ = self.mainSigner_nsprefix_ + ':' if (UseCapturedNS_ and self.mainSigner_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
@@ -3647,6 +3789,9 @@ class respPersonType(GeneratedsSuper):
         if self.description is not None:
             description_ = self.description
             description_.to_etree(element, name_='description', mapping_=mapping_, nsmap_=nsmap_)
+        if self.role is not None:
+            role_ = self.role
+            etree_.SubElement(element, '{https://ptb.de/dcc}role').text = self.gds_format_string(role_)
         if self.mainSigner is not None:
             mainSigner_ = self.mainSigner
             etree_.SubElement(element, '{https://ptb.de/dcc}mainSigner').text = self.gds_format_boolean(mainSigner_)
@@ -3685,10 +3830,16 @@ class respPersonType(GeneratedsSuper):
             self.person = obj_
             obj_.original_tagname_ = 'person'
         elif nodeName_ == 'description':
-            obj_ = textType.factory(parent_object_=self)
+            obj_ = richContentType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.description = obj_
             obj_.original_tagname_ = 'description'
+        elif nodeName_ == 'role':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'role')
+            value_ = self.gds_validate_string(value_, node, 'role')
+            self.role = value_
+            self.role_nsprefix_ = child_.prefix
         elif nodeName_ == 'mainSigner':
             sval_ = child_.text
             ival_ = self.gds_parse_boolean(sval_, node, 'mainSigner')
@@ -3717,7 +3868,7 @@ class respPersonType(GeneratedsSuper):
 
 
 class statementListType(GeneratedsSuper):
-    """Elements for the statements"""
+    """List of statements attached to a DCC."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -3830,6 +3981,7 @@ class statementListType(GeneratedsSuper):
 
 
 class measurementResultListType(GeneratedsSuper):
+    """List of measurement results that are part of a DCC."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -3942,15 +4094,28 @@ class measurementResultListType(GeneratedsSuper):
 
 
 class measurementResultType(GeneratedsSuper):
+    """A measurement results with the methods, software and equipments used for
+    the calibration.
+    Also contains influence conditions and a list of the actual results."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, usedMethods=None, usedSoftware=None, measuringEquipments=None, influenceConditions=None, results=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refId=None, refType=None, name=None, description=None, usedMethods=None, usedSoftware=None, measuringEquipments=None, influenceConditions=None, results=None, measurementMetaData=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = "dcc"
+        self.id = _cast(None, id)
+        self.id_nsprefix_ = None
+        self.refId = _cast(None, refId)
+        self.refId_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
+        self.name = name
+        self.name_nsprefix_ = "dcc"
+        self.description = description
+        self.description_nsprefix_ = "dcc"
         self.usedMethods = usedMethods
         self.usedMethods_nsprefix_ = "dcc"
         self.usedSoftware = usedSoftware
@@ -3961,6 +4126,8 @@ class measurementResultType(GeneratedsSuper):
         self.influenceConditions_nsprefix_ = "dcc"
         self.results = results
         self.results_nsprefix_ = "dcc"
+        self.measurementMetaData = measurementMetaData
+        self.measurementMetaData_nsprefix_ = "dcc"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3976,6 +4143,14 @@ class measurementResultType(GeneratedsSuper):
         return self.ns_prefix_
     def set_ns_prefix_(self, ns_prefix):
         self.ns_prefix_ = ns_prefix
+    def get_name(self):
+        return self.name
+    def set_name(self, name):
+        self.name = name
+    def get_description(self):
+        return self.description
+    def set_description(self, description):
+        self.description = description
     def get_usedMethods(self):
         return self.usedMethods
     def set_usedMethods(self, usedMethods):
@@ -3996,13 +4171,32 @@ class measurementResultType(GeneratedsSuper):
         return self.results
     def set_results(self, results):
         self.results = results
+    def get_measurementMetaData(self):
+        return self.measurementMetaData
+    def set_measurementMetaData(self, measurementMetaData):
+        self.measurementMetaData = measurementMetaData
+    def get_id(self):
+        return self.id
+    def set_id(self, id):
+        self.id = id
+    def get_refId(self):
+        return self.refId
+    def set_refId(self, refId):
+        self.refId = refId
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
     def hasContent_(self):
         if (
+            self.name is not None or
+            self.description is not None or
             self.usedMethods is not None or
             self.usedSoftware is not None or
             self.measuringEquipments is not None or
             self.influenceConditions is not None or
-            self.results is not None
+            self.results is not None or
+            self.measurementMetaData is not None
         ):
             return True
         else:
@@ -4031,12 +4225,26 @@ class measurementResultType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='measurementResultType'):
-        pass
+        if self.id is not None and 'id' not in already_processed:
+            already_processed.add('id')
+            outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refId is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            outfile.write(' refId=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refId), input_name='refId')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
     def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='measurementResultType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.name is not None:
+            namespaceprefix_ = self.name_nsprefix_ + ':' if (UseCapturedNS_ and self.name_nsprefix_) else ''
+            self.name.export(outfile, level, namespaceprefix_, namespacedef_='', name_='name', pretty_print=pretty_print)
+        if self.description is not None:
+            namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
+            self.description.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
         if self.usedMethods is not None:
             namespaceprefix_ = self.usedMethods_nsprefix_ + ':' if (UseCapturedNS_ and self.usedMethods_nsprefix_) else ''
             self.usedMethods.export(outfile, level, namespaceprefix_, namespacedef_='', name_='usedMethods', pretty_print=pretty_print)
@@ -4052,11 +4260,26 @@ class measurementResultType(GeneratedsSuper):
         if self.results is not None:
             namespaceprefix_ = self.results_nsprefix_ + ':' if (UseCapturedNS_ and self.results_nsprefix_) else ''
             self.results.export(outfile, level, namespaceprefix_, namespacedef_='', name_='results', pretty_print=pretty_print)
+        if self.measurementMetaData is not None:
+            namespaceprefix_ = self.measurementMetaData_nsprefix_ + ':' if (UseCapturedNS_ and self.measurementMetaData_nsprefix_) else ''
+            self.measurementMetaData.export(outfile, level, namespaceprefix_, namespacedef_='', name_='measurementMetaData', pretty_print=pretty_print)
     def to_etree(self, parent_element=None, name_='measurementResultType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
         else:
             element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
+        if self.id is not None:
+            element.set('id', self.gds_format_string(self.id))
+        if self.refId is not None:
+            element.set('refId', self.gds_format_string(self.refId))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
+        if self.name is not None:
+            name_ = self.name
+            name_.to_etree(element, name_='name', mapping_=mapping_, nsmap_=nsmap_)
+        if self.description is not None:
+            description_ = self.description
+            description_.to_etree(element, name_='description', mapping_=mapping_, nsmap_=nsmap_)
         if self.usedMethods is not None:
             usedMethods_ = self.usedMethods
             usedMethods_.to_etree(element, name_='usedMethods', mapping_=mapping_, nsmap_=nsmap_)
@@ -4072,6 +4295,9 @@ class measurementResultType(GeneratedsSuper):
         if self.results is not None:
             results_ = self.results
             results_.to_etree(element, name_='results', mapping_=mapping_, nsmap_=nsmap_)
+        if self.measurementMetaData is not None:
+            measurementMetaData_ = self.measurementMetaData
+            measurementMetaData_.to_etree(element, name_='measurementMetaData', mapping_=mapping_, nsmap_=nsmap_)
         if mapping_ is not None:
             mapping_[id(self)] = element
         return element
@@ -4087,9 +4313,30 @@ class measurementResultType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
-        pass
+        value = find_attr_value_('id', node)
+        if value is not None and 'id' not in already_processed:
+            already_processed.add('id')
+            self.id = value
+        value = find_attr_value_('refId', node)
+        if value is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            self.refId = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'usedMethods':
+        if nodeName_ == 'name':
+            obj_ = textType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.name = obj_
+            obj_.original_tagname_ = 'name'
+        elif nodeName_ == 'description':
+            obj_ = richContentType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.description = obj_
+            obj_.original_tagname_ = 'description'
+        elif nodeName_ == 'usedMethods':
             obj_ = usedMethodListType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.usedMethods = obj_
@@ -4114,11 +4361,16 @@ class measurementResultType(GeneratedsSuper):
             obj_.build(child_, gds_collector_=gds_collector_)
             self.results = obj_
             obj_.original_tagname_ = 'results'
+        elif nodeName_ == 'measurementMetaData':
+            obj_ = measurementMetaDataListType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.measurementMetaData = obj_
+            obj_.original_tagname_ = 'measurementMetaData'
 # end class measurementResultType
 
 
 class usedMethodListType(GeneratedsSuper):
-    """Clear description of the used method"""
+    """List of the methods used in the calibration."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -4231,10 +4483,11 @@ class usedMethodListType(GeneratedsSuper):
 
 
 class usedMethodType(GeneratedsSuper):
+    """A method used in the calibration."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, name=None, description=None, norm=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refType=None, name=None, description=None, norm=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -4242,12 +4495,11 @@ class usedMethodType(GeneratedsSuper):
         self.ns_prefix_ = "dcc"
         self.id = _cast(None, id)
         self.id_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
         self.name = name
         self.name_nsprefix_ = "dcc"
-        if description is None:
-            self.description = []
-        else:
-            self.description = description
+        self.description = description
         self.description_nsprefix_ = "dcc"
         if norm is None:
             self.norm = []
@@ -4277,12 +4529,6 @@ class usedMethodType(GeneratedsSuper):
         return self.description
     def set_description(self, description):
         self.description = description
-    def add_description(self, value):
-        self.description.append(value)
-    def insert_description_at(self, index, value):
-        self.description.insert(index, value)
-    def replace_description_at(self, index, value):
-        self.description[index] = value
     def get_norm(self):
         return self.norm
     def set_norm(self, norm):
@@ -4297,10 +4543,14 @@ class usedMethodType(GeneratedsSuper):
         return self.id
     def set_id(self, id):
         self.id = id
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
     def hasContent_(self):
         if (
             self.name is not None or
-            self.description or
+            self.description is not None or
             self.norm
         ):
             return True
@@ -4333,6 +4583,9 @@ class usedMethodType(GeneratedsSuper):
         if self.id is not None and 'id' not in already_processed:
             already_processed.add('id')
             outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
     def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='usedMethodType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
@@ -4341,9 +4594,9 @@ class usedMethodType(GeneratedsSuper):
         if self.name is not None:
             namespaceprefix_ = self.name_nsprefix_ + ':' if (UseCapturedNS_ and self.name_nsprefix_) else ''
             self.name.export(outfile, level, namespaceprefix_, namespacedef_='', name_='name', pretty_print=pretty_print)
-        for description_ in self.description:
+        if self.description is not None:
             namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
-            description_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
+            self.description.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
         for norm_ in self.norm:
             namespaceprefix_ = self.norm_nsprefix_ + ':' if (UseCapturedNS_ and self.norm_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
@@ -4355,10 +4608,13 @@ class usedMethodType(GeneratedsSuper):
             element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
         if self.id is not None:
             element.set('id', self.gds_format_string(self.id))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
         if self.name is not None:
             name_ = self.name
             name_.to_etree(element, name_='name', mapping_=mapping_, nsmap_=nsmap_)
-        for description_ in self.description:
+        if self.description is not None:
+            description_ = self.description
             description_.to_etree(element, name_='description', mapping_=mapping_, nsmap_=nsmap_)
         for norm_ in self.norm:
             etree_.SubElement(element, '{https://ptb.de/dcc}norm').text = self.gds_format_string(norm_)
@@ -4381,6 +4637,10 @@ class usedMethodType(GeneratedsSuper):
         if value is not None and 'id' not in already_processed:
             already_processed.add('id')
             self.id = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'name':
             obj_ = textType.factory(parent_object_=self)
@@ -4388,9 +4648,9 @@ class usedMethodType(GeneratedsSuper):
             self.name = obj_
             obj_.original_tagname_ = 'name'
         elif nodeName_ == 'description':
-            obj_ = textType.factory(parent_object_=self)
+            obj_ = richContentType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
-            self.description.append(obj_)
+            self.description = obj_
             obj_.original_tagname_ = 'description'
         elif nodeName_ == 'norm':
             value_ = child_.text
@@ -4402,9 +4662,7 @@ class usedMethodType(GeneratedsSuper):
 
 
 class influenceConditionListType(GeneratedsSuper):
-    """Elements for the conditions (e.g. environmental) under which the
-    calibrations were
-    made that have an influence on the measurement results"""
+    """List of conditions that influence the measurements."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -4516,306 +4774,14 @@ class influenceConditionListType(GeneratedsSuper):
 # end class influenceConditionListType
 
 
-class calibrationLocationListType(GeneratedsSuper):
-    """Locations, where the calibration was done"""
-    __hash__ = GeneratedsSuper.__hash__
-    subclass = None
-    superclass = None
-    def __init__(self, calibrationLocation=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = "dcc"
-        if calibrationLocation is None:
-            self.calibrationLocation = []
-        else:
-            self.calibrationLocation = calibrationLocation
-        self.calibrationLocation_nsprefix_ = "dcc"
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, calibrationLocationListType)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if calibrationLocationListType.subclass:
-            return calibrationLocationListType.subclass(*args_, **kwargs_)
-        else:
-            return calibrationLocationListType(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def get_ns_prefix_(self):
-        return self.ns_prefix_
-    def set_ns_prefix_(self, ns_prefix):
-        self.ns_prefix_ = ns_prefix
-    def get_calibrationLocation(self):
-        return self.calibrationLocation
-    def set_calibrationLocation(self, calibrationLocation):
-        self.calibrationLocation = calibrationLocation
-    def add_calibrationLocation(self, value):
-        self.calibrationLocation.append(value)
-    def insert_calibrationLocation_at(self, index, value):
-        self.calibrationLocation.insert(index, value)
-    def replace_calibrationLocation_at(self, index, value):
-        self.calibrationLocation[index] = value
-    def hasContent_(self):
-        if (
-            self.calibrationLocation
-        ):
-            return True
-        else:
-            return False
-    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='calibrationLocationListType', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('calibrationLocationListType')
-        if imported_ns_def_ is not None:
-            namespacedef_ = imported_ns_def_
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'calibrationLocationListType':
-            name_ = self.original_tagname_
-        if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
-        showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='calibrationLocationListType')
-        if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='calibrationLocationListType', pretty_print=pretty_print)
-            showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
-        else:
-            outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='calibrationLocationListType'):
-        pass
-    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='calibrationLocationListType', fromsubclass_=False, pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        for calibrationLocation_ in self.calibrationLocation:
-            namespaceprefix_ = self.calibrationLocation_nsprefix_ + ':' if (UseCapturedNS_ and self.calibrationLocation_nsprefix_) else ''
-            calibrationLocation_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='calibrationLocation', pretty_print=pretty_print)
-    def to_etree(self, parent_element=None, name_='calibrationLocationListType', mapping_=None, nsmap_=None):
-        if parent_element is None:
-            element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
-        else:
-            element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
-        for calibrationLocation_ in self.calibrationLocation:
-            calibrationLocation_.to_etree(element, name_='calibrationLocation', mapping_=mapping_, nsmap_=nsmap_)
-        if mapping_ is not None:
-            mapping_[id(self)] = element
-        return element
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'calibrationLocation':
-            obj_ = calibrationLocationType.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.calibrationLocation.append(obj_)
-            obj_.original_tagname_ = 'calibrationLocation'
-# end class calibrationLocationListType
-
-
-class calibrationLocationType(GeneratedsSuper):
-    __hash__ = GeneratedsSuper.__hash__
-    subclass = None
-    superclass = None
-    def __init__(self, id=None, calibrationLocationSite=None, beginLocationCalDateTime=None, endLocationCalDateTime=None, location=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = "dcc"
-        self.id = _cast(None, id)
-        self.id_nsprefix_ = None
-        self.calibrationLocationSite = calibrationLocationSite
-        self.calibrationLocationSite_nsprefix_ = "dcc"
-        if isinstance(beginLocationCalDateTime, BaseStrType_):
-            initvalue_ = datetime_.datetime.strptime(beginLocationCalDateTime, '%Y-%m-%dT%H:%M:%S')
-        else:
-            initvalue_ = beginLocationCalDateTime
-        self.beginLocationCalDateTime = initvalue_
-        self.beginLocationCalDateTime_nsprefix_ = "dcc"
-        if isinstance(endLocationCalDateTime, BaseStrType_):
-            initvalue_ = datetime_.datetime.strptime(endLocationCalDateTime, '%Y-%m-%dT%H:%M:%S')
-        else:
-            initvalue_ = endLocationCalDateTime
-        self.endLocationCalDateTime = initvalue_
-        self.endLocationCalDateTime_nsprefix_ = "dcc"
-        self.location = location
-        self.location_nsprefix_ = "dcc"
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, calibrationLocationType)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if calibrationLocationType.subclass:
-            return calibrationLocationType.subclass(*args_, **kwargs_)
-        else:
-            return calibrationLocationType(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def get_ns_prefix_(self):
-        return self.ns_prefix_
-    def set_ns_prefix_(self, ns_prefix):
-        self.ns_prefix_ = ns_prefix
-    def get_calibrationLocationSite(self):
-        return self.calibrationLocationSite
-    def set_calibrationLocationSite(self, calibrationLocationSite):
-        self.calibrationLocationSite = calibrationLocationSite
-    def get_beginLocationCalDateTime(self):
-        return self.beginLocationCalDateTime
-    def set_beginLocationCalDateTime(self, beginLocationCalDateTime):
-        self.beginLocationCalDateTime = beginLocationCalDateTime
-    def get_endLocationCalDateTime(self):
-        return self.endLocationCalDateTime
-    def set_endLocationCalDateTime(self, endLocationCalDateTime):
-        self.endLocationCalDateTime = endLocationCalDateTime
-    def get_location(self):
-        return self.location
-    def set_location(self, location):
-        self.location = location
-    def get_id(self):
-        return self.id
-    def set_id(self, id):
-        self.id = id
-    def hasContent_(self):
-        if (
-            self.calibrationLocationSite is not None or
-            self.beginLocationCalDateTime is not None or
-            self.endLocationCalDateTime is not None or
-            self.location is not None
-        ):
-            return True
-        else:
-            return False
-    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='calibrationLocationType', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('calibrationLocationType')
-        if imported_ns_def_ is not None:
-            namespacedef_ = imported_ns_def_
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'calibrationLocationType':
-            name_ = self.original_tagname_
-        if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
-        showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='calibrationLocationType')
-        if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='calibrationLocationType', pretty_print=pretty_print)
-            showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
-        else:
-            outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='calibrationLocationType'):
-        if self.id is not None and 'id' not in already_processed:
-            already_processed.add('id')
-            outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
-    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='calibrationLocationType', fromsubclass_=False, pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.calibrationLocationSite is not None:
-            namespaceprefix_ = self.calibrationLocationSite_nsprefix_ + ':' if (UseCapturedNS_ and self.calibrationLocationSite_nsprefix_) else ''
-            self.calibrationLocationSite.export(outfile, level, namespaceprefix_, namespacedef_='', name_='calibrationLocationSite', pretty_print=pretty_print)
-        if self.beginLocationCalDateTime is not None:
-            namespaceprefix_ = self.beginLocationCalDateTime_nsprefix_ + ':' if (UseCapturedNS_ and self.beginLocationCalDateTime_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sbeginLocationCalDateTime>%s</%sbeginLocationCalDateTime>%s' % (namespaceprefix_ , self.gds_format_datetime(self.beginLocationCalDateTime, input_name='beginLocationCalDateTime'), namespaceprefix_ , eol_))
-        if self.endLocationCalDateTime is not None:
-            namespaceprefix_ = self.endLocationCalDateTime_nsprefix_ + ':' if (UseCapturedNS_ and self.endLocationCalDateTime_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sendLocationCalDateTime>%s</%sendLocationCalDateTime>%s' % (namespaceprefix_ , self.gds_format_datetime(self.endLocationCalDateTime, input_name='endLocationCalDateTime'), namespaceprefix_ , eol_))
-        if self.location is not None:
-            namespaceprefix_ = self.location_nsprefix_ + ':' if (UseCapturedNS_ and self.location_nsprefix_) else ''
-            self.location.export(outfile, level, namespaceprefix_, namespacedef_='', name_='location', pretty_print=pretty_print)
-    def to_etree(self, parent_element=None, name_='calibrationLocationType', mapping_=None, nsmap_=None):
-        if parent_element is None:
-            element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
-        else:
-            element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
-        if self.id is not None:
-            element.set('id', self.gds_format_string(self.id))
-        if self.calibrationLocationSite is not None:
-            calibrationLocationSite_ = self.calibrationLocationSite
-            calibrationLocationSite_.to_etree(element, name_='calibrationLocationSite', mapping_=mapping_, nsmap_=nsmap_)
-        if self.beginLocationCalDateTime is not None:
-            beginLocationCalDateTime_ = self.beginLocationCalDateTime
-            etree_.SubElement(element, '{https://ptb.de/dcc}beginLocationCalDateTime').text = self.gds_format_datetime(beginLocationCalDateTime_)
-        if self.endLocationCalDateTime is not None:
-            endLocationCalDateTime_ = self.endLocationCalDateTime
-            etree_.SubElement(element, '{https://ptb.de/dcc}endLocationCalDateTime').text = self.gds_format_datetime(endLocationCalDateTime_)
-        if self.location is not None:
-            location_ = self.location
-            location_.to_etree(element, name_='location', mapping_=mapping_, nsmap_=nsmap_)
-        if mapping_ is not None:
-            mapping_[id(self)] = element
-        return element
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        value = find_attr_value_('id', node)
-        if value is not None and 'id' not in already_processed:
-            already_processed.add('id')
-            self.id = value
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'calibrationLocationSite':
-            obj_ = textType.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.calibrationLocationSite = obj_
-            obj_.original_tagname_ = 'calibrationLocationSite'
-        elif nodeName_ == 'beginLocationCalDateTime':
-            sval_ = child_.text
-            dval_ = self.gds_parse_datetime(sval_)
-            self.beginLocationCalDateTime = dval_
-            self.beginLocationCalDateTime_nsprefix_ = child_.prefix
-        elif nodeName_ == 'endLocationCalDateTime':
-            sval_ = child_.text
-            dval_ = self.gds_parse_datetime(sval_)
-            self.endLocationCalDateTime = dval_
-            self.endLocationCalDateTime_nsprefix_ = child_.prefix
-        elif nodeName_ == 'location':
-            obj_ = locationType.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.location = obj_
-            obj_.original_tagname_ = 'location'
-# end class calibrationLocationType
-
-
 class conditionType(GeneratedsSuper):
-    """All necessary information for one part of a measurement"""
+    """Condition (e.g. environmental) under which the calibrations were
+    performed which have an influence on
+    the measurement results."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, refType=None, name=None, description=None, state=None, data=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refType=None, name=None, description=None, status=None, data=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -4829,9 +4795,9 @@ class conditionType(GeneratedsSuper):
         self.name_nsprefix_ = "dcc"
         self.description = description
         self.description_nsprefix_ = "dcc"
-        self.state = state
-        self.validate_stateType(self.state)
-        self.state_nsprefix_ = "dcc"
+        self.status = status
+        self.validate_statusType(self.status)
+        self.status_nsprefix_ = "dcc"
         self.data = data
         self.data_nsprefix_ = "dcc"
     def factory(*args_, **kwargs_):
@@ -4857,10 +4823,10 @@ class conditionType(GeneratedsSuper):
         return self.description
     def set_description(self, description):
         self.description = description
-    def get_state(self):
-        return self.state
-    def set_state(self, state):
-        self.state = state
+    def get_status(self):
+        return self.status
+    def set_status(self, status):
+        self.status = status
     def get_data(self):
         return self.data
     def set_data(self, data):
@@ -4873,9 +4839,9 @@ class conditionType(GeneratedsSuper):
         return self.refType
     def set_refType(self, refType):
         self.refType = refType
-    def validate_stateType(self, value):
+    def validate_statusType(self, value):
         result = True
-        # Validate type stateType, a restriction on xs:string.
+        # Validate type statusType, a restriction on xs:string.
         if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
             if not isinstance(value, str):
                 lineno = self.gds_get_node_lineno_()
@@ -4885,25 +4851,14 @@ class conditionType(GeneratedsSuper):
             enumerations = ['beforeAdjustment', 'afterAdjustment', 'beforeRepair', 'afterRepair']
             if value not in enumerations:
                 lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on stateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on statusType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
                 result = False
         return result
-    def validate_stringRefType(self, value):
-        # Validate type dcc:stringRefType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_stringRefType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_stringRefType_patterns_, ))
-    validate_stringRefType_patterns_ = [['^((/[A-Za-z][A-Za-z0-9]+)*)$']]
     def hasContent_(self):
         if (
             self.name is not None or
             self.description is not None or
-            self.state is not None or
+            self.status is not None or
             self.data is not None
         ):
             return True
@@ -4950,10 +4905,10 @@ class conditionType(GeneratedsSuper):
         if self.description is not None:
             namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
             self.description.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
-        if self.state is not None:
-            namespaceprefix_ = self.state_nsprefix_ + ':' if (UseCapturedNS_ and self.state_nsprefix_) else ''
+        if self.status is not None:
+            namespaceprefix_ = self.status_nsprefix_ + ':' if (UseCapturedNS_ and self.status_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sstate>%s</%sstate>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.state), input_name='state')), namespaceprefix_ , eol_))
+            outfile.write('<%sstatus>%s</%sstatus>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.status), input_name='status')), namespaceprefix_ , eol_))
         if self.data is not None:
             namespaceprefix_ = self.data_nsprefix_ + ':' if (UseCapturedNS_ and self.data_nsprefix_) else ''
             self.data.export(outfile, level, namespaceprefix_, namespacedef_='', name_='data', pretty_print=pretty_print)
@@ -4972,9 +4927,9 @@ class conditionType(GeneratedsSuper):
         if self.description is not None:
             description_ = self.description
             description_.to_etree(element, name_='description', mapping_=mapping_, nsmap_=nsmap_)
-        if self.state is not None:
-            state_ = self.state
-            etree_.SubElement(element, '{https://ptb.de/dcc}state').text = self.gds_format_string(state_)
+        if self.status is not None:
+            status_ = self.status
+            etree_.SubElement(element, '{https://ptb.de/dcc}status').text = self.gds_format_string(status_)
         if self.data is not None:
             data_ = self.data
             data_.to_etree(element, name_='data', mapping_=mapping_, nsmap_=nsmap_)
@@ -5001,7 +4956,6 @@ class conditionType(GeneratedsSuper):
         if value is not None and 'refType' not in already_processed:
             already_processed.add('refType')
             self.refType = value
-            self.validate_stringRefType(self.refType)    # validate type stringRefType
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'name':
             obj_ = textType.factory(parent_object_=self)
@@ -5009,18 +4963,18 @@ class conditionType(GeneratedsSuper):
             self.name = obj_
             obj_.original_tagname_ = 'name'
         elif nodeName_ == 'description':
-            obj_ = textType.factory(parent_object_=self)
+            obj_ = richContentType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.description = obj_
             obj_.original_tagname_ = 'description'
-        elif nodeName_ == 'state':
+        elif nodeName_ == 'status':
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'state')
-            value_ = self.gds_validate_string(value_, node, 'state')
-            self.state = value_
-            self.state_nsprefix_ = child_.prefix
-            # validate type stateType
-            self.validate_stateType(self.state)
+            value_ = self.gds_parse_string(value_, node, 'status')
+            value_ = self.gds_validate_string(value_, node, 'status')
+            self.status = value_
+            self.status_nsprefix_ = child_.prefix
+            # validate type statusType
+            self.validate_statusType(self.status)
         elif nodeName_ == 'data':
             obj_ = dataType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -5029,204 +4983,8 @@ class conditionType(GeneratedsSuper):
 # end class conditionType
 
 
-class resultType(GeneratedsSuper):
-    """The result itself"""
-    __hash__ = GeneratedsSuper.__hash__
-    subclass = None
-    superclass = None
-    def __init__(self, id=None, refId=None, refType=None, name=None, description=None, data=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = "dcc"
-        self.id = _cast(None, id)
-        self.id_nsprefix_ = None
-        self.refId = _cast(None, refId)
-        self.refId_nsprefix_ = None
-        self.refType = _cast(None, refType)
-        self.refType_nsprefix_ = None
-        self.name = name
-        self.name_nsprefix_ = "dcc"
-        self.description = description
-        self.description_nsprefix_ = "dcc"
-        self.data = data
-        self.data_nsprefix_ = "dcc"
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, resultType)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if resultType.subclass:
-            return resultType.subclass(*args_, **kwargs_)
-        else:
-            return resultType(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def get_ns_prefix_(self):
-        return self.ns_prefix_
-    def set_ns_prefix_(self, ns_prefix):
-        self.ns_prefix_ = ns_prefix
-    def get_name(self):
-        return self.name
-    def set_name(self, name):
-        self.name = name
-    def get_description(self):
-        return self.description
-    def set_description(self, description):
-        self.description = description
-    def get_data(self):
-        return self.data
-    def set_data(self, data):
-        self.data = data
-    def get_id(self):
-        return self.id
-    def set_id(self, id):
-        self.id = id
-    def get_refId(self):
-        return self.refId
-    def set_refId(self, refId):
-        self.refId = refId
-    def get_refType(self):
-        return self.refType
-    def set_refType(self, refType):
-        self.refType = refType
-    def validate_stringRefType(self, value):
-        # Validate type dcc:stringRefType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_stringRefType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_stringRefType_patterns_, ))
-    validate_stringRefType_patterns_ = [['^((/[A-Za-z][A-Za-z0-9]+)*)$']]
-    def hasContent_(self):
-        if (
-            self.name is not None or
-            self.description is not None or
-            self.data is not None
-        ):
-            return True
-        else:
-            return False
-    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='resultType', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('resultType')
-        if imported_ns_def_ is not None:
-            namespacedef_ = imported_ns_def_
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'resultType':
-            name_ = self.original_tagname_
-        if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
-        showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='resultType')
-        if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='resultType', pretty_print=pretty_print)
-            showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
-        else:
-            outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='resultType'):
-        if self.id is not None and 'id' not in already_processed:
-            already_processed.add('id')
-            outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
-        if self.refId is not None and 'refId' not in already_processed:
-            already_processed.add('refId')
-            outfile.write(' refId=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refId), input_name='refId')), ))
-        if self.refType is not None and 'refType' not in already_processed:
-            already_processed.add('refType')
-            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
-    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='resultType', fromsubclass_=False, pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.name is not None:
-            namespaceprefix_ = self.name_nsprefix_ + ':' if (UseCapturedNS_ and self.name_nsprefix_) else ''
-            self.name.export(outfile, level, namespaceprefix_, namespacedef_='', name_='name', pretty_print=pretty_print)
-        if self.description is not None:
-            namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
-            self.description.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
-        if self.data is not None:
-            namespaceprefix_ = self.data_nsprefix_ + ':' if (UseCapturedNS_ and self.data_nsprefix_) else ''
-            self.data.export(outfile, level, namespaceprefix_, namespacedef_='', name_='data', pretty_print=pretty_print)
-    def to_etree(self, parent_element=None, name_='resultType', mapping_=None, nsmap_=None):
-        if parent_element is None:
-            element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
-        else:
-            element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
-        if self.id is not None:
-            element.set('id', self.gds_format_string(self.id))
-        if self.refId is not None:
-            element.set('refId', self.gds_format_string(self.refId))
-        if self.refType is not None:
-            element.set('refType', self.gds_format_string(self.refType))
-        if self.name is not None:
-            name_ = self.name
-            name_.to_etree(element, name_='name', mapping_=mapping_, nsmap_=nsmap_)
-        if self.description is not None:
-            description_ = self.description
-            description_.to_etree(element, name_='description', mapping_=mapping_, nsmap_=nsmap_)
-        if self.data is not None:
-            data_ = self.data
-            data_.to_etree(element, name_='data', mapping_=mapping_, nsmap_=nsmap_)
-        if mapping_ is not None:
-            mapping_[id(self)] = element
-        return element
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        value = find_attr_value_('id', node)
-        if value is not None and 'id' not in already_processed:
-            already_processed.add('id')
-            self.id = value
-        value = find_attr_value_('refId', node)
-        if value is not None and 'refId' not in already_processed:
-            already_processed.add('refId')
-            self.refId = value
-        value = find_attr_value_('refType', node)
-        if value is not None and 'refType' not in already_processed:
-            already_processed.add('refType')
-            self.refType = value
-            self.validate_stringRefType(self.refType)    # validate type stringRefType
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'name':
-            obj_ = textType.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.name = obj_
-            obj_.original_tagname_ = 'name'
-        elif nodeName_ == 'description':
-            obj_ = textType.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.description = obj_
-            obj_.original_tagname_ = 'description'
-        elif nodeName_ == 'data':
-            obj_ = dataType.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.data = obj_
-            obj_.original_tagname_ = 'data'
-# end class resultType
-
-
 class resultListType(GeneratedsSuper):
-    """Elements for the measurement results"""
+    """List of results of the calibration."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -5338,15 +5096,12 @@ class resultListType(GeneratedsSuper):
 # end class resultListType
 
 
-class dataType(GeneratedsSuper):
-    """In the Element "outcome", any of the elements
-    "text", "formula", "byteData", "chart", "image", "data" and "xml"
-    can be used multiple times in an arbitrary order. The usage of each element
-    is optional. At least one of the elements must be provided."""
+class resultType(GeneratedsSuper):
+    """The actual result of the calibration."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, text=None, formula=None, byteData=None, xml=None, quantity=None, list=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refId=None, refType=None, name=None, description=None, data=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -5354,6 +5109,193 @@ class dataType(GeneratedsSuper):
         self.ns_prefix_ = "dcc"
         self.id = _cast(None, id)
         self.id_nsprefix_ = None
+        self.refId = _cast(None, refId)
+        self.refId_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
+        self.name = name
+        self.name_nsprefix_ = "dcc"
+        self.description = description
+        self.description_nsprefix_ = "dcc"
+        self.data = data
+        self.data_nsprefix_ = "dcc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, resultType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if resultType.subclass:
+            return resultType.subclass(*args_, **kwargs_)
+        else:
+            return resultType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_name(self):
+        return self.name
+    def set_name(self, name):
+        self.name = name
+    def get_description(self):
+        return self.description
+    def set_description(self, description):
+        self.description = description
+    def get_data(self):
+        return self.data
+    def set_data(self, data):
+        self.data = data
+    def get_id(self):
+        return self.id
+    def set_id(self, id):
+        self.id = id
+    def get_refId(self):
+        return self.refId
+    def set_refId(self, refId):
+        self.refId = refId
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
+    def hasContent_(self):
+        if (
+            self.name is not None or
+            self.description is not None or
+            self.data is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='resultType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('resultType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'resultType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='resultType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='resultType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='resultType'):
+        if self.id is not None and 'id' not in already_processed:
+            already_processed.add('id')
+            outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refId is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            outfile.write(' refId=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refId), input_name='refId')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='resultType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.name is not None:
+            namespaceprefix_ = self.name_nsprefix_ + ':' if (UseCapturedNS_ and self.name_nsprefix_) else ''
+            self.name.export(outfile, level, namespaceprefix_, namespacedef_='', name_='name', pretty_print=pretty_print)
+        if self.description is not None:
+            namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
+            self.description.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
+        if self.data is not None:
+            namespaceprefix_ = self.data_nsprefix_ + ':' if (UseCapturedNS_ and self.data_nsprefix_) else ''
+            self.data.export(outfile, level, namespaceprefix_, namespacedef_='', name_='data', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='resultType', mapping_=None, nsmap_=None):
+        if parent_element is None:
+            element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
+        else:
+            element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
+        if self.id is not None:
+            element.set('id', self.gds_format_string(self.id))
+        if self.refId is not None:
+            element.set('refId', self.gds_format_string(self.refId))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
+        if self.name is not None:
+            name_ = self.name
+            name_.to_etree(element, name_='name', mapping_=mapping_, nsmap_=nsmap_)
+        if self.description is not None:
+            description_ = self.description
+            description_.to_etree(element, name_='description', mapping_=mapping_, nsmap_=nsmap_)
+        if self.data is not None:
+            data_ = self.data
+            data_.to_etree(element, name_='data', mapping_=mapping_, nsmap_=nsmap_)
+        if mapping_ is not None:
+            mapping_[id(self)] = element
+        return element
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('id', node)
+        if value is not None and 'id' not in already_processed:
+            already_processed.add('id')
+            self.id = value
+        value = find_attr_value_('refId', node)
+        if value is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            self.refId = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'name':
+            obj_ = textType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.name = obj_
+            obj_.original_tagname_ = 'name'
+        elif nodeName_ == 'description':
+            obj_ = richContentType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.description = obj_
+            obj_.original_tagname_ = 'description'
+        elif nodeName_ == 'data':
+            obj_ = dataType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.data = obj_
+            obj_.original_tagname_ = 'data'
+# end class resultType
+
+
+class dataType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, id=None, refId=None, refType=None, text=None, formula=None, byteData=None, xml=None, quantity=None, list=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "dcc"
+        self.id = _cast(None, id)
+        self.id_nsprefix_ = None
+        self.refId = _cast(None, refId)
+        self.refId_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
         if text is None:
             self.text = []
         else:
@@ -5463,6 +5405,14 @@ class dataType(GeneratedsSuper):
         return self.id
     def set_id(self, id):
         self.id = id
+    def get_refId(self):
+        return self.refId
+    def set_refId(self, refId):
+        self.refId = refId
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
     def hasContent_(self):
         if (
             self.text or
@@ -5502,6 +5452,12 @@ class dataType(GeneratedsSuper):
         if self.id is not None and 'id' not in already_processed:
             already_processed.add('id')
             outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refId is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            outfile.write(' refId=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refId), input_name='refId')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
     def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='dataType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
@@ -5532,6 +5488,10 @@ class dataType(GeneratedsSuper):
             element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
         if self.id is not None:
             element.set('id', self.gds_format_string(self.id))
+        if self.refId is not None:
+            element.set('refId', self.gds_format_string(self.refId))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
         for text_ in self.text:
             text_.to_etree(element, name_='text', mapping_=mapping_, nsmap_=nsmap_)
         for formula_ in self.formula:
@@ -5563,9 +5523,17 @@ class dataType(GeneratedsSuper):
         if value is not None and 'id' not in already_processed:
             already_processed.add('id')
             self.id = value
+        value = find_attr_value_('refId', node)
+        if value is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            self.refId = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'text':
-            obj_ = textType.factory(parent_object_=self)
+            obj_ = richContentType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.text.append(obj_)
             obj_.original_tagname_ = 'text'
@@ -5590,7 +5558,7 @@ class dataType(GeneratedsSuper):
             self.quantity.append(obj_)
             obj_.original_tagname_ = 'quantity'
         elif nodeName_ == 'list':
-            obj_ = listType.factory(parent_object_=self)
+            obj_ = listType1.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.list.append(obj_)
             obj_.original_tagname_ = 'list'
@@ -5598,21 +5566,15 @@ class dataType(GeneratedsSuper):
 
 
 class quantityType(GeneratedsSuper):
-    """Basic element for the statement of measurement values in a DCC.
-    The measurement value, its unit and uncertainty are defined by type
-    'si:real'.
-    The 'unit' must be defined in the SI-system (siunitx format).
-    Additional information can be made according to MRA, Ilac and external
-    measurements in the 'measurementMetaData' element.
-    In addition, the 'quantity' can contain a comma separated list of
-    independent real quantities
-    ('si:realCS').
-    The 'quantity' has an optional 'name' element and it can have a unique ID.
-    The 'name' element can be repeated with different languages."""
+    """A single measurement quantity that can contain a D-SI element or text.
+    Additionally used methods, used software, influence conditions that only
+    affect this quantity can be
+    added.
+    Measurement metadata can also be added."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, refId=None, refType=None, name=None, noQuantity=None, real=None, list=None, hybrid=None, usedMethods=None, usedSoftware=None, influenceConditions=None, measurementMetaData=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refId=None, refType=None, name=None, description=None, noQuantity=None, real=None, list=None, hybrid=None, complex=None, constant=None, usedMethods=None, usedSoftware=None, measuringEquipments=None, influenceConditions=None, measurementMetaData=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -5626,6 +5588,8 @@ class quantityType(GeneratedsSuper):
         self.refType_nsprefix_ = None
         self.name = name
         self.name_nsprefix_ = "dcc"
+        self.description = description
+        self.description_nsprefix_ = "dcc"
         self.noQuantity = noQuantity
         self.noQuantity_nsprefix_ = "dcc"
         self.real = real
@@ -5634,10 +5598,16 @@ class quantityType(GeneratedsSuper):
         self.list_nsprefix_ = "si"
         self.hybrid = hybrid
         self.hybrid_nsprefix_ = "si"
+        self.complex = complex
+        self.complex_nsprefix_ = "si"
+        self.constant = constant
+        self.constant_nsprefix_ = "si"
         self.usedMethods = usedMethods
         self.usedMethods_nsprefix_ = "dcc"
         self.usedSoftware = usedSoftware
         self.usedSoftware_nsprefix_ = "dcc"
+        self.measuringEquipments = measuringEquipments
+        self.measuringEquipments_nsprefix_ = "dcc"
         self.influenceConditions = influenceConditions
         self.influenceConditions_nsprefix_ = "dcc"
         self.measurementMetaData = measurementMetaData
@@ -5661,6 +5631,10 @@ class quantityType(GeneratedsSuper):
         return self.name
     def set_name(self, name):
         self.name = name
+    def get_description(self):
+        return self.description
+    def set_description(self, description):
+        self.description = description
     def get_noQuantity(self):
         return self.noQuantity
     def set_noQuantity(self, noQuantity):
@@ -5677,6 +5651,14 @@ class quantityType(GeneratedsSuper):
         return self.hybrid
     def set_hybrid(self, hybrid):
         self.hybrid = hybrid
+    def get_complex(self):
+        return self.complex
+    def set_complex(self, complex):
+        self.complex = complex
+    def get_constant(self):
+        return self.constant
+    def set_constant(self, constant):
+        self.constant = constant
     def get_usedMethods(self):
         return self.usedMethods
     def set_usedMethods(self, usedMethods):
@@ -5685,6 +5667,10 @@ class quantityType(GeneratedsSuper):
         return self.usedSoftware
     def set_usedSoftware(self, usedSoftware):
         self.usedSoftware = usedSoftware
+    def get_measuringEquipments(self):
+        return self.measuringEquipments
+    def set_measuringEquipments(self, measuringEquipments):
+        self.measuringEquipments = measuringEquipments
     def get_influenceConditions(self):
         return self.influenceConditions
     def set_influenceConditions(self, influenceConditions):
@@ -5705,26 +5691,19 @@ class quantityType(GeneratedsSuper):
         return self.refType
     def set_refType(self, refType):
         self.refType = refType
-    def validate_stringRefType(self, value):
-        # Validate type dcc:stringRefType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_stringRefType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_stringRefType_patterns_, ))
-    validate_stringRefType_patterns_ = [['^((/[A-Za-z][A-Za-z0-9]+)*)$']]
     def hasContent_(self):
         if (
             self.name is not None or
+            self.description is not None or
             self.noQuantity is not None or
             self.real is not None or
             self.list is not None or
             self.hybrid is not None or
+            self.complex is not None or
+            self.constant is not None or
             self.usedMethods is not None or
             self.usedSoftware is not None or
+            self.measuringEquipments is not None or
             self.influenceConditions is not None or
             self.measurementMetaData is not None
         ):
@@ -5772,6 +5751,9 @@ class quantityType(GeneratedsSuper):
         if self.name is not None:
             namespaceprefix_ = self.name_nsprefix_ + ':' if (UseCapturedNS_ and self.name_nsprefix_) else ''
             self.name.export(outfile, level, namespaceprefix_, namespacedef_='', name_='name', pretty_print=pretty_print)
+        if self.description is not None:
+            namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
+            self.description.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
         if self.noQuantity is not None:
             namespaceprefix_ = self.noQuantity_nsprefix_ + ':' if (UseCapturedNS_ and self.noQuantity_nsprefix_) else ''
             self.noQuantity.export(outfile, level, namespaceprefix_, namespacedef_='', name_='noQuantity', pretty_print=pretty_print)
@@ -5784,12 +5766,21 @@ class quantityType(GeneratedsSuper):
         if self.hybrid is not None:
             namespaceprefix_ = self.hybrid_nsprefix_ + ':' if (UseCapturedNS_ and self.hybrid_nsprefix_) else ''
             self.hybrid.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='hybrid', pretty_print=pretty_print)
+        if self.complex is not None:
+            namespaceprefix_ = self.complex_nsprefix_ + ':' if (UseCapturedNS_ and self.complex_nsprefix_) else ''
+            self.complex.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='complex', pretty_print=pretty_print)
+        if self.constant is not None:
+            namespaceprefix_ = self.constant_nsprefix_ + ':' if (UseCapturedNS_ and self.constant_nsprefix_) else ''
+            self.constant.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='constant', pretty_print=pretty_print)
         if self.usedMethods is not None:
             namespaceprefix_ = self.usedMethods_nsprefix_ + ':' if (UseCapturedNS_ and self.usedMethods_nsprefix_) else ''
             self.usedMethods.export(outfile, level, namespaceprefix_, namespacedef_='', name_='usedMethods', pretty_print=pretty_print)
         if self.usedSoftware is not None:
             namespaceprefix_ = self.usedSoftware_nsprefix_ + ':' if (UseCapturedNS_ and self.usedSoftware_nsprefix_) else ''
             self.usedSoftware.export(outfile, level, namespaceprefix_, namespacedef_='', name_='usedSoftware', pretty_print=pretty_print)
+        if self.measuringEquipments is not None:
+            namespaceprefix_ = self.measuringEquipments_nsprefix_ + ':' if (UseCapturedNS_ and self.measuringEquipments_nsprefix_) else ''
+            self.measuringEquipments.export(outfile, level, namespaceprefix_, namespacedef_='', name_='measuringEquipments', pretty_print=pretty_print)
         if self.influenceConditions is not None:
             namespaceprefix_ = self.influenceConditions_nsprefix_ + ':' if (UseCapturedNS_ and self.influenceConditions_nsprefix_) else ''
             self.influenceConditions.export(outfile, level, namespaceprefix_, namespacedef_='', name_='influenceConditions', pretty_print=pretty_print)
@@ -5810,6 +5801,9 @@ class quantityType(GeneratedsSuper):
         if self.name is not None:
             name_ = self.name
             name_.to_etree(element, name_='name', mapping_=mapping_, nsmap_=nsmap_)
+        if self.description is not None:
+            description_ = self.description
+            description_.to_etree(element, name_='description', mapping_=mapping_, nsmap_=nsmap_)
         if self.noQuantity is not None:
             noQuantity_ = self.noQuantity
             noQuantity_.to_etree(element, name_='noQuantity', mapping_=mapping_, nsmap_=nsmap_)
@@ -5822,12 +5816,21 @@ class quantityType(GeneratedsSuper):
         if self.hybrid is not None:
             hybrid_ = self.hybrid
             hybrid_.to_etree(element, name_='hybrid', mapping_=mapping_, nsmap_=nsmap_)
+        if self.complex is not None:
+            complex_ = self.complex
+            complex_.to_etree(element, name_='complex', mapping_=mapping_, nsmap_=nsmap_)
+        if self.constant is not None:
+            constant_ = self.constant
+            constant_.to_etree(element, name_='constant', mapping_=mapping_, nsmap_=nsmap_)
         if self.usedMethods is not None:
             usedMethods_ = self.usedMethods
             usedMethods_.to_etree(element, name_='usedMethods', mapping_=mapping_, nsmap_=nsmap_)
         if self.usedSoftware is not None:
             usedSoftware_ = self.usedSoftware
             usedSoftware_.to_etree(element, name_='usedSoftware', mapping_=mapping_, nsmap_=nsmap_)
+        if self.measuringEquipments is not None:
+            measuringEquipments_ = self.measuringEquipments
+            measuringEquipments_.to_etree(element, name_='measuringEquipments', mapping_=mapping_, nsmap_=nsmap_)
         if self.influenceConditions is not None:
             influenceConditions_ = self.influenceConditions
             influenceConditions_.to_etree(element, name_='influenceConditions', mapping_=mapping_, nsmap_=nsmap_)
@@ -5861,33 +5864,47 @@ class quantityType(GeneratedsSuper):
         if value is not None and 'refType' not in already_processed:
             already_processed.add('refType')
             self.refType = value
-            self.validate_stringRefType(self.refType)    # validate type stringRefType
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'name':
             obj_ = textType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.name = obj_
             obj_.original_tagname_ = 'name'
+        elif nodeName_ == 'description':
+            obj_ = richContentType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.description = obj_
+            obj_.original_tagname_ = 'description'
         elif nodeName_ == 'noQuantity':
-            obj_ = textType.factory(parent_object_=self)
+            obj_ = richContentType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.noQuantity = obj_
             obj_.original_tagname_ = 'noQuantity'
         elif nodeName_ == 'real':
-            obj_ = real.factory(parent_object_=self)
+            obj_ = realQuantityType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.real = obj_
             obj_.original_tagname_ = 'real'
         elif nodeName_ == 'list':
-            obj_ = list.factory(parent_object_=self)
+            obj_ = listType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.list = obj_
             obj_.original_tagname_ = 'list'
         elif nodeName_ == 'hybrid':
-            obj_ = hybrid.factory(parent_object_=self)
+            obj_ = hybridType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.hybrid = obj_
             obj_.original_tagname_ = 'hybrid'
+        elif nodeName_ == 'complex':
+            obj_ = complexQuantityType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.complex = obj_
+            obj_.original_tagname_ = 'complex'
+        elif nodeName_ == 'constant':
+            obj_ = constantQuantityType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.constant = obj_
+            obj_.original_tagname_ = 'constant'
         elif nodeName_ == 'usedMethods':
             obj_ = usedMethodListType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -5898,6 +5915,11 @@ class quantityType(GeneratedsSuper):
             obj_.build(child_, gds_collector_=gds_collector_)
             self.usedSoftware = obj_
             obj_.original_tagname_ = 'usedSoftware'
+        elif nodeName_ == 'measuringEquipments':
+            obj_ = measuringEquipmentListType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.measuringEquipments = obj_
+            obj_.original_tagname_ = 'measuringEquipments'
         elif nodeName_ == 'influenceConditions':
             obj_ = influenceConditionListType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -5911,25 +5933,18 @@ class quantityType(GeneratedsSuper):
 # end class quantityType
 
 
-class listType(GeneratedsSuper):
+class listType1(GeneratedsSuper):
     """The 'list' element allows to define a collection of measurement results
     which are subject to structures with integrity. Basic structures are
     vector quantities. A recursive usage of 'list' allows the creation of
     matrix and tensor structures as well as structures of higher dimension. The
     'list'
     may also be used to give measurement results in combination with some
-    ambient conditions at the measurement.
-    In this version of the data format, the 'list' supports a global definition
-    of uncertainties
-    that are binding for all quantities inside the 'list' element.
-    For future versions it is planned to add uncertainty elements for vector
-    quantities
-    (e.g. covariance matrix).
-    The 'list' element can have a unique ID and several name elements."""
+    ambient conditions at the measurement."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, name=None, dateTime=None, list=None, quantity=None, usedMethods=None, usedSoftware=None, influenceConditions=None, measurementMetaData=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refId=None, refType=None, name=None, description=None, dateTime=None, list=None, quantity=None, usedMethods=None, usedSoftware=None, measuringEquipments=None, influenceConditions=None, measurementMetaData=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -5937,8 +5952,14 @@ class listType(GeneratedsSuper):
         self.ns_prefix_ = "dcc"
         self.id = _cast(None, id)
         self.id_nsprefix_ = None
+        self.refId = _cast(None, refId)
+        self.refId_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
         self.name = name
         self.name_nsprefix_ = "dcc"
+        self.description = description
+        self.description_nsprefix_ = "dcc"
         if isinstance(dateTime, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M:%S')
         else:
@@ -5959,6 +5980,8 @@ class listType(GeneratedsSuper):
         self.usedMethods_nsprefix_ = "dcc"
         self.usedSoftware = usedSoftware
         self.usedSoftware_nsprefix_ = "dcc"
+        self.measuringEquipments = measuringEquipments
+        self.measuringEquipments_nsprefix_ = "dcc"
         self.influenceConditions = influenceConditions
         self.influenceConditions_nsprefix_ = "dcc"
         self.measurementMetaData = measurementMetaData
@@ -5966,13 +5989,13 @@ class listType(GeneratedsSuper):
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, listType)
+                CurrentSubclassModule_, listType1)
             if subclass is not None:
                 return subclass(*args_, **kwargs_)
-        if listType.subclass:
-            return listType.subclass(*args_, **kwargs_)
+        if listType1.subclass:
+            return listType1.subclass(*args_, **kwargs_)
         else:
-            return listType(*args_, **kwargs_)
+            return listType1(*args_, **kwargs_)
     factory = staticmethod(factory)
     def get_ns_prefix_(self):
         return self.ns_prefix_
@@ -5982,6 +6005,10 @@ class listType(GeneratedsSuper):
         return self.name
     def set_name(self, name):
         self.name = name
+    def get_description(self):
+        return self.description
+    def set_description(self, description):
+        self.description = description
     def get_dateTime(self):
         return self.dateTime
     def set_dateTime(self, dateTime):
@@ -6014,6 +6041,10 @@ class listType(GeneratedsSuper):
         return self.usedSoftware
     def set_usedSoftware(self, usedSoftware):
         self.usedSoftware = usedSoftware
+    def get_measuringEquipments(self):
+        return self.measuringEquipments
+    def set_measuringEquipments(self, measuringEquipments):
+        self.measuringEquipments = measuringEquipments
     def get_influenceConditions(self):
         return self.influenceConditions
     def set_influenceConditions(self, influenceConditions):
@@ -6026,48 +6057,64 @@ class listType(GeneratedsSuper):
         return self.id
     def set_id(self, id):
         self.id = id
+    def get_refId(self):
+        return self.refId
+    def set_refId(self, refId):
+        self.refId = refId
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
     def hasContent_(self):
         if (
             self.name is not None or
+            self.description is not None or
             self.dateTime is not None or
             self.list or
             self.quantity or
             self.usedMethods is not None or
             self.usedSoftware is not None or
+            self.measuringEquipments is not None or
             self.influenceConditions is not None or
             self.measurementMetaData is not None
         ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='listType', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('listType')
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='listType1', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('listType1')
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'listType':
+        if self.original_tagname_ is not None and name_ == 'listType1':
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
             namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
         outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='listType')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='listType1')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='listType', pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='listType1', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
             outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='listType'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='listType1'):
         if self.id is not None and 'id' not in already_processed:
             already_processed.add('id')
             outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
-    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='listType', fromsubclass_=False, pretty_print=True):
+        if self.refId is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            outfile.write(' refId=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refId), input_name='refId')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='listType1', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
@@ -6075,6 +6122,9 @@ class listType(GeneratedsSuper):
         if self.name is not None:
             namespaceprefix_ = self.name_nsprefix_ + ':' if (UseCapturedNS_ and self.name_nsprefix_) else ''
             self.name.export(outfile, level, namespaceprefix_, namespacedef_='', name_='name', pretty_print=pretty_print)
+        if self.description is not None:
+            namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
+            self.description.export(outfile, level, namespaceprefix_, namespacedef_='', name_='description', pretty_print=pretty_print)
         if self.dateTime is not None:
             namespaceprefix_ = self.dateTime_nsprefix_ + ':' if (UseCapturedNS_ and self.dateTime_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
@@ -6091,22 +6141,32 @@ class listType(GeneratedsSuper):
         if self.usedSoftware is not None:
             namespaceprefix_ = self.usedSoftware_nsprefix_ + ':' if (UseCapturedNS_ and self.usedSoftware_nsprefix_) else ''
             self.usedSoftware.export(outfile, level, namespaceprefix_, namespacedef_='', name_='usedSoftware', pretty_print=pretty_print)
+        if self.measuringEquipments is not None:
+            namespaceprefix_ = self.measuringEquipments_nsprefix_ + ':' if (UseCapturedNS_ and self.measuringEquipments_nsprefix_) else ''
+            self.measuringEquipments.export(outfile, level, namespaceprefix_, namespacedef_='', name_='measuringEquipments', pretty_print=pretty_print)
         if self.influenceConditions is not None:
             namespaceprefix_ = self.influenceConditions_nsprefix_ + ':' if (UseCapturedNS_ and self.influenceConditions_nsprefix_) else ''
             self.influenceConditions.export(outfile, level, namespaceprefix_, namespacedef_='', name_='influenceConditions', pretty_print=pretty_print)
         if self.measurementMetaData is not None:
             namespaceprefix_ = self.measurementMetaData_nsprefix_ + ':' if (UseCapturedNS_ and self.measurementMetaData_nsprefix_) else ''
             self.measurementMetaData.export(outfile, level, namespaceprefix_, namespacedef_='', name_='measurementMetaData', pretty_print=pretty_print)
-    def to_etree(self, parent_element=None, name_='listType', mapping_=None, nsmap_=None):
+    def to_etree(self, parent_element=None, name_='listType1', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
         else:
             element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
         if self.id is not None:
             element.set('id', self.gds_format_string(self.id))
+        if self.refId is not None:
+            element.set('refId', self.gds_format_string(self.refId))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
         if self.name is not None:
             name_ = self.name
             name_.to_etree(element, name_='name', mapping_=mapping_, nsmap_=nsmap_)
+        if self.description is not None:
+            description_ = self.description
+            description_.to_etree(element, name_='description', mapping_=mapping_, nsmap_=nsmap_)
         if self.dateTime is not None:
             dateTime_ = self.dateTime
             etree_.SubElement(element, '{https://ptb.de/dcc}dateTime').text = self.gds_format_datetime(dateTime_)
@@ -6120,6 +6180,9 @@ class listType(GeneratedsSuper):
         if self.usedSoftware is not None:
             usedSoftware_ = self.usedSoftware
             usedSoftware_.to_etree(element, name_='usedSoftware', mapping_=mapping_, nsmap_=nsmap_)
+        if self.measuringEquipments is not None:
+            measuringEquipments_ = self.measuringEquipments
+            measuringEquipments_.to_etree(element, name_='measuringEquipments', mapping_=mapping_, nsmap_=nsmap_)
         if self.influenceConditions is not None:
             influenceConditions_ = self.influenceConditions
             influenceConditions_.to_etree(element, name_='influenceConditions', mapping_=mapping_, nsmap_=nsmap_)
@@ -6145,19 +6208,32 @@ class listType(GeneratedsSuper):
         if value is not None and 'id' not in already_processed:
             already_processed.add('id')
             self.id = value
+        value = find_attr_value_('refId', node)
+        if value is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            self.refId = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'name':
             obj_ = textType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.name = obj_
             obj_.original_tagname_ = 'name'
+        elif nodeName_ == 'description':
+            obj_ = richContentType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.description = obj_
+            obj_.original_tagname_ = 'description'
         elif nodeName_ == 'dateTime':
             sval_ = child_.text
             dval_ = self.gds_parse_datetime(sval_)
             self.dateTime = dval_
             self.dateTime_nsprefix_ = child_.prefix
         elif nodeName_ == 'list':
-            obj_ = listType.factory(parent_object_=self)
+            obj_ = listType1.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.list.append(obj_)
             obj_.original_tagname_ = 'list'
@@ -6176,6 +6252,11 @@ class listType(GeneratedsSuper):
             obj_.build(child_, gds_collector_=gds_collector_)
             self.usedSoftware = obj_
             obj_.original_tagname_ = 'usedSoftware'
+        elif nodeName_ == 'measuringEquipments':
+            obj_ = measuringEquipmentListType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.measuringEquipments = obj_
+            obj_.original_tagname_ = 'measuringEquipments'
         elif nodeName_ == 'influenceConditions':
             obj_ = influenceConditionListType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -6186,18 +6267,11 @@ class listType(GeneratedsSuper):
             obj_.build(child_, gds_collector_=gds_collector_)
             self.measurementMetaData = obj_
             obj_.original_tagname_ = 'measurementMetaData'
-# end class listType
+# end class listType1
 
 
 class measurementMetaDataListType(GeneratedsSuper):
-    """TODO: noch anpassen an neue Struktur
-    The measurement meta data comprises optional information that lead to a
-    measurement result.
-    The sub-elements should reference the specific and detailed information in
-    the administrative part.
-    Each element is optional and the user should only provide the elements that
-    are relevant
-    for the measurement result."""
+    """A list of additional metadata elements."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -6313,7 +6387,7 @@ class statementMetaDataType(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, countryCodeISO3166_1=None, convention=None, traceable=None, norm=None, reference=None, declaration=None, valid=None, refId=None, date=None, period=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refId=None, refType=None, countryCodeISO3166_1=None, convention=None, traceable=None, norm=None, reference=None, declaration=None, valid=None, date=None, period=None, respAuthority=None, conformity=None, data=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -6321,6 +6395,10 @@ class statementMetaDataType(GeneratedsSuper):
         self.ns_prefix_ = "dcc"
         self.id = _cast(None, id)
         self.id_nsprefix_ = None
+        self.refId = _cast(None, refId)
+        self.refId_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
         if countryCodeISO3166_1 is None:
             self.countryCodeISO3166_1 = []
         else:
@@ -6338,8 +6416,6 @@ class statementMetaDataType(GeneratedsSuper):
         self.declaration_nsprefix_ = "dcc"
         self.valid = valid
         self.valid_nsprefix_ = "dcc"
-        self.refId = refId
-        self.refId_nsprefix_ = "dcc"
         if isinstance(date, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(date, '%Y-%m-%d').date()
         else:
@@ -6348,6 +6424,13 @@ class statementMetaDataType(GeneratedsSuper):
         self.date_nsprefix_ = "dcc"
         self.period = period
         self.period_nsprefix_ = "dcc"
+        self.respAuthority = respAuthority
+        self.respAuthority_nsprefix_ = "dcc"
+        self.conformity = conformity
+        self.validate_stringConformityStatementStatusType(self.conformity)
+        self.conformity_nsprefix_ = "dcc"
+        self.data = data
+        self.data_nsprefix_ = "dcc"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6397,10 +6480,6 @@ class statementMetaDataType(GeneratedsSuper):
         return self.valid
     def set_valid(self, valid):
         self.valid = valid
-    def get_refId(self):
-        return self.refId
-    def set_refId(self, refId):
-        self.refId = refId
     def get_date(self):
         return self.date
     def set_date(self, date):
@@ -6409,10 +6488,30 @@ class statementMetaDataType(GeneratedsSuper):
         return self.period
     def set_period(self, period):
         self.period = period
+    def get_respAuthority(self):
+        return self.respAuthority
+    def set_respAuthority(self, respAuthority):
+        self.respAuthority = respAuthority
+    def get_conformity(self):
+        return self.conformity
+    def set_conformity(self, conformity):
+        self.conformity = conformity
+    def get_data(self):
+        return self.data
+    def set_data(self, data):
+        self.data = data
     def get_id(self):
         return self.id
     def set_id(self, id):
         self.id = id
+    def get_refId(self):
+        return self.refId
+    def set_refId(self, refId):
+        self.refId = refId
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
     def validate_stringISO3166Type(self, value):
         result = True
         # Validate type stringISO3166Type, a restriction on xs:string.
@@ -6427,6 +6526,21 @@ class statementMetaDataType(GeneratedsSuper):
                 result = False
         return result
     validate_stringISO3166Type_patterns_ = [['^([A-Z]{2})$']]
+    def validate_stringConformityStatementStatusType(self, value):
+        result = True
+        # Validate type stringConformityStatementStatusType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['pass', 'fail', 'conditionalPass', 'conditionalFail', 'noPass', 'noFail']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on stringConformityStatementStatusType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
     def hasContent_(self):
         if (
             self.countryCodeISO3166_1 or
@@ -6436,9 +6550,11 @@ class statementMetaDataType(GeneratedsSuper):
             self.reference is not None or
             self.declaration is not None or
             self.valid is not None or
-            self.refId is not None or
             self.date is not None or
-            self.period is not None
+            self.period is not None or
+            self.respAuthority is not None or
+            self.conformity is not None or
+            self.data is not None
         ):
             return True
         else:
@@ -6470,6 +6586,12 @@ class statementMetaDataType(GeneratedsSuper):
         if self.id is not None and 'id' not in already_processed:
             already_processed.add('id')
             outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refId is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            outfile.write(' refId=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refId), input_name='refId')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
     def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='statementMetaDataType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
@@ -6502,10 +6624,6 @@ class statementMetaDataType(GeneratedsSuper):
             namespaceprefix_ = self.valid_nsprefix_ + ':' if (UseCapturedNS_ and self.valid_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%svalid>%s</%svalid>%s' % (namespaceprefix_ , self.gds_format_boolean(self.valid, input_name='valid'), namespaceprefix_ , eol_))
-        if self.refId is not None:
-            namespaceprefix_ = self.refId_nsprefix_ + ':' if (UseCapturedNS_ and self.refId_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%srefId>%s</%srefId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.refId), input_name='refId')), namespaceprefix_ , eol_))
         if self.date is not None:
             namespaceprefix_ = self.date_nsprefix_ + ':' if (UseCapturedNS_ and self.date_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
@@ -6514,6 +6632,16 @@ class statementMetaDataType(GeneratedsSuper):
             namespaceprefix_ = self.period_nsprefix_ + ':' if (UseCapturedNS_ and self.period_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%speriod>%s</%speriod>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.period), input_name='period')), namespaceprefix_ , eol_))
+        if self.respAuthority is not None:
+            namespaceprefix_ = self.respAuthority_nsprefix_ + ':' if (UseCapturedNS_ and self.respAuthority_nsprefix_) else ''
+            self.respAuthority.export(outfile, level, namespaceprefix_, namespacedef_='', name_='respAuthority', pretty_print=pretty_print)
+        if self.conformity is not None:
+            namespaceprefix_ = self.conformity_nsprefix_ + ':' if (UseCapturedNS_ and self.conformity_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sconformity>%s</%sconformity>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.conformity), input_name='conformity')), namespaceprefix_ , eol_))
+        if self.data is not None:
+            namespaceprefix_ = self.data_nsprefix_ + ':' if (UseCapturedNS_ and self.data_nsprefix_) else ''
+            self.data.export(outfile, level, namespaceprefix_, namespacedef_='', name_='data', pretty_print=pretty_print)
     def to_etree(self, parent_element=None, name_='statementMetaDataType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
@@ -6521,6 +6649,10 @@ class statementMetaDataType(GeneratedsSuper):
             element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
         if self.id is not None:
             element.set('id', self.gds_format_string(self.id))
+        if self.refId is not None:
+            element.set('refId', self.gds_format_string(self.refId))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
         for countryCodeISO3166_1_ in self.countryCodeISO3166_1:
             etree_.SubElement(element, '{https://ptb.de/dcc}countryCodeISO3166_1').text = self.gds_format_string(countryCodeISO3166_1_)
         if self.convention is not None:
@@ -6541,15 +6673,21 @@ class statementMetaDataType(GeneratedsSuper):
         if self.valid is not None:
             valid_ = self.valid
             etree_.SubElement(element, '{https://ptb.de/dcc}valid').text = self.gds_format_boolean(valid_)
-        if self.refId is not None:
-            refId_ = self.refId
-            etree_.SubElement(element, '{https://ptb.de/dcc}refId').text = self.gds_format_string(refId_)
         if self.date is not None:
             date_ = self.date
             etree_.SubElement(element, '{https://ptb.de/dcc}date').text = self.gds_format_date(date_)
         if self.period is not None:
             period_ = self.period
             etree_.SubElement(element, '{https://ptb.de/dcc}period').text = self.gds_format_string(period_)
+        if self.respAuthority is not None:
+            respAuthority_ = self.respAuthority
+            respAuthority_.to_etree(element, name_='respAuthority', mapping_=mapping_, nsmap_=nsmap_)
+        if self.conformity is not None:
+            conformity_ = self.conformity
+            etree_.SubElement(element, '{https://ptb.de/dcc}conformity').text = self.gds_format_string(conformity_)
+        if self.data is not None:
+            data_ = self.data
+            data_.to_etree(element, name_='data', mapping_=mapping_, nsmap_=nsmap_)
         if mapping_ is not None:
             mapping_[id(self)] = element
         return element
@@ -6569,6 +6707,14 @@ class statementMetaDataType(GeneratedsSuper):
         if value is not None and 'id' not in already_processed:
             already_processed.add('id')
             self.id = value
+        value = find_attr_value_('refId', node)
+        if value is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            self.refId = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'countryCodeISO3166_1':
             value_ = child_.text
@@ -6603,7 +6749,7 @@ class statementMetaDataType(GeneratedsSuper):
             self.reference = value_
             self.reference_nsprefix_ = child_.prefix
         elif nodeName_ == 'declaration':
-            obj_ = textType.factory(parent_object_=self)
+            obj_ = richContentType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.declaration = obj_
             obj_.original_tagname_ = 'declaration'
@@ -6613,12 +6759,6 @@ class statementMetaDataType(GeneratedsSuper):
             ival_ = self.gds_validate_boolean(ival_, node, 'valid')
             self.valid = ival_
             self.valid_nsprefix_ = child_.prefix
-        elif nodeName_ == 'refId':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'refId')
-            value_ = self.gds_validate_string(value_, node, 'refId')
-            self.refId = value_
-            self.refId_nsprefix_ = child_.prefix
         elif nodeName_ == 'date':
             sval_ = child_.text
             dval_ = self.gds_parse_date(sval_)
@@ -6630,14 +6770,33 @@ class statementMetaDataType(GeneratedsSuper):
             value_ = self.gds_validate_string(value_, node, 'period')
             self.period = value_
             self.period_nsprefix_ = child_.prefix
+        elif nodeName_ == 'respAuthority':
+            obj_ = contactType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.respAuthority = obj_
+            obj_.original_tagname_ = 'respAuthority'
+        elif nodeName_ == 'conformity':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'conformity')
+            value_ = self.gds_validate_string(value_, node, 'conformity')
+            self.conformity = value_
+            self.conformity_nsprefix_ = child_.prefix
+            # validate type stringConformityStatementStatusType
+            self.validate_stringConformityStatementStatusType(self.conformity)
+        elif nodeName_ == 'data':
+            obj_ = dataType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.data = obj_
+            obj_.original_tagname_ = 'data'
 # end class statementMetaDataType
 
 
 class stringWithLangType(GeneratedsSuper):
+    """A string element with an additional lang attribute for localization."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, lang=None, id=None, valueOf_=None, gds_collector_=None, **kwargs_):
+    def __init__(self, lang=None, id=None, refId=None, refType=None, valueOf_=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -6647,6 +6806,10 @@ class stringWithLangType(GeneratedsSuper):
         self.lang_nsprefix_ = None
         self.id = _cast(None, id)
         self.id_nsprefix_ = None
+        self.refId = _cast(None, refId)
+        self.refId_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
         self.valueOf_ = valueOf_
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
@@ -6671,6 +6834,14 @@ class stringWithLangType(GeneratedsSuper):
         return self.id
     def set_id(self, id):
         self.id = id
+    def get_refId(self):
+        return self.refId
+    def set_refId(self, refId):
+        self.refId = refId
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
     def get_valueOf_(self): return self.valueOf_
     def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
     def validate_stringISO639Type(self, value):
@@ -6721,6 +6892,12 @@ class stringWithLangType(GeneratedsSuper):
         if self.id is not None and 'id' not in already_processed:
             already_processed.add('id')
             outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refId is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            outfile.write(' refId=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refId), input_name='refId')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
     def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='stringWithLangType', fromsubclass_=False, pretty_print=True):
         pass
     def to_etree(self, parent_element=None, name_='stringWithLangType', mapping_=None, nsmap_=None):
@@ -6732,6 +6909,10 @@ class stringWithLangType(GeneratedsSuper):
             element.set('lang', self.gds_format_string(self.lang))
         if self.id is not None:
             element.set('id', self.gds_format_string(self.id))
+        if self.refId is not None:
+            element.set('refId', self.gds_format_string(self.refId))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
         if self.hasContent_():
             element.text = self.gds_format_string(self.get_valueOf_())
         if mapping_ is not None:
@@ -6759,6 +6940,14 @@ class stringWithLangType(GeneratedsSuper):
         if value is not None and 'id' not in already_processed:
             already_processed.add('id')
             self.id = value
+        value = find_attr_value_('refId', node)
+        if value is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            self.refId = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         pass
 # end class stringWithLangType
@@ -6768,7 +6957,7 @@ class locationType(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, city=None, countryCode=None, postCode=None, postOfficeBox=None, state=None, street=None, streetNo=None, further=None, gds_collector_=None, **kwargs_):
+    def __init__(self, city=None, countryCode=None, postCode=None, postOfficeBox=None, state=None, street=None, streetNo=None, further=None, positionCoordinates=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -6814,6 +7003,11 @@ class locationType(GeneratedsSuper):
         else:
             self.further = further
         self.further_nsprefix_ = "dcc"
+        if positionCoordinates is None:
+            self.positionCoordinates = []
+        else:
+            self.positionCoordinates = positionCoordinates
+        self.positionCoordinates_nsprefix_ = "dcc"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6909,6 +7103,16 @@ class locationType(GeneratedsSuper):
         self.further.insert(index, value)
     def replace_further_at(self, index, value):
         self.further[index] = value
+    def get_positionCoordinates(self):
+        return self.positionCoordinates
+    def set_positionCoordinates(self, positionCoordinates):
+        self.positionCoordinates = positionCoordinates
+    def add_positionCoordinates(self, value):
+        self.positionCoordinates.append(value)
+    def insert_positionCoordinates_at(self, index, value):
+        self.positionCoordinates.insert(index, value)
+    def replace_positionCoordinates_at(self, index, value):
+        self.positionCoordinates[index] = value
     def validate_stringISO3166Type(self, value):
         result = True
         # Validate type stringISO3166Type, a restriction on xs:string.
@@ -6932,7 +7136,8 @@ class locationType(GeneratedsSuper):
             self.state or
             self.street or
             self.streetNo or
-            self.further
+            self.further or
+            self.positionCoordinates
         ):
             return True
         else:
@@ -6998,6 +7203,9 @@ class locationType(GeneratedsSuper):
         for further_ in self.further:
             namespaceprefix_ = self.further_nsprefix_ + ':' if (UseCapturedNS_ and self.further_nsprefix_) else ''
             further_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='further', pretty_print=pretty_print)
+        for positionCoordinates_ in self.positionCoordinates:
+            namespaceprefix_ = self.positionCoordinates_nsprefix_ + ':' if (UseCapturedNS_ and self.positionCoordinates_nsprefix_) else ''
+            positionCoordinates_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='positionCoordinates', pretty_print=pretty_print)
     def to_etree(self, parent_element=None, name_='locationType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
@@ -7019,6 +7227,8 @@ class locationType(GeneratedsSuper):
             etree_.SubElement(element, '{https://ptb.de/dcc}streetNo').text = self.gds_format_string(streetNo_)
         for further_ in self.further:
             further_.to_etree(element, name_='further', mapping_=mapping_, nsmap_=nsmap_)
+        for positionCoordinates_ in self.positionCoordinates:
+            positionCoordinates_.to_etree(element, name_='positionCoordinates', mapping_=mapping_, nsmap_=nsmap_)
         if mapping_ is not None:
             mapping_[id(self)] = element
         return element
@@ -7081,11 +7291,257 @@ class locationType(GeneratedsSuper):
             self.streetNo.append(value_)
             self.streetNo_nsprefix_ = child_.prefix
         elif nodeName_ == 'further':
-            obj_ = textType.factory(parent_object_=self)
+            obj_ = richContentType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.further.append(obj_)
             obj_.original_tagname_ = 'further'
+        elif nodeName_ == 'positionCoordinates':
+            obj_ = positionCoordinatesType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.positionCoordinates.append(obj_)
+            obj_.original_tagname_ = 'positionCoordinates'
 # end class locationType
+
+
+class positionCoordinatesType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, id=None, refId=None, refType=None, positionCoordinateSystem=None, reference=None, declaration=None, positionCoordinate1=None, positionCoordinate2=None, positionCoordinate3=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "dcc"
+        self.id = _cast(None, id)
+        self.id_nsprefix_ = None
+        self.refId = _cast(None, refId)
+        self.refId_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
+        self.positionCoordinateSystem = positionCoordinateSystem
+        self.positionCoordinateSystem_nsprefix_ = "dcc"
+        self.reference = reference
+        self.reference_nsprefix_ = "dcc"
+        self.declaration = declaration
+        self.declaration_nsprefix_ = "dcc"
+        self.positionCoordinate1 = positionCoordinate1
+        self.positionCoordinate1_nsprefix_ = "si"
+        self.positionCoordinate2 = positionCoordinate2
+        self.positionCoordinate2_nsprefix_ = "si"
+        self.positionCoordinate3 = positionCoordinate3
+        self.positionCoordinate3_nsprefix_ = "si"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, positionCoordinatesType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if positionCoordinatesType.subclass:
+            return positionCoordinatesType.subclass(*args_, **kwargs_)
+        else:
+            return positionCoordinatesType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_positionCoordinateSystem(self):
+        return self.positionCoordinateSystem
+    def set_positionCoordinateSystem(self, positionCoordinateSystem):
+        self.positionCoordinateSystem = positionCoordinateSystem
+    def get_reference(self):
+        return self.reference
+    def set_reference(self, reference):
+        self.reference = reference
+    def get_declaration(self):
+        return self.declaration
+    def set_declaration(self, declaration):
+        self.declaration = declaration
+    def get_positionCoordinate1(self):
+        return self.positionCoordinate1
+    def set_positionCoordinate1(self, positionCoordinate1):
+        self.positionCoordinate1 = positionCoordinate1
+    def get_positionCoordinate2(self):
+        return self.positionCoordinate2
+    def set_positionCoordinate2(self, positionCoordinate2):
+        self.positionCoordinate2 = positionCoordinate2
+    def get_positionCoordinate3(self):
+        return self.positionCoordinate3
+    def set_positionCoordinate3(self, positionCoordinate3):
+        self.positionCoordinate3 = positionCoordinate3
+    def get_id(self):
+        return self.id
+    def set_id(self, id):
+        self.id = id
+    def get_refId(self):
+        return self.refId
+    def set_refId(self, refId):
+        self.refId = refId
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
+    def hasContent_(self):
+        if (
+            self.positionCoordinateSystem is not None or
+            self.reference is not None or
+            self.declaration is not None or
+            self.positionCoordinate1 is not None or
+            self.positionCoordinate2 is not None or
+            self.positionCoordinate3 is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc" xmlns:si="https://ptb.de/si" ', name_='positionCoordinatesType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('positionCoordinatesType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'positionCoordinatesType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='positionCoordinatesType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='positionCoordinatesType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='positionCoordinatesType'):
+        if self.id is not None and 'id' not in already_processed:
+            already_processed.add('id')
+            outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refId is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            outfile.write(' refId=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refId), input_name='refId')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc" xmlns:si="https://ptb.de/si" ', name_='positionCoordinatesType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.positionCoordinateSystem is not None:
+            namespaceprefix_ = self.positionCoordinateSystem_nsprefix_ + ':' if (UseCapturedNS_ and self.positionCoordinateSystem_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%spositionCoordinateSystem>%s</%spositionCoordinateSystem>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.positionCoordinateSystem), input_name='positionCoordinateSystem')), namespaceprefix_ , eol_))
+        if self.reference is not None:
+            namespaceprefix_ = self.reference_nsprefix_ + ':' if (UseCapturedNS_ and self.reference_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sreference>%s</%sreference>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.reference), input_name='reference')), namespaceprefix_ , eol_))
+        if self.declaration is not None:
+            namespaceprefix_ = self.declaration_nsprefix_ + ':' if (UseCapturedNS_ and self.declaration_nsprefix_) else ''
+            self.declaration.export(outfile, level, namespaceprefix_, namespacedef_='', name_='declaration', pretty_print=pretty_print)
+        if self.positionCoordinate1 is not None:
+            namespaceprefix_ = self.positionCoordinate1_nsprefix_ + ':' if (UseCapturedNS_ and self.positionCoordinate1_nsprefix_) else ''
+            self.positionCoordinate1.export(outfile, level, namespaceprefix_, namespacedef_='', name_='positionCoordinate1', pretty_print=pretty_print)
+        if self.positionCoordinate2 is not None:
+            namespaceprefix_ = self.positionCoordinate2_nsprefix_ + ':' if (UseCapturedNS_ and self.positionCoordinate2_nsprefix_) else ''
+            self.positionCoordinate2.export(outfile, level, namespaceprefix_, namespacedef_='', name_='positionCoordinate2', pretty_print=pretty_print)
+        if self.positionCoordinate3 is not None:
+            namespaceprefix_ = self.positionCoordinate3_nsprefix_ + ':' if (UseCapturedNS_ and self.positionCoordinate3_nsprefix_) else ''
+            self.positionCoordinate3.export(outfile, level, namespaceprefix_, namespacedef_='', name_='positionCoordinate3', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='positionCoordinatesType', mapping_=None, nsmap_=None):
+        if parent_element is None:
+            element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
+        else:
+            element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
+        if self.id is not None:
+            element.set('id', self.gds_format_string(self.id))
+        if self.refId is not None:
+            element.set('refId', self.gds_format_string(self.refId))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
+        if self.positionCoordinateSystem is not None:
+            positionCoordinateSystem_ = self.positionCoordinateSystem
+            etree_.SubElement(element, '{https://ptb.de/dcc}positionCoordinateSystem').text = self.gds_format_string(positionCoordinateSystem_)
+        if self.reference is not None:
+            reference_ = self.reference
+            etree_.SubElement(element, '{https://ptb.de/dcc}reference').text = self.gds_format_string(reference_)
+        if self.declaration is not None:
+            declaration_ = self.declaration
+            declaration_.to_etree(element, name_='declaration', mapping_=mapping_, nsmap_=nsmap_)
+        if self.positionCoordinate1 is not None:
+            positionCoordinate1_ = self.positionCoordinate1
+            positionCoordinate1_.to_etree(element, name_='positionCoordinate1', mapping_=mapping_, nsmap_=nsmap_)
+        if self.positionCoordinate2 is not None:
+            positionCoordinate2_ = self.positionCoordinate2
+            positionCoordinate2_.to_etree(element, name_='positionCoordinate2', mapping_=mapping_, nsmap_=nsmap_)
+        if self.positionCoordinate3 is not None:
+            positionCoordinate3_ = self.positionCoordinate3
+            positionCoordinate3_.to_etree(element, name_='positionCoordinate3', mapping_=mapping_, nsmap_=nsmap_)
+        if mapping_ is not None:
+            mapping_[id(self)] = element
+        return element
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('id', node)
+        if value is not None and 'id' not in already_processed:
+            already_processed.add('id')
+            self.id = value
+        value = find_attr_value_('refId', node)
+        if value is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            self.refId = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'positionCoordinateSystem':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'positionCoordinateSystem')
+            value_ = self.gds_validate_string(value_, node, 'positionCoordinateSystem')
+            self.positionCoordinateSystem = value_
+            self.positionCoordinateSystem_nsprefix_ = child_.prefix
+        elif nodeName_ == 'reference':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'reference')
+            value_ = self.gds_validate_string(value_, node, 'reference')
+            self.reference = value_
+            self.reference_nsprefix_ = child_.prefix
+        elif nodeName_ == 'declaration':
+            obj_ = richContentType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.declaration = obj_
+            obj_.original_tagname_ = 'declaration'
+        elif nodeName_ == 'positionCoordinate1':
+            obj_ = realQuantityType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.positionCoordinate1 = obj_
+            obj_.original_tagname_ = 'positionCoordinate1'
+        elif nodeName_ == 'positionCoordinate2':
+            obj_ = realQuantityType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.positionCoordinate2 = obj_
+            obj_.original_tagname_ = 'positionCoordinate2'
+        elif nodeName_ == 'positionCoordinate3':
+            obj_ = realQuantityType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.positionCoordinate3 = obj_
+            obj_.original_tagname_ = 'positionCoordinate3'
+# end class positionCoordinatesType
 
 
 class contactType(GeneratedsSuper):
@@ -7305,7 +7761,7 @@ class contactNotStrictType(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, name=None, eMail=None, phone=None, fax=None, location=None, descriptionData=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refId=None, refType=None, name=None, eMail=None, phone=None, fax=None, location=None, descriptionData=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -7313,6 +7769,10 @@ class contactNotStrictType(GeneratedsSuper):
         self.ns_prefix_ = "dcc"
         self.id = _cast(None, id)
         self.id_nsprefix_ = None
+        self.refId = _cast(None, refId)
+        self.refId_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
         self.name = name
         self.name_nsprefix_ = "dcc"
         self.eMail = eMail
@@ -7368,6 +7828,14 @@ class contactNotStrictType(GeneratedsSuper):
         return self.id
     def set_id(self, id):
         self.id = id
+    def get_refId(self):
+        return self.refId
+    def set_refId(self, refId):
+        self.refId = refId
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
     def hasContent_(self):
         if (
             self.name is not None or
@@ -7407,6 +7875,12 @@ class contactNotStrictType(GeneratedsSuper):
         if self.id is not None and 'id' not in already_processed:
             already_processed.add('id')
             outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refId is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            outfile.write(' refId=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refId), input_name='refId')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
     def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='contactNotStrictType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
@@ -7440,6 +7914,10 @@ class contactNotStrictType(GeneratedsSuper):
             element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
         if self.id is not None:
             element.set('id', self.gds_format_string(self.id))
+        if self.refId is not None:
+            element.set('refId', self.gds_format_string(self.refId))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
         if self.name is not None:
             name_ = self.name
             name_.to_etree(element, name_='name', mapping_=mapping_, nsmap_=nsmap_)
@@ -7477,6 +7955,14 @@ class contactNotStrictType(GeneratedsSuper):
         if value is not None and 'id' not in already_processed:
             already_processed.add('id')
             self.id = value
+        value = find_attr_value_('refId', node)
+        if value is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            self.refId = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'name':
             obj_ = textType.factory(parent_object_=self)
@@ -7518,7 +8004,7 @@ class hashType(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, reference=None, referenceID=None, procedure=None, value=None, linkedReport=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, referral=None, referralID=None, procedure=None, value=None, linkedReport=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -7526,10 +8012,10 @@ class hashType(GeneratedsSuper):
         self.ns_prefix_ = "dcc"
         self.id = _cast(None, id)
         self.id_nsprefix_ = None
-        self.reference = reference
-        self.reference_nsprefix_ = "dcc"
-        self.referenceID = referenceID
-        self.referenceID_nsprefix_ = "dcc"
+        self.referral = referral
+        self.referral_nsprefix_ = "dcc"
+        self.referralID = referralID
+        self.referralID_nsprefix_ = "dcc"
         self.procedure = procedure
         self.procedure_nsprefix_ = "dcc"
         self.value = value
@@ -7551,14 +8037,14 @@ class hashType(GeneratedsSuper):
         return self.ns_prefix_
     def set_ns_prefix_(self, ns_prefix):
         self.ns_prefix_ = ns_prefix
-    def get_reference(self):
-        return self.reference
-    def set_reference(self, reference):
-        self.reference = reference
-    def get_referenceID(self):
-        return self.referenceID
-    def set_referenceID(self, referenceID):
-        self.referenceID = referenceID
+    def get_referral(self):
+        return self.referral
+    def set_referral(self, referral):
+        self.referral = referral
+    def get_referralID(self):
+        return self.referralID
+    def set_referralID(self, referralID):
+        self.referralID = referralID
     def get_procedure(self):
         return self.procedure
     def set_procedure(self, procedure):
@@ -7577,8 +8063,8 @@ class hashType(GeneratedsSuper):
         self.id = id
     def hasContent_(self):
         if (
-            self.reference is not None or
-            self.referenceID is not None or
+            self.referral is not None or
+            self.referralID is not None or
             self.procedure is not None or
             self.value is not None or
             self.linkedReport is not None
@@ -7618,13 +8104,13 @@ class hashType(GeneratedsSuper):
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.reference is not None:
-            namespaceprefix_ = self.reference_nsprefix_ + ':' if (UseCapturedNS_ and self.reference_nsprefix_) else ''
-            self.reference.export(outfile, level, namespaceprefix_, namespacedef_='', name_='reference', pretty_print=pretty_print)
-        if self.referenceID is not None:
-            namespaceprefix_ = self.referenceID_nsprefix_ + ':' if (UseCapturedNS_ and self.referenceID_nsprefix_) else ''
+        if self.referral is not None:
+            namespaceprefix_ = self.referral_nsprefix_ + ':' if (UseCapturedNS_ and self.referral_nsprefix_) else ''
+            self.referral.export(outfile, level, namespaceprefix_, namespacedef_='', name_='referral', pretty_print=pretty_print)
+        if self.referralID is not None:
+            namespaceprefix_ = self.referralID_nsprefix_ + ':' if (UseCapturedNS_ and self.referralID_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sreferenceID>%s</%sreferenceID>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.referenceID), input_name='referenceID')), namespaceprefix_ , eol_))
+            outfile.write('<%sreferralID>%s</%sreferralID>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.referralID), input_name='referralID')), namespaceprefix_ , eol_))
         if self.procedure is not None:
             namespaceprefix_ = self.procedure_nsprefix_ + ':' if (UseCapturedNS_ and self.procedure_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
@@ -7643,12 +8129,12 @@ class hashType(GeneratedsSuper):
             element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
         if self.id is not None:
             element.set('id', self.gds_format_string(self.id))
-        if self.reference is not None:
-            reference_ = self.reference
-            reference_.to_etree(element, name_='reference', mapping_=mapping_, nsmap_=nsmap_)
-        if self.referenceID is not None:
-            referenceID_ = self.referenceID
-            etree_.SubElement(element, '{https://ptb.de/dcc}referenceID').text = self.gds_format_string(referenceID_)
+        if self.referral is not None:
+            referral_ = self.referral
+            referral_.to_etree(element, name_='referral', mapping_=mapping_, nsmap_=nsmap_)
+        if self.referralID is not None:
+            referralID_ = self.referralID
+            etree_.SubElement(element, '{https://ptb.de/dcc}referralID').text = self.gds_format_string(referralID_)
         if self.procedure is not None:
             procedure_ = self.procedure
             etree_.SubElement(element, '{https://ptb.de/dcc}procedure').text = self.gds_format_string(procedure_)
@@ -7678,17 +8164,17 @@ class hashType(GeneratedsSuper):
             already_processed.add('id')
             self.id = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'reference':
+        if nodeName_ == 'referral':
             obj_ = textType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
-            self.reference = obj_
-            obj_.original_tagname_ = 'reference'
-        elif nodeName_ == 'referenceID':
+            self.referral = obj_
+            obj_.original_tagname_ = 'referral'
+        elif nodeName_ == 'referralID':
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'referenceID')
-            value_ = self.gds_validate_string(value_, node, 'referenceID')
-            self.referenceID = value_
-            self.referenceID_nsprefix_ = child_.prefix
+            value_ = self.gds_parse_string(value_, node, 'referralID')
+            value_ = self.gds_validate_string(value_, node, 'referralID')
+            self.referralID = value_
+            self.referralID_nsprefix_ = child_.prefix
         elif nodeName_ == 'procedure':
             value_ = child_.text
             value_ = self.gds_parse_string(value_, node, 'procedure')
@@ -7710,11 +8196,10 @@ class hashType(GeneratedsSuper):
 
 
 class textType(GeneratedsSuper):
-    """The textType defines the type for writing text in the DCC.
+    """The textType defines the type for writing localized text in the DCC.
     In this Type, the element content can be used many times with different
     language definition (attribute
-    lang).
-    The optional attribute ID is for a unique ID."""
+    lang)."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -7839,21 +8324,241 @@ class textType(GeneratedsSuper):
 # end class textType
 
 
-class byteDataType(GeneratedsSuper):
-    """The byteDataType defines a type which allows to add
-    binary encoded files to the measurement result section.
-    It is a good practise to use the Base64
-    Data Encodings standard (see RFC 4648).
-    The file must be encoded as base64Binary, see RFC 4648.
-    Examples for the content are image files or ZIP archives.
-    The element fileName gives the name of the original file.
-    Element mimeType is the underlying file type (e.g. zip, jpeg, png).
-    Element data contains the base64Binary encoded file.
-    The optional attribute ID is for a unique ID of this data block."""
+class richContentType(GeneratedsSuper):
+    """Rich content Type can contain files and formulas beside the normal text
+    content."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, id=None, name=None, description=None, fileName=None, mimeType=None, data=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refId=None, refType=None, name=None, content=None, file=None, formula=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "dcc"
+        self.id = _cast(None, id)
+        self.id_nsprefix_ = None
+        self.refId = _cast(None, refId)
+        self.refId_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
+        self.name = name
+        self.name_nsprefix_ = "dcc"
+        if content is None:
+            self.content = []
+        else:
+            self.content = content
+        self.content_nsprefix_ = "dcc"
+        if file is None:
+            self.file = []
+        else:
+            self.file = file
+        self.file_nsprefix_ = "dcc"
+        if formula is None:
+            self.formula = []
+        else:
+            self.formula = formula
+        self.formula_nsprefix_ = "dcc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, richContentType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if richContentType.subclass:
+            return richContentType.subclass(*args_, **kwargs_)
+        else:
+            return richContentType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_name(self):
+        return self.name
+    def set_name(self, name):
+        self.name = name
+    def get_content(self):
+        return self.content
+    def set_content(self, content):
+        self.content = content
+    def add_content(self, value):
+        self.content.append(value)
+    def insert_content_at(self, index, value):
+        self.content.insert(index, value)
+    def replace_content_at(self, index, value):
+        self.content[index] = value
+    def get_file(self):
+        return self.file
+    def set_file(self, file):
+        self.file = file
+    def add_file(self, value):
+        self.file.append(value)
+    def insert_file_at(self, index, value):
+        self.file.insert(index, value)
+    def replace_file_at(self, index, value):
+        self.file[index] = value
+    def get_formula(self):
+        return self.formula
+    def set_formula(self, formula):
+        self.formula = formula
+    def add_formula(self, value):
+        self.formula.append(value)
+    def insert_formula_at(self, index, value):
+        self.formula.insert(index, value)
+    def replace_formula_at(self, index, value):
+        self.formula[index] = value
+    def get_id(self):
+        return self.id
+    def set_id(self, id):
+        self.id = id
+    def get_refId(self):
+        return self.refId
+    def set_refId(self, refId):
+        self.refId = refId
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
+    def hasContent_(self):
+        if (
+            self.name is not None or
+            self.content or
+            self.file or
+            self.formula
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='richContentType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('richContentType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'richContentType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='richContentType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='richContentType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='richContentType'):
+        if self.id is not None and 'id' not in already_processed:
+            already_processed.add('id')
+            outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refId is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            outfile.write(' refId=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refId), input_name='refId')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='richContentType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.name is not None:
+            namespaceprefix_ = self.name_nsprefix_ + ':' if (UseCapturedNS_ and self.name_nsprefix_) else ''
+            self.name.export(outfile, level, namespaceprefix_, namespacedef_='', name_='name', pretty_print=pretty_print)
+        for content_ in self.content:
+            namespaceprefix_ = self.content_nsprefix_ + ':' if (UseCapturedNS_ and self.content_nsprefix_) else ''
+            content_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='content', pretty_print=pretty_print)
+        for file_ in self.file:
+            namespaceprefix_ = self.file_nsprefix_ + ':' if (UseCapturedNS_ and self.file_nsprefix_) else ''
+            file_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='file', pretty_print=pretty_print)
+        for formula_ in self.formula:
+            namespaceprefix_ = self.formula_nsprefix_ + ':' if (UseCapturedNS_ and self.formula_nsprefix_) else ''
+            formula_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='formula', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='richContentType', mapping_=None, nsmap_=None):
+        if parent_element is None:
+            element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
+        else:
+            element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
+        if self.id is not None:
+            element.set('id', self.gds_format_string(self.id))
+        if self.refId is not None:
+            element.set('refId', self.gds_format_string(self.refId))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
+        if self.name is not None:
+            name_ = self.name
+            name_.to_etree(element, name_='name', mapping_=mapping_, nsmap_=nsmap_)
+        for content_ in self.content:
+            content_.to_etree(element, name_='content', mapping_=mapping_, nsmap_=nsmap_)
+        for file_ in self.file:
+            file_.to_etree(element, name_='file', mapping_=mapping_, nsmap_=nsmap_)
+        for formula_ in self.formula:
+            formula_.to_etree(element, name_='formula', mapping_=mapping_, nsmap_=nsmap_)
+        if mapping_ is not None:
+            mapping_[id(self)] = element
+        return element
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('id', node)
+        if value is not None and 'id' not in already_processed:
+            already_processed.add('id')
+            self.id = value
+        value = find_attr_value_('refId', node)
+        if value is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            self.refId = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'name':
+            obj_ = textType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.name = obj_
+            obj_.original_tagname_ = 'name'
+        elif nodeName_ == 'content':
+            obj_ = stringWithLangType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.content.append(obj_)
+            obj_.original_tagname_ = 'content'
+        elif nodeName_ == 'file':
+            obj_ = byteDataType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.file.append(obj_)
+            obj_.original_tagname_ = 'file'
+        elif nodeName_ == 'formula':
+            obj_ = formulaType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.formula.append(obj_)
+            obj_.original_tagname_ = 'formula'
+# end class richContentType
+
+
+class byteDataType(GeneratedsSuper):
+    """The byteDataType defines a type which allows to add binary encoded files
+    to the measurement result
+    section."""
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, id=None, name=None, description=None, fileName=None, mimeType=None, dataBase64=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -7869,8 +8574,8 @@ class byteDataType(GeneratedsSuper):
         self.fileName_nsprefix_ = "dcc"
         self.mimeType = mimeType
         self.mimeType_nsprefix_ = "dcc"
-        self.data = data
-        self.data_nsprefix_ = "dcc"
+        self.dataBase64 = dataBase64
+        self.dataBase64_nsprefix_ = "dcc"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -7902,10 +8607,10 @@ class byteDataType(GeneratedsSuper):
         return self.mimeType
     def set_mimeType(self, mimeType):
         self.mimeType = mimeType
-    def get_data(self):
-        return self.data
-    def set_data(self, data):
-        self.data = data
+    def get_dataBase64(self):
+        return self.dataBase64
+    def set_dataBase64(self, dataBase64):
+        self.dataBase64 = dataBase64
     def get_id(self):
         return self.id
     def set_id(self, id):
@@ -7916,7 +8621,7 @@ class byteDataType(GeneratedsSuper):
             self.description is not None or
             self.fileName is not None or
             self.mimeType is not None or
-            self.data is not None
+            self.dataBase64 is not None
         ):
             return True
         else:
@@ -7967,10 +8672,10 @@ class byteDataType(GeneratedsSuper):
             namespaceprefix_ = self.mimeType_nsprefix_ + ':' if (UseCapturedNS_ and self.mimeType_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%smimeType>%s</%smimeType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.mimeType), input_name='mimeType')), namespaceprefix_ , eol_))
-        if self.data is not None:
-            namespaceprefix_ = self.data_nsprefix_ + ':' if (UseCapturedNS_ and self.data_nsprefix_) else ''
+        if self.dataBase64 is not None:
+            namespaceprefix_ = self.dataBase64_nsprefix_ + ':' if (UseCapturedNS_ and self.dataBase64_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sdata>%s</%sdata>%s' % (namespaceprefix_ , self.gds_format_base64(self.data, input_name='data'), namespaceprefix_ , eol_))
+            outfile.write('<%sdataBase64>%s</%sdataBase64>%s' % (namespaceprefix_ , self.gds_format_base64(self.dataBase64, input_name='dataBase64'), namespaceprefix_ , eol_))
     def to_etree(self, parent_element=None, name_='byteDataType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
@@ -7990,9 +8695,9 @@ class byteDataType(GeneratedsSuper):
         if self.mimeType is not None:
             mimeType_ = self.mimeType
             etree_.SubElement(element, '{https://ptb.de/dcc}mimeType').text = self.gds_format_string(mimeType_)
-        if self.data is not None:
-            data_ = self.data
-            etree_.SubElement(element, '{https://ptb.de/dcc}data').text = self.gds_format_base64(data_)
+        if self.dataBase64 is not None:
+            dataBase64_ = self.dataBase64
+            etree_.SubElement(element, '{https://ptb.de/dcc}dataBase64').text = self.gds_format_base64(dataBase64_)
         if mapping_ is not None:
             mapping_[id(self)] = element
         return element
@@ -8019,7 +8724,7 @@ class byteDataType(GeneratedsSuper):
             self.name = obj_
             obj_.original_tagname_ = 'name'
         elif nodeName_ == 'description':
-            obj_ = textType.factory(parent_object_=self)
+            obj_ = richContentType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.description = obj_
             obj_.original_tagname_ = 'description'
@@ -8035,44 +8740,43 @@ class byteDataType(GeneratedsSuper):
             value_ = self.gds_validate_string(value_, node, 'mimeType')
             self.mimeType = value_
             self.mimeType_nsprefix_ = child_.prefix
-        elif nodeName_ == 'data':
+        elif nodeName_ == 'dataBase64':
             sval_ = child_.text
             if sval_ is not None:
                 try:
                     bval_ = base64.b64decode(sval_)
                 except (TypeError, ValueError) as exp:
                     raise_parse_error(child_, 'requires base64 encoded string: %s' % exp)
-                bval_ = self.gds_validate_base64(bval_, node, 'data')
+                bval_ = self.gds_validate_base64(bval_, node, 'dataBase64')
             else:
                 bval_ = None
-            self.data = bval_
-            self.data_nsprefix_ = child_.prefix
+            self.dataBase64 = bval_
+            self.dataBase64_nsprefix_ = child_.prefix
 # end class byteDataType
 
 
 class formulaType(GeneratedsSuper):
     """This data block is used to add formulas and equations to the measurement
-    result section of the DCC.
-    A formula is expected to by written by means of the LaTeX ams math
-    formalism. All units in the
-    LaTeX expression must follow the siunitx LaTeX standard.
-    The formula is written to the siunitx element.
-    The optional attribute ID is for a unique ID of this block."""
+    result section of the DCC."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, lang=None, id=None, siunitx=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refId=None, refType=None, latex=None, mathml=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = "dcc"
-        self.lang = _cast(None, lang)
-        self.lang_nsprefix_ = None
         self.id = _cast(None, id)
         self.id_nsprefix_ = None
-        self.siunitx = siunitx
-        self.siunitx_nsprefix_ = "dcc"
+        self.refId = _cast(None, refId)
+        self.refId_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
+        self.latex = latex
+        self.latex_nsprefix_ = "dcc"
+        self.mathml = mathml
+        self.mathml_nsprefix_ = "dcc"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -8088,21 +8792,30 @@ class formulaType(GeneratedsSuper):
         return self.ns_prefix_
     def set_ns_prefix_(self, ns_prefix):
         self.ns_prefix_ = ns_prefix
-    def get_siunitx(self):
-        return self.siunitx
-    def set_siunitx(self, siunitx):
-        self.siunitx = siunitx
-    def get_lang(self):
-        return self.lang
-    def set_lang(self, lang):
-        self.lang = lang
+    def get_latex(self):
+        return self.latex
+    def set_latex(self, latex):
+        self.latex = latex
+    def get_mathml(self):
+        return self.mathml
+    def set_mathml(self, mathml):
+        self.mathml = mathml
     def get_id(self):
         return self.id
     def set_id(self, id):
         self.id = id
+    def get_refId(self):
+        return self.refId
+    def set_refId(self, refId):
+        self.refId = refId
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
     def hasContent_(self):
         if (
-            self.siunitx is not None
+            self.latex is not None or
+            self.mathml is not None
         ):
             return True
         else:
@@ -8131,33 +8844,44 @@ class formulaType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='formulaType'):
-        if self.lang is not None and 'lang' not in already_processed:
-            already_processed.add('lang')
-            outfile.write(' lang=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.lang), input_name='lang')), ))
         if self.id is not None and 'id' not in already_processed:
             already_processed.add('id')
             outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refId is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            outfile.write(' refId=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refId), input_name='refId')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
     def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='formulaType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.siunitx is not None:
-            namespaceprefix_ = self.siunitx_nsprefix_ + ':' if (UseCapturedNS_ and self.siunitx_nsprefix_) else ''
+        if self.latex is not None:
+            namespaceprefix_ = self.latex_nsprefix_ + ':' if (UseCapturedNS_ and self.latex_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssiunitx>%s</%ssiunitx>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.siunitx), input_name='siunitx')), namespaceprefix_ , eol_))
+            outfile.write('<%slatex>%s</%slatex>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.latex), input_name='latex')), namespaceprefix_ , eol_))
+        if self.mathml is not None:
+            namespaceprefix_ = self.mathml_nsprefix_ + ':' if (UseCapturedNS_ and self.mathml_nsprefix_) else ''
+            self.mathml.export(outfile, level, namespaceprefix_, namespacedef_='', name_='mathml', pretty_print=pretty_print)
     def to_etree(self, parent_element=None, name_='formulaType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
         else:
             element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
-        if self.lang is not None:
-            element.set('lang', self.gds_format_string(self.lang))
         if self.id is not None:
             element.set('id', self.gds_format_string(self.id))
-        if self.siunitx is not None:
-            siunitx_ = self.siunitx
-            etree_.SubElement(element, '{https://ptb.de/dcc}siunitx').text = self.gds_format_string(siunitx_)
+        if self.refId is not None:
+            element.set('refId', self.gds_format_string(self.refId))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
+        if self.latex is not None:
+            latex_ = self.latex
+            etree_.SubElement(element, '{https://ptb.de/dcc}latex').text = self.gds_format_string(latex_)
+        if self.mathml is not None:
+            mathml_ = self.mathml
+            mathml_.to_etree(element, name_='mathml', mapping_=mapping_, nsmap_=nsmap_)
         if mapping_ is not None:
             mapping_[id(self)] = element
         return element
@@ -8173,38 +8897,51 @@ class formulaType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
-        value = find_attr_value_('lang', node)
-        if value is not None and 'lang' not in already_processed:
-            already_processed.add('lang')
-            self.lang = value
         value = find_attr_value_('id', node)
         if value is not None and 'id' not in already_processed:
             already_processed.add('id')
             self.id = value
+        value = find_attr_value_('refId', node)
+        if value is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            self.refId = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'siunitx':
+        if nodeName_ == 'latex':
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'siunitx')
-            value_ = self.gds_validate_string(value_, node, 'siunitx')
-            self.siunitx = value_
-            self.siunitx_nsprefix_ = child_.prefix
+            value_ = self.gds_parse_string(value_, node, 'latex')
+            value_ = self.gds_validate_string(value_, node, 'latex')
+            self.latex = value_
+            self.latex_nsprefix_ = child_.prefix
+        elif nodeName_ == 'mathml':
+            obj_ = xmlType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.mathml = obj_
+            obj_.original_tagname_ = 'mathml'
 # end class formulaType
 
 
 class xmlType(GeneratedsSuper):
-    """This data block is used to add user or application specific XML content
-    to the
-    measurement result section of the DCC.
-    The optional attribute ID is for a unique ID of this block."""
+    """This data block is used to add user or application specific XML
+    content."""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, anytypeobjs_=None, gds_collector_=None, **kwargs_):
+    def __init__(self, id=None, refId=None, refType=None, anytypeobjs_=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = "dcc"
+        self.id = _cast(None, id)
+        self.id_nsprefix_ = None
+        self.refId = _cast(None, refId)
+        self.refId_nsprefix_ = None
+        self.refType = _cast(None, refType)
+        self.refType_nsprefix_ = None
         self.anytypeobjs_ = anytypeobjs_
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
@@ -8223,6 +8960,18 @@ class xmlType(GeneratedsSuper):
         self.ns_prefix_ = ns_prefix
     def get_anytypeobjs_(self): return self.anytypeobjs_
     def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
+    def get_id(self):
+        return self.id
+    def set_id(self, id):
+        self.id = id
+    def get_refId(self):
+        return self.refId
+    def set_refId(self, refId):
+        self.refId = refId
+    def get_refType(self):
+        return self.refType
+    def set_refType(self, refType):
+        self.refType = refType
     def hasContent_(self):
         if (
             self.anytypeobjs_ is not None
@@ -8254,7 +9003,15 @@ class xmlType(GeneratedsSuper):
         else:
             outfile.write('/>%s' % (eol_, ))
     def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='xmlType'):
-        pass
+        if self.id is not None and 'id' not in already_processed:
+            already_processed.add('id')
+            outfile.write(' id=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.id), input_name='id')), ))
+        if self.refId is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            outfile.write(' refId=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refId), input_name='refId')), ))
+        if self.refType is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            outfile.write(' refType=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.refType), input_name='refType')), ))
     def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc"', name_='xmlType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
@@ -8269,6 +9026,12 @@ class xmlType(GeneratedsSuper):
             element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
         else:
             element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
+        if self.id is not None:
+            element.set('id', self.gds_format_string(self.id))
+        if self.refId is not None:
+            element.set('refId', self.gds_format_string(self.refId))
+        if self.refType is not None:
+            element.set('refType', self.gds_format_string(self.refType))
         if self.anytypeobjs_ is not None:
             self.anytypeobjs_.to_etree(element, mapping_=mapping_, nsmap_=nsmap_)
         if mapping_ is not None:
@@ -8286,47 +9049,26 @@ class xmlType(GeneratedsSuper):
             self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
         return self
     def buildAttributes(self, node, attrs, already_processed):
-        pass
+        value = find_attr_value_('id', node)
+        if value is not None and 'id' not in already_processed:
+            already_processed.add('id')
+            self.id = value
+        value = find_attr_value_('refId', node)
+        if value is not None and 'refId' not in already_processed:
+            already_processed.add('refId')
+            self.refId = value
+        value = find_attr_value_('refType', node)
+        if value is not None and 'refType' not in already_processed:
+            already_processed.add('refType')
+            self.refType = value
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         content_ = self.gds_build_any(child_, 'xmlType')
         self.set_anytypeobjs_(content_)
 # end class xmlType
 
 
-class real(GeneratedsSuper):
-    """Meta data element definition for a real measurement quantity.
-    The following statements of a real quantity are possible.
-    [(m)-mandatory, (o)-optional]
-    1. Basic measured quantity
-    (o) - element label (string)
-    (m) - element value (decimal value type)
-    (m) - element unit (string - SI format)
-    (o) - element dateTime (xs:dateTime)
-    2. Measured quantity with expanded measurement uncertainty
-    (o) - element label (string)
-    (m) - element value (decimal value type)
-    (m) - element unit (string - SI format)
-    (o) - element dateTime (xs:dateTime)
-    (m) - element expandedUnc (element type expandedUnc - sub structure)
-    3. Measured quantity with uncertainty coverage interval (probabilistic-
-    symmetric)
-    (o) - element label (string)
-    (m) - element value (decimal value type)
-    (m) - element unit (string - SI format)
-    (o) - element dateTime (xs:dateTime)
-    (m) - element coverageInterval (element type coverageInterval - sub
-    structure)
-    Integration into external XML:
-    <myXML xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:si="https://ptb.de/si">
-    <xs:element name="individualElement">
-    <xs:complexType>
-    <xs:sequence>
-    <xs:element ref="si:real"/>
-    </xs:sequence>
-    </xs:complexType>
-    </xs:element>
-    </mxXML>"""
+class realQuantityType(GeneratedsSuper):
+    """univariate measurement uncertainty"""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -8357,13 +9099,13 @@ class real(GeneratedsSuper):
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, real)
+                CurrentSubclassModule_, realQuantityType)
             if subclass is not None:
                 return subclass(*args_, **kwargs_)
-        if real.subclass:
-            return real.subclass(*args_, **kwargs_)
+        if realQuantityType.subclass:
+            return realQuantityType.subclass(*args_, **kwargs_)
         else:
-            return real(*args_, **kwargs_)
+            return realQuantityType(*args_, **kwargs_)
     factory = staticmethod(factory)
     def get_ns_prefix_(self):
         return self.ns_prefix_
@@ -8429,32 +9171,32 @@ class real(GeneratedsSuper):
             return True
         else:
             return False
-    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='real', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('real')
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='realQuantityType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('realQuantityType')
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'real':
+        if self.original_tagname_ is not None and name_ == 'realQuantityType':
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
             namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
         outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='real')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='realQuantityType')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='real', pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='realQuantityType', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
             outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='real'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='realQuantityType'):
         pass
-    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='real', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='realQuantityType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
@@ -8477,11 +9219,11 @@ class real(GeneratedsSuper):
             outfile.write('<%sdateTime>%s</%sdateTime>%s' % (namespaceprefix_ , self.gds_format_datetime(self.dateTime, input_name='dateTime'), namespaceprefix_ , eol_))
         if self.expandedUnc is not None:
             namespaceprefix_ = self.expandedUnc_nsprefix_ + ':' if (UseCapturedNS_ and self.expandedUnc_nsprefix_) else ''
-            self.expandedUnc.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='expandedUnc', pretty_print=pretty_print)
+            self.expandedUnc.export(outfile, level, namespaceprefix_, namespacedef_='', name_='expandedUnc', pretty_print=pretty_print)
         if self.coverageInterval is not None:
             namespaceprefix_ = self.coverageInterval_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageInterval_nsprefix_) else ''
-            self.coverageInterval.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='coverageInterval', pretty_print=pretty_print)
-    def to_etree(self, parent_element=None, name_='real', mapping_=None, nsmap_=None):
+            self.coverageInterval.export(outfile, level, namespaceprefix_, namespacedef_='', name_='coverageInterval', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='realQuantityType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
         else:
@@ -8549,522 +9291,19 @@ class real(GeneratedsSuper):
             self.dateTime = dval_
             self.dateTime_nsprefix_ = child_.prefix
         elif nodeName_ == 'expandedUnc':
-            obj_ = expandedUnc.factory(parent_object_=self)
+            obj_ = expandedUncType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.expandedUnc = obj_
             obj_.original_tagname_ = 'expandedUnc'
         elif nodeName_ == 'coverageInterval':
-            obj_ = coverageInterval.factory(parent_object_=self)
+            obj_ = coverageIntervalType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.coverageInterval = obj_
             obj_.original_tagname_ = 'coverageInterval'
-# end class real
+# end class realQuantityType
 
 
-class expandedUnc(GeneratedsSuper):
-    """Definition of the structure, that gives the necessary components for
-    stating
-    an expanded measurement uncertainty. This element must always be used in
-    the
-    context of a real quantity, which is an application within si:real and/or
-    si:globalUnivariateUnc.
-    The element has the following components [(m)-mandatory, (o)-optional]:
-    (m) - element uncertainty (decimal value >= 0)
-    (m) - element coverageFactor (decimal value >= 1)
-    (m) - element coverageProbability (decimal value in [0,1])
-    (o) - element distribution (string)
-    The unit of component uncertainty is the unit used in the context of
-    si:real and/or si:globalUnivariateUnc."""
-    __hash__ = GeneratedsSuper.__hash__
-    subclass = None
-    superclass = None
-    def __init__(self, uncertainty=None, coverageFactor=None, coverageProbability=None, distribution=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = "si"
-        self.uncertainty = uncertainty
-        self.validate_uncertaintyValueType(self.uncertainty)
-        self.uncertainty_nsprefix_ = "si"
-        self.coverageFactor = coverageFactor
-        self.validate_kValueType(self.coverageFactor)
-        self.coverageFactor_nsprefix_ = "si"
-        self.coverageProbability = coverageProbability
-        self.validate_probabilityValueType(self.coverageProbability)
-        self.coverageProbability_nsprefix_ = "si"
-        self.distribution = distribution
-        self.distribution_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, expandedUnc)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if expandedUnc.subclass:
-            return expandedUnc.subclass(*args_, **kwargs_)
-        else:
-            return expandedUnc(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def get_ns_prefix_(self):
-        return self.ns_prefix_
-    def set_ns_prefix_(self, ns_prefix):
-        self.ns_prefix_ = ns_prefix
-    def get_uncertainty(self):
-        return self.uncertainty
-    def set_uncertainty(self, uncertainty):
-        self.uncertainty = uncertainty
-    def get_coverageFactor(self):
-        return self.coverageFactor
-    def set_coverageFactor(self, coverageFactor):
-        self.coverageFactor = coverageFactor
-    def get_coverageProbability(self):
-        return self.coverageProbability
-    def set_coverageProbability(self, coverageProbability):
-        self.coverageProbability = coverageProbability
-    def get_distribution(self):
-        return self.distribution
-    def set_distribution(self, distribution):
-        self.distribution = distribution
-    def validate_uncertaintyValueType(self, value):
-        result = True
-        # Validate type uncertaintyValueType, a restriction on xs:double.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, float):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_uncertaintyValueType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_uncertaintyValueType_patterns_, ))
-                result = False
-        return result
-    validate_uncertaintyValueType_patterns_ = [['^(\\+?((\\d*\\.\\d+)|(\\d+\\.\\d*)|(\\d+\\.?))([Ee][-+]?\\d+)?)$']]
-    def validate_kValueType(self, value):
-        result = True
-        # Validate type kValueType, a restriction on xs:double.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, float):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_kValueType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_kValueType_patterns_, ))
-                result = False
-        return result
-    validate_kValueType_patterns_ = [['^(\\+?(([1-9]\\d*\\.\\d*)|([1-9]\\d*)))$']]
-    def validate_probabilityValueType(self, value):
-        result = True
-        # Validate type probabilityValueType, a restriction on xs:double.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, float):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_probabilityValueType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_probabilityValueType_patterns_, ))
-                result = False
-        return result
-    validate_probabilityValueType_patterns_ = [['^(\\+?((0(\\.\\d*)?)|(1(\\.0*)?)))$']]
-    def hasContent_(self):
-        if (
-            self.uncertainty is not None or
-            self.coverageFactor is not None or
-            self.coverageProbability is not None or
-            self.distribution is not None
-        ):
-            return True
-        else:
-            return False
-    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='expandedUnc', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('expandedUnc')
-        if imported_ns_def_ is not None:
-            namespacedef_ = imported_ns_def_
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'expandedUnc':
-            name_ = self.original_tagname_
-        if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
-        showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='expandedUnc')
-        if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='expandedUnc', pretty_print=pretty_print)
-            showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
-        else:
-            outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='expandedUnc'):
-        pass
-    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='expandedUnc', fromsubclass_=False, pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.uncertainty is not None:
-            namespaceprefix_ = self.uncertainty_nsprefix_ + ':' if (UseCapturedNS_ and self.uncertainty_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%suncertainty>%s</%suncertainty>%s' % (namespaceprefix_ , self.gds_format_double(self.uncertainty, input_name='uncertainty'), namespaceprefix_ , eol_))
-        if self.coverageFactor is not None:
-            namespaceprefix_ = self.coverageFactor_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageFactor_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%scoverageFactor>%s</%scoverageFactor>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageFactor, input_name='coverageFactor'), namespaceprefix_ , eol_))
-        if self.coverageProbability is not None:
-            namespaceprefix_ = self.coverageProbability_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageProbability_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%scoverageProbability>%s</%scoverageProbability>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageProbability, input_name='coverageProbability'), namespaceprefix_ , eol_))
-        if self.distribution is not None:
-            namespaceprefix_ = self.distribution_nsprefix_ + ':' if (UseCapturedNS_ and self.distribution_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sdistribution>%s</%sdistribution>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.distribution), input_name='distribution')), namespaceprefix_ , eol_))
-    def to_etree(self, parent_element=None, name_='expandedUnc', mapping_=None, nsmap_=None):
-        if parent_element is None:
-            element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
-        else:
-            element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
-        if self.uncertainty is not None:
-            uncertainty_ = self.uncertainty
-            etree_.SubElement(element, '{https://ptb.de/si}uncertainty').text = self.gds_format_double(uncertainty_)
-        if self.coverageFactor is not None:
-            coverageFactor_ = self.coverageFactor
-            etree_.SubElement(element, '{https://ptb.de/si}coverageFactor').text = self.gds_format_double(coverageFactor_)
-        if self.coverageProbability is not None:
-            coverageProbability_ = self.coverageProbability
-            etree_.SubElement(element, '{https://ptb.de/si}coverageProbability').text = self.gds_format_double(coverageProbability_)
-        if self.distribution is not None:
-            distribution_ = self.distribution
-            etree_.SubElement(element, '{https://ptb.de/si}distribution').text = self.gds_format_string(distribution_)
-        if mapping_ is not None:
-            mapping_[id(self)] = element
-        return element
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'uncertainty' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'uncertainty')
-            fval_ = self.gds_validate_double(fval_, node, 'uncertainty')
-            self.uncertainty = fval_
-            self.uncertainty_nsprefix_ = child_.prefix
-            # validate type uncertaintyValueType
-            self.validate_uncertaintyValueType(self.uncertainty)
-        elif nodeName_ == 'coverageFactor' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'coverageFactor')
-            fval_ = self.gds_validate_double(fval_, node, 'coverageFactor')
-            self.coverageFactor = fval_
-            self.coverageFactor_nsprefix_ = child_.prefix
-            # validate type kValueType
-            self.validate_kValueType(self.coverageFactor)
-        elif nodeName_ == 'coverageProbability' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'coverageProbability')
-            fval_ = self.gds_validate_double(fval_, node, 'coverageProbability')
-            self.coverageProbability = fval_
-            self.coverageProbability_nsprefix_ = child_.prefix
-            # validate type probabilityValueType
-            self.validate_probabilityValueType(self.coverageProbability)
-        elif nodeName_ == 'distribution':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'distribution')
-            value_ = self.gds_validate_string(value_, node, 'distribution')
-            self.distribution = value_
-            self.distribution_nsprefix_ = child_.prefix
-# end class expandedUnc
-
-
-class coverageInterval(GeneratedsSuper):
-    """Definition of the structure, that gives the necessary components for
-    stating
-    a probabilistic-symmetric coverage interval for a real uncertainty. This
-    element
-    must always be used in the context of a real quantity, which is an
-    application
-    within si:real and/or si:globalUnivariateUnc.
-    The element has the following components [(m)-mandatory, (o)-optional]:
-    (m) - element stdUncertainty (decimal value >= 0)
-    (m) - element intervalMin (decimal value type)
-    (m) - element intervalMax (decimal value type)
-    (m) - element coverageProbability (decimal value in [0,1])
-    (o) - element distribution (string)
-    The unit of components stdUncertainty, intervalMin and intervalMax is the
-    unit
-    used in the context of si:real and/or si:globalUnivaraiteUnc."""
-    __hash__ = GeneratedsSuper.__hash__
-    subclass = None
-    superclass = None
-    def __init__(self, standardUnc=None, intervalMin=None, intervalMax=None, coverageProbability=None, distribution=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = "si"
-        self.standardUnc = standardUnc
-        self.validate_uncertaintyValueType(self.standardUnc)
-        self.standardUnc_nsprefix_ = "si"
-        self.intervalMin = intervalMin
-        self.validate_decimalType(self.intervalMin)
-        self.intervalMin_nsprefix_ = "si"
-        self.intervalMax = intervalMax
-        self.validate_decimalType(self.intervalMax)
-        self.intervalMax_nsprefix_ = "si"
-        self.coverageProbability = coverageProbability
-        self.validate_probabilityValueType(self.coverageProbability)
-        self.coverageProbability_nsprefix_ = "si"
-        self.distribution = distribution
-        self.distribution_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, coverageInterval)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if coverageInterval.subclass:
-            return coverageInterval.subclass(*args_, **kwargs_)
-        else:
-            return coverageInterval(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def get_ns_prefix_(self):
-        return self.ns_prefix_
-    def set_ns_prefix_(self, ns_prefix):
-        self.ns_prefix_ = ns_prefix
-    def get_standardUnc(self):
-        return self.standardUnc
-    def set_standardUnc(self, standardUnc):
-        self.standardUnc = standardUnc
-    def get_intervalMin(self):
-        return self.intervalMin
-    def set_intervalMin(self, intervalMin):
-        self.intervalMin = intervalMin
-    def get_intervalMax(self):
-        return self.intervalMax
-    def set_intervalMax(self, intervalMax):
-        self.intervalMax = intervalMax
-    def get_coverageProbability(self):
-        return self.coverageProbability
-    def set_coverageProbability(self, coverageProbability):
-        self.coverageProbability = coverageProbability
-    def get_distribution(self):
-        return self.distribution
-    def set_distribution(self, distribution):
-        self.distribution = distribution
-    def validate_uncertaintyValueType(self, value):
-        result = True
-        # Validate type uncertaintyValueType, a restriction on xs:double.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, float):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_uncertaintyValueType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_uncertaintyValueType_patterns_, ))
-                result = False
-        return result
-    validate_uncertaintyValueType_patterns_ = [['^(\\+?((\\d*\\.\\d+)|(\\d+\\.\\d*)|(\\d+\\.?))([Ee][-+]?\\d+)?)$']]
-    def validate_decimalType(self, value):
-        result = True
-        # Validate type decimalType, a restriction on xs:double.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, float):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_decimalType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_decimalType_patterns_, ))
-                result = False
-        return result
-    validate_decimalType_patterns_ = [['^([-+]?((\\d*\\.\\d+)|(\\d+\\.\\d*)|(\\d+\\.?))([Ee][-+]?\\d+)?)$']]
-    def validate_probabilityValueType(self, value):
-        result = True
-        # Validate type probabilityValueType, a restriction on xs:double.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, float):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_probabilityValueType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_probabilityValueType_patterns_, ))
-                result = False
-        return result
-    validate_probabilityValueType_patterns_ = [['^(\\+?((0(\\.\\d*)?)|(1(\\.0*)?)))$']]
-    def hasContent_(self):
-        if (
-            self.standardUnc is not None or
-            self.intervalMin is not None or
-            self.intervalMax is not None or
-            self.coverageProbability is not None or
-            self.distribution is not None
-        ):
-            return True
-        else:
-            return False
-    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='coverageInterval', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('coverageInterval')
-        if imported_ns_def_ is not None:
-            namespacedef_ = imported_ns_def_
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'coverageInterval':
-            name_ = self.original_tagname_
-        if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
-        showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='coverageInterval')
-        if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='coverageInterval', pretty_print=pretty_print)
-            showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
-        else:
-            outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='coverageInterval'):
-        pass
-    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='coverageInterval', fromsubclass_=False, pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.standardUnc is not None:
-            namespaceprefix_ = self.standardUnc_nsprefix_ + ':' if (UseCapturedNS_ and self.standardUnc_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sstandardUnc>%s</%sstandardUnc>%s' % (namespaceprefix_ , self.gds_format_double(self.standardUnc, input_name='standardUnc'), namespaceprefix_ , eol_))
-        if self.intervalMin is not None:
-            namespaceprefix_ = self.intervalMin_nsprefix_ + ':' if (UseCapturedNS_ and self.intervalMin_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sintervalMin>%s</%sintervalMin>%s' % (namespaceprefix_ , self.gds_format_double(self.intervalMin, input_name='intervalMin'), namespaceprefix_ , eol_))
-        if self.intervalMax is not None:
-            namespaceprefix_ = self.intervalMax_nsprefix_ + ':' if (UseCapturedNS_ and self.intervalMax_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sintervalMax>%s</%sintervalMax>%s' % (namespaceprefix_ , self.gds_format_double(self.intervalMax, input_name='intervalMax'), namespaceprefix_ , eol_))
-        if self.coverageProbability is not None:
-            namespaceprefix_ = self.coverageProbability_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageProbability_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%scoverageProbability>%s</%scoverageProbability>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageProbability, input_name='coverageProbability'), namespaceprefix_ , eol_))
-        if self.distribution is not None:
-            namespaceprefix_ = self.distribution_nsprefix_ + ':' if (UseCapturedNS_ and self.distribution_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sdistribution>%s</%sdistribution>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.distribution), input_name='distribution')), namespaceprefix_ , eol_))
-    def to_etree(self, parent_element=None, name_='coverageInterval', mapping_=None, nsmap_=None):
-        if parent_element is None:
-            element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
-        else:
-            element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
-        if self.standardUnc is not None:
-            standardUnc_ = self.standardUnc
-            etree_.SubElement(element, '{https://ptb.de/si}standardUnc').text = self.gds_format_double(standardUnc_)
-        if self.intervalMin is not None:
-            intervalMin_ = self.intervalMin
-            etree_.SubElement(element, '{https://ptb.de/si}intervalMin').text = self.gds_format_double(intervalMin_)
-        if self.intervalMax is not None:
-            intervalMax_ = self.intervalMax
-            etree_.SubElement(element, '{https://ptb.de/si}intervalMax').text = self.gds_format_double(intervalMax_)
-        if self.coverageProbability is not None:
-            coverageProbability_ = self.coverageProbability
-            etree_.SubElement(element, '{https://ptb.de/si}coverageProbability').text = self.gds_format_double(coverageProbability_)
-        if self.distribution is not None:
-            distribution_ = self.distribution
-            etree_.SubElement(element, '{https://ptb.de/si}distribution').text = self.gds_format_string(distribution_)
-        if mapping_ is not None:
-            mapping_[id(self)] = element
-        return element
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'standardUnc' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'standardUnc')
-            fval_ = self.gds_validate_double(fval_, node, 'standardUnc')
-            self.standardUnc = fval_
-            self.standardUnc_nsprefix_ = child_.prefix
-            # validate type uncertaintyValueType
-            self.validate_uncertaintyValueType(self.standardUnc)
-        elif nodeName_ == 'intervalMin' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'intervalMin')
-            fval_ = self.gds_validate_double(fval_, node, 'intervalMin')
-            self.intervalMin = fval_
-            self.intervalMin_nsprefix_ = child_.prefix
-            # validate type decimalType
-            self.validate_decimalType(self.intervalMin)
-        elif nodeName_ == 'intervalMax' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'intervalMax')
-            fval_ = self.gds_validate_double(fval_, node, 'intervalMax')
-            self.intervalMax = fval_
-            self.intervalMax_nsprefix_ = child_.prefix
-            # validate type decimalType
-            self.validate_decimalType(self.intervalMax)
-        elif nodeName_ == 'coverageProbability' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'coverageProbability')
-            fval_ = self.gds_validate_double(fval_, node, 'coverageProbability')
-            self.coverageProbability = fval_
-            self.coverageProbability_nsprefix_ = child_.prefix
-            # validate type probabilityValueType
-            self.validate_probabilityValueType(self.coverageProbability)
-        elif nodeName_ == 'distribution':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'distribution')
-            value_ = self.gds_validate_string(value_, node, 'distribution')
-            self.distribution = value_
-            self.distribution_nsprefix_ = child_.prefix
-# end class coverageInterval
-
-
-class constant(GeneratedsSuper):
-    """Definition of a structure for real numbers, that represent for
-    fundamental
-    physical constants and mathematical constants.
-    The element has the following components [(m)-mandatory, (o)-optional]:
-    (o) - element label (string)
-    (m) - element value (decimal value type)
-    (m) - element unit (string - SI unit)
-    (o) - element dateTime (xs:dateTime)
-    (o) - element uncertainty (decimal value >= 0)
-    (o) - element distribution (string)
-    The value and the uncertainty have the unit specified by the element unit.
-    For fundamental physical constants, that are defined experimentally, the
-    uncertainty is the standard deviation.
-    For rounded mathematical constants, the uncertainty is the standard
-    deviation
-    of a rectangular distribution (element value defines center point), that
-    contains the exact value of the constant with 100 percent probability."""
+class constantQuantityType(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -9096,13 +9335,13 @@ class constant(GeneratedsSuper):
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, constant)
+                CurrentSubclassModule_, constantQuantityType)
             if subclass is not None:
                 return subclass(*args_, **kwargs_)
-        if constant.subclass:
-            return constant.subclass(*args_, **kwargs_)
+        if constantQuantityType.subclass:
+            return constantQuantityType.subclass(*args_, **kwargs_)
         else:
-            return constant(*args_, **kwargs_)
+            return constantQuantityType(*args_, **kwargs_)
     factory = staticmethod(factory)
     def get_ns_prefix_(self):
         return self.ns_prefix_
@@ -9182,32 +9421,32 @@ class constant(GeneratedsSuper):
             return True
         else:
             return False
-    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='constant', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('constant')
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='constantQuantityType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('constantQuantityType')
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'constant':
+        if self.original_tagname_ is not None and name_ == 'constantQuantityType':
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
             namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
         outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='constant')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='constantQuantityType')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='constant', pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='constantQuantityType', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
             outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='constant'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='constantQuantityType'):
         pass
-    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='constant', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='constantQuantityType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
@@ -9236,7 +9475,7 @@ class constant(GeneratedsSuper):
             namespaceprefix_ = self.distribution_nsprefix_ + ':' if (UseCapturedNS_ and self.distribution_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sdistribution>%s</%sdistribution>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.distribution), input_name='distribution')), namespaceprefix_ , eol_))
-    def to_etree(self, parent_element=None, name_='constant', mapping_=None, nsmap_=None):
+    def to_etree(self, parent_element=None, name_='constantQuantityType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
         else:
@@ -9317,65 +9556,11 @@ class constant(GeneratedsSuper):
             value_ = self.gds_validate_string(value_, node, 'distribution')
             self.distribution = value_
             self.distribution_nsprefix_ = child_.prefix
-# end class constant
+# end class constantQuantityType
 
 
-class complex(GeneratedsSuper):
-    """The definition of complex quantities in the D-SI meta data model.
-    Complex quantities allow two representations of complex numerical values:
-    One is the Cartesian coordinate form, the other representation is the
-    polar coordinate form.
-    The following statements of a complex quantity are possible.
-    [(m)-mandatory, (o)-optional]
-    1. Basic measured quantity in Cartesian form
-    (o) - element label (string)
-    (m) - element valueReal (decimal value type)
-    (m) - element valueImag (decimal value type)
-    (m) - element unit (string - SI unit)
-    (o) - element dateTime (xs:dateTime)
-    2. Basic measured quantity in polar form
-    (o) - element label (string)
-    (m) - element valueMagnitude (decimal value type)
-    (m) - element valuePhase (decimal value type)
-    (m) - element unit (string - SI unit)
-    (m) - element unitPhase (string - SI unit for an angular quantity)
-    (o) - element dateTime (xs:dateTime)
-    3. Basic measured quantity in Cartesian form with ellipsoidal coverage
-    region
-    (o) - element label (string)
-    (m) - element valueReal (decimal value type)
-    (m) - element valueImag (decimal value type)
-    (m) - element unit (string - SI unit)
-    (o) - element dateTime (xs:dateTime)
-    (m) - element ellipsoidalRegion (element type ellipsoidalRegion - sub
-    structure)
-    4. Basic measured quantity in polar form with ellipsoidal coverage region
-    (o) - element label (string)
-    (m) - element valueMagnitude (decimal value type)
-    (m) - element valuePhase (decimal value type)
-    (m) - element unit (string - SI unit)
-    (m) - element unitPhase (string - SI unit for an angular quantity)
-    (o) - element dateTime (xs:dateTime)
-    (m) - element ellipsoidalRegion (element type ellipsoidalRegion - sub
-    structure)
-    5. Basic measured quantity in Cartesian form with rectangular coverage
-    region
-    (o) - element label (string)
-    (m) - element valueReal (decimal value type)
-    (m) - element valueImag (decimal value type)
-    (m) - element unit (string - SI unit)
-    (o) - element dateTime (xs:dateTime)
-    (m) - element rectangularRegion (element type rectangularRegion - sub
-    structure)
-    6. Basic measured quantity in polar form with rectangular coverage region
-    (o) - element label (string)
-    (m) - element valueMagnitude (decimal value type)
-    (m) - element valuePhase (decimal value type)
-    (m) - element unit (string - SI unit)
-    (m) - element unitPhase (string - SI unit for an angular quantity)
-    (o) - element dateTime (xs:dateTime)
-    (m) - element rectangularRegion (element type rectangularRegion - sub
-    structure)"""
+class complexQuantityType(GeneratedsSuper):
+    """bivariate measurement uncertainty"""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
@@ -9418,13 +9603,13 @@ class complex(GeneratedsSuper):
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, complex)
+                CurrentSubclassModule_, complexQuantityType)
             if subclass is not None:
                 return subclass(*args_, **kwargs_)
-        if complex.subclass:
-            return complex.subclass(*args_, **kwargs_)
+        if complexQuantityType.subclass:
+            return complexQuantityType.subclass(*args_, **kwargs_)
         else:
-            return complex(*args_, **kwargs_)
+            return complexQuantityType(*args_, **kwargs_)
     factory = staticmethod(factory)
     def get_ns_prefix_(self):
         return self.ns_prefix_
@@ -9520,32 +9705,32 @@ class complex(GeneratedsSuper):
             return True
         else:
             return False
-    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='complex', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('complex')
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='complexQuantityType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('complexQuantityType')
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'complex':
+        if self.original_tagname_ is not None and name_ == 'complexQuantityType':
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
             namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
         outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='complex')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='complexQuantityType')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='complex', pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='complexQuantityType', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
             outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='complex'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='complexQuantityType'):
         pass
-    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='complex', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='complexQuantityType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
@@ -9584,11 +9769,11 @@ class complex(GeneratedsSuper):
             outfile.write('<%sdateTime>%s</%sdateTime>%s' % (namespaceprefix_ , self.gds_format_datetime(self.dateTime, input_name='dateTime'), namespaceprefix_ , eol_))
         if self.ellipsoidalRegion is not None:
             namespaceprefix_ = self.ellipsoidalRegion_nsprefix_ + ':' if (UseCapturedNS_ and self.ellipsoidalRegion_nsprefix_) else ''
-            self.ellipsoidalRegion.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='ellipsoidalRegion', pretty_print=pretty_print)
+            self.ellipsoidalRegion.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ellipsoidalRegion', pretty_print=pretty_print)
         if self.rectangularRegion is not None:
             namespaceprefix_ = self.rectangularRegion_nsprefix_ + ':' if (UseCapturedNS_ and self.rectangularRegion_nsprefix_) else ''
-            self.rectangularRegion.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='rectangularRegion', pretty_print=pretty_print)
-    def to_etree(self, parent_element=None, name_='complex', mapping_=None, nsmap_=None):
+            self.rectangularRegion.export(outfile, level, namespaceprefix_, namespacedef_='', name_='rectangularRegion', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='complexQuantityType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
         else:
@@ -9700,113 +9885,197 @@ class complex(GeneratedsSuper):
             self.dateTime = dval_
             self.dateTime_nsprefix_ = child_.prefix
         elif nodeName_ == 'ellipsoidalRegion':
-            obj_ = ellipsoidalRegion.factory(parent_object_=self)
+            obj_ = ellipsoidalRegionType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.ellipsoidalRegion = obj_
             obj_.original_tagname_ = 'ellipsoidalRegion'
         elif nodeName_ == 'rectangularRegion':
-            obj_ = rectangularRegion.factory(parent_object_=self)
+            obj_ = rectangularRegionType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.rectangularRegion = obj_
             obj_.original_tagname_ = 'rectangularRegion'
-# end class complex
+# end class complexQuantityType
 
 
-class covarianceMatrix(GeneratedsSuper):
-    """Definition of a covariance matrix element that is used for
-    multidimensional uncertainty statements in the D-SI format.
-    A covariance matrix has n column elements.
-    The dimension of the covariance matrix is the amount of columns.
-    Each column contains the covariance values of one column of the
-    covariance matrix.
-    The order of the columns is from left to right column in the
-    covariance matrix."""
+class realInListType(GeneratedsSuper):
+    """univariate measurement uncertainty"""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, column=None, gds_collector_=None, **kwargs_):
+    def __init__(self, label=None, value=None, unit=None, dateTime=None, expandedUnc=None, coverageInterval=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = "si"
-        if column is None:
-            self.column = []
+        self.label = label
+        self.label_nsprefix_ = None
+        self.value = value
+        self.validate_decimalType(self.value)
+        self.value_nsprefix_ = "si"
+        self.unit = unit
+        self.validate_unitType(self.unit)
+        self.unit_nsprefix_ = "si"
+        if isinstance(dateTime, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M:%S')
         else:
-            self.column = column
-        self.column_nsprefix_ = None
+            initvalue_ = dateTime
+        self.dateTime = initvalue_
+        self.dateTime_nsprefix_ = None
+        self.expandedUnc = expandedUnc
+        self.expandedUnc_nsprefix_ = "si"
+        self.coverageInterval = coverageInterval
+        self.coverageInterval_nsprefix_ = "si"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, covarianceMatrix)
+                CurrentSubclassModule_, realInListType)
             if subclass is not None:
                 return subclass(*args_, **kwargs_)
-        if covarianceMatrix.subclass:
-            return covarianceMatrix.subclass(*args_, **kwargs_)
+        if realInListType.subclass:
+            return realInListType.subclass(*args_, **kwargs_)
         else:
-            return covarianceMatrix(*args_, **kwargs_)
+            return realInListType(*args_, **kwargs_)
     factory = staticmethod(factory)
     def get_ns_prefix_(self):
         return self.ns_prefix_
     def set_ns_prefix_(self, ns_prefix):
         self.ns_prefix_ = ns_prefix
-    def get_column(self):
-        return self.column
-    def set_column(self, column):
-        self.column = column
-    def add_column(self, value):
-        self.column.append(value)
-    def insert_column_at(self, index, value):
-        self.column.insert(index, value)
-    def replace_column_at(self, index, value):
-        self.column[index] = value
+    def get_label(self):
+        return self.label
+    def set_label(self, label):
+        self.label = label
+    def get_value(self):
+        return self.value
+    def set_value(self, value):
+        self.value = value
+    def get_unit(self):
+        return self.unit
+    def set_unit(self, unit):
+        self.unit = unit
+    def get_dateTime(self):
+        return self.dateTime
+    def set_dateTime(self, dateTime):
+        self.dateTime = dateTime
+    def get_expandedUnc(self):
+        return self.expandedUnc
+    def set_expandedUnc(self, expandedUnc):
+        self.expandedUnc = expandedUnc
+    def get_coverageInterval(self):
+        return self.coverageInterval
+    def set_coverageInterval(self, coverageInterval):
+        self.coverageInterval = coverageInterval
+    def validate_decimalType(self, value):
+        result = True
+        # Validate type decimalType, a restriction on xs:double.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, float):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
+                return False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_decimalType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_decimalType_patterns_, ))
+                result = False
+        return result
+    validate_decimalType_patterns_ = [['^([-+]?((\\d*\\.\\d+)|(\\d+\\.\\d*)|(\\d+\\.?))([Ee][-+]?\\d+)?)$']]
+    def validate_unitType(self, value):
+        result = True
+        # Validate type unitType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            pass
+        return result
     def hasContent_(self):
         if (
-            self.column
+            self.label is not None or
+            self.value is not None or
+            self.unit is not None or
+            self.dateTime is not None or
+            self.expandedUnc is not None or
+            self.coverageInterval is not None
         ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='covarianceMatrix', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('covarianceMatrix')
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='realInListType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('realInListType')
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'covarianceMatrix':
+        if self.original_tagname_ is not None and name_ == 'realInListType':
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
             namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
         outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='covarianceMatrix')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='realInListType')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='covarianceMatrix', pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='realInListType', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
             outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='covarianceMatrix'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='realInListType'):
         pass
-    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='covarianceMatrix', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='realInListType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
-        for column_ in self.column:
-            namespaceprefix_ = self.column_nsprefix_ + ':' if (UseCapturedNS_ and self.column_nsprefix_) else ''
-            column_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='column', pretty_print=pretty_print)
-    def to_etree(self, parent_element=None, name_='covarianceMatrix', mapping_=None, nsmap_=None):
+        if self.label is not None:
+            namespaceprefix_ = self.label_nsprefix_ + ':' if (UseCapturedNS_ and self.label_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%slabel>%s</%slabel>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.label), input_name='label')), namespaceprefix_ , eol_))
+        if self.value is not None:
+            namespaceprefix_ = self.value_nsprefix_ + ':' if (UseCapturedNS_ and self.value_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%svalue>%s</%svalue>%s' % (namespaceprefix_ , self.gds_format_double(self.value, input_name='value'), namespaceprefix_ , eol_))
+        if self.unit is not None:
+            namespaceprefix_ = self.unit_nsprefix_ + ':' if (UseCapturedNS_ and self.unit_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sunit>%s</%sunit>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.unit), input_name='unit')), namespaceprefix_ , eol_))
+        if self.dateTime is not None:
+            namespaceprefix_ = self.dateTime_nsprefix_ + ':' if (UseCapturedNS_ and self.dateTime_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sdateTime>%s</%sdateTime>%s' % (namespaceprefix_ , self.gds_format_datetime(self.dateTime, input_name='dateTime'), namespaceprefix_ , eol_))
+        if self.expandedUnc is not None:
+            namespaceprefix_ = self.expandedUnc_nsprefix_ + ':' if (UseCapturedNS_ and self.expandedUnc_nsprefix_) else ''
+            self.expandedUnc.export(outfile, level, namespaceprefix_, namespacedef_='', name_='expandedUnc', pretty_print=pretty_print)
+        if self.coverageInterval is not None:
+            namespaceprefix_ = self.coverageInterval_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageInterval_nsprefix_) else ''
+            self.coverageInterval.export(outfile, level, namespaceprefix_, namespacedef_='', name_='coverageInterval', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='realInListType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
         else:
             element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
-        for column_ in self.column:
-            column_.to_etree(element, name_='column', mapping_=mapping_, nsmap_=nsmap_)
+        if self.label is not None:
+            label_ = self.label
+            etree_.SubElement(element, '{https://ptb.de/si}label').text = self.gds_format_string(label_)
+        if self.value is not None:
+            value_ = self.value
+            etree_.SubElement(element, '{https://ptb.de/si}value').text = self.gds_format_double(value_)
+        if self.unit is not None:
+            unit_ = self.unit
+            etree_.SubElement(element, '{https://ptb.de/si}unit').text = self.gds_format_string(unit_)
+        if self.dateTime is not None:
+            dateTime_ = self.dateTime
+            etree_.SubElement(element, '{https://ptb.de/si}dateTime').text = self.gds_format_datetime(dateTime_)
+        if self.expandedUnc is not None:
+            expandedUnc_ = self.expandedUnc
+            expandedUnc_.to_etree(element, name_='expandedUnc', mapping_=mapping_, nsmap_=nsmap_)
+        if self.coverageInterval is not None:
+            coverageInterval_ = self.coverageInterval
+            coverageInterval_.to_etree(element, name_='coverageInterval', mapping_=mapping_, nsmap_=nsmap_)
         if mapping_ is not None:
             mapping_[id(self)] = element
         return element
@@ -9824,381 +10093,295 @@ class covarianceMatrix(GeneratedsSuper):
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'column':
-            obj_ = columnType.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.column.append(obj_)
-            obj_.original_tagname_ = 'column'
-# end class covarianceMatrix
-
-
-class ellipsoidalRegion(GeneratedsSuper):
-    """Definition of the structure, that provides a hyper-ellipsoidal coverage
-    region for stating the uncertainty of multivariate quantities. It is
-    used in the context of uncertainty for complex quantities and
-    lists of real or complex quantities.
-    The element has the following components [(m)-mandatory, (o)-optional]:
-    (m) - element covarianceMatrix (sub structure covarianceMatrix)
-    (m) - element coverageFactor (decimal value >= 1)
-    (m) - element coverageProbability (decimal value in [0,1])
-    (o) - element distribution (string)"""
-    __hash__ = GeneratedsSuper.__hash__
-    subclass = None
-    superclass = None
-    def __init__(self, covarianceMatrix=None, coverageFactor=None, coverageProbability=None, distribution=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = "si"
-        self.covarianceMatrix = covarianceMatrix
-        self.covarianceMatrix_nsprefix_ = "si"
-        self.coverageFactor = coverageFactor
-        self.validate_kValueType(self.coverageFactor)
-        self.coverageFactor_nsprefix_ = "si"
-        self.coverageProbability = coverageProbability
-        self.validate_probabilityValueType(self.coverageProbability)
-        self.coverageProbability_nsprefix_ = "si"
-        self.distribution = distribution
-        self.distribution_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, ellipsoidalRegion)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if ellipsoidalRegion.subclass:
-            return ellipsoidalRegion.subclass(*args_, **kwargs_)
-        else:
-            return ellipsoidalRegion(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def get_ns_prefix_(self):
-        return self.ns_prefix_
-    def set_ns_prefix_(self, ns_prefix):
-        self.ns_prefix_ = ns_prefix
-    def get_covarianceMatrix(self):
-        return self.covarianceMatrix
-    def set_covarianceMatrix(self, covarianceMatrix):
-        self.covarianceMatrix = covarianceMatrix
-    def get_coverageFactor(self):
-        return self.coverageFactor
-    def set_coverageFactor(self, coverageFactor):
-        self.coverageFactor = coverageFactor
-    def get_coverageProbability(self):
-        return self.coverageProbability
-    def set_coverageProbability(self, coverageProbability):
-        self.coverageProbability = coverageProbability
-    def get_distribution(self):
-        return self.distribution
-    def set_distribution(self, distribution):
-        self.distribution = distribution
-    def validate_kValueType(self, value):
-        result = True
-        # Validate type kValueType, a restriction on xs:double.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, float):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_kValueType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_kValueType_patterns_, ))
-                result = False
-        return result
-    validate_kValueType_patterns_ = [['^(\\+?(([1-9]\\d*\\.\\d*)|([1-9]\\d*)))$']]
-    def validate_probabilityValueType(self, value):
-        result = True
-        # Validate type probabilityValueType, a restriction on xs:double.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, float):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_probabilityValueType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_probabilityValueType_patterns_, ))
-                result = False
-        return result
-    validate_probabilityValueType_patterns_ = [['^(\\+?((0(\\.\\d*)?)|(1(\\.0*)?)))$']]
-    def hasContent_(self):
-        if (
-            self.covarianceMatrix is not None or
-            self.coverageFactor is not None or
-            self.coverageProbability is not None or
-            self.distribution is not None
-        ):
-            return True
-        else:
-            return False
-    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='ellipsoidalRegion', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ellipsoidalRegion')
-        if imported_ns_def_ is not None:
-            namespacedef_ = imported_ns_def_
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'ellipsoidalRegion':
-            name_ = self.original_tagname_
-        if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
-        showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ellipsoidalRegion')
-        if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='ellipsoidalRegion', pretty_print=pretty_print)
-            showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
-        else:
-            outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='ellipsoidalRegion'):
-        pass
-    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='ellipsoidalRegion', fromsubclass_=False, pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.covarianceMatrix is not None:
-            namespaceprefix_ = self.covarianceMatrix_nsprefix_ + ':' if (UseCapturedNS_ and self.covarianceMatrix_nsprefix_) else ''
-            self.covarianceMatrix.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='covarianceMatrix', pretty_print=pretty_print)
-        if self.coverageFactor is not None:
-            namespaceprefix_ = self.coverageFactor_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageFactor_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%scoverageFactor>%s</%scoverageFactor>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageFactor, input_name='coverageFactor'), namespaceprefix_ , eol_))
-        if self.coverageProbability is not None:
-            namespaceprefix_ = self.coverageProbability_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageProbability_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%scoverageProbability>%s</%scoverageProbability>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageProbability, input_name='coverageProbability'), namespaceprefix_ , eol_))
-        if self.distribution is not None:
-            namespaceprefix_ = self.distribution_nsprefix_ + ':' if (UseCapturedNS_ and self.distribution_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sdistribution>%s</%sdistribution>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.distribution), input_name='distribution')), namespaceprefix_ , eol_))
-    def to_etree(self, parent_element=None, name_='ellipsoidalRegion', mapping_=None, nsmap_=None):
-        if parent_element is None:
-            element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
-        else:
-            element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
-        if self.covarianceMatrix is not None:
-            covarianceMatrix_ = self.covarianceMatrix
-            covarianceMatrix_.to_etree(element, name_='covarianceMatrix', mapping_=mapping_, nsmap_=nsmap_)
-        if self.coverageFactor is not None:
-            coverageFactor_ = self.coverageFactor
-            etree_.SubElement(element, '{https://ptb.de/si}coverageFactor').text = self.gds_format_double(coverageFactor_)
-        if self.coverageProbability is not None:
-            coverageProbability_ = self.coverageProbability
-            etree_.SubElement(element, '{https://ptb.de/si}coverageProbability').text = self.gds_format_double(coverageProbability_)
-        if self.distribution is not None:
-            distribution_ = self.distribution
-            etree_.SubElement(element, '{https://ptb.de/si}distribution').text = self.gds_format_string(distribution_)
-        if mapping_ is not None:
-            mapping_[id(self)] = element
-        return element
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'covarianceMatrix':
-            obj_ = covarianceMatrix.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.covarianceMatrix = obj_
-            obj_.original_tagname_ = 'covarianceMatrix'
-        elif nodeName_ == 'coverageFactor' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'coverageFactor')
-            fval_ = self.gds_validate_double(fval_, node, 'coverageFactor')
-            self.coverageFactor = fval_
-            self.coverageFactor_nsprefix_ = child_.prefix
-            # validate type kValueType
-            self.validate_kValueType(self.coverageFactor)
-        elif nodeName_ == 'coverageProbability' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'coverageProbability')
-            fval_ = self.gds_validate_double(fval_, node, 'coverageProbability')
-            self.coverageProbability = fval_
-            self.coverageProbability_nsprefix_ = child_.prefix
-            # validate type probabilityValueType
-            self.validate_probabilityValueType(self.coverageProbability)
-        elif nodeName_ == 'distribution':
+        if nodeName_ == 'label':
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'distribution')
-            value_ = self.gds_validate_string(value_, node, 'distribution')
-            self.distribution = value_
-            self.distribution_nsprefix_ = child_.prefix
-# end class ellipsoidalRegion
+            value_ = self.gds_parse_string(value_, node, 'label')
+            value_ = self.gds_validate_string(value_, node, 'label')
+            self.label = value_
+            self.label_nsprefix_ = child_.prefix
+        elif nodeName_ == 'value' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'value')
+            fval_ = self.gds_validate_double(fval_, node, 'value')
+            self.value = fval_
+            self.value_nsprefix_ = child_.prefix
+            # validate type decimalType
+            self.validate_decimalType(self.value)
+        elif nodeName_ == 'unit':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'unit')
+            value_ = self.gds_validate_string(value_, node, 'unit')
+            self.unit = value_
+            self.unit_nsprefix_ = child_.prefix
+            # validate type unitType
+            self.validate_unitType(self.unit)
+        elif nodeName_ == 'dateTime':
+            sval_ = child_.text
+            dval_ = self.gds_parse_datetime(sval_)
+            self.dateTime = dval_
+            self.dateTime_nsprefix_ = child_.prefix
+        elif nodeName_ == 'expandedUnc':
+            obj_ = expandedUncType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expandedUnc = obj_
+            obj_.original_tagname_ = 'expandedUnc'
+        elif nodeName_ == 'coverageInterval':
+            obj_ = coverageIntervalType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.coverageInterval = obj_
+            obj_.original_tagname_ = 'coverageInterval'
+# end class realInListType
 
 
-class rectangularRegion(GeneratedsSuper):
-    """Definition of the structure that provides a hyper-rectangular coverage
-    region for stating the uncertainty of multivariate quantities. It is
-    used in the context of uncertainty for complex quantities and
-    lists of real or complex quantities.
-    The element has the following components [(m)-mandatory, (o)-optional]:
-    (m) - element covarianceMatrix (sub structure covarianceMatrix)
-    (m) - element coverageFactor (decimal value >= 1)
-    (m) - element coverageProbability (decimal value in [0,1])
-    (o) - element distribution (string)"""
+class complexInListType(GeneratedsSuper):
+    """bivariate measurement uncertainty"""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, covarianceMatrix=None, coverageFactor=None, coverageProbability=None, distribution=None, gds_collector_=None, **kwargs_):
+    def __init__(self, label=None, valueReal=None, valueImag=None, valueMagnitude=None, valuePhase=None, unit=None, unitPhase=None, dateTime=None, ellipsoidalRegion=None, rectangularRegion=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = "si"
-        self.covarianceMatrix = covarianceMatrix
-        self.covarianceMatrix_nsprefix_ = "si"
-        self.coverageFactor = coverageFactor
-        self.validate_kValueType(self.coverageFactor)
-        self.coverageFactor_nsprefix_ = "si"
-        self.coverageProbability = coverageProbability
-        self.validate_probabilityValueType(self.coverageProbability)
-        self.coverageProbability_nsprefix_ = "si"
-        self.distribution = distribution
-        self.distribution_nsprefix_ = None
+        self.label = label
+        self.label_nsprefix_ = None
+        self.valueReal = valueReal
+        self.validate_decimalType(self.valueReal)
+        self.valueReal_nsprefix_ = "si"
+        self.valueImag = valueImag
+        self.validate_decimalType(self.valueImag)
+        self.valueImag_nsprefix_ = "si"
+        self.valueMagnitude = valueMagnitude
+        self.validate_decimalType(self.valueMagnitude)
+        self.valueMagnitude_nsprefix_ = "si"
+        self.valuePhase = valuePhase
+        self.validate_decimalType(self.valuePhase)
+        self.valuePhase_nsprefix_ = "si"
+        self.unit = unit
+        self.validate_unitType(self.unit)
+        self.unit_nsprefix_ = "si"
+        self.unitPhase = unitPhase
+        self.validate_unitPhaseType(self.unitPhase)
+        self.unitPhase_nsprefix_ = "si"
+        if isinstance(dateTime, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M:%S')
+        else:
+            initvalue_ = dateTime
+        self.dateTime = initvalue_
+        self.dateTime_nsprefix_ = None
+        self.ellipsoidalRegion = ellipsoidalRegion
+        self.ellipsoidalRegion_nsprefix_ = "si"
+        self.rectangularRegion = rectangularRegion
+        self.rectangularRegion_nsprefix_ = "si"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, rectangularRegion)
+                CurrentSubclassModule_, complexInListType)
             if subclass is not None:
                 return subclass(*args_, **kwargs_)
-        if rectangularRegion.subclass:
-            return rectangularRegion.subclass(*args_, **kwargs_)
+        if complexInListType.subclass:
+            return complexInListType.subclass(*args_, **kwargs_)
         else:
-            return rectangularRegion(*args_, **kwargs_)
+            return complexInListType(*args_, **kwargs_)
     factory = staticmethod(factory)
     def get_ns_prefix_(self):
         return self.ns_prefix_
     def set_ns_prefix_(self, ns_prefix):
         self.ns_prefix_ = ns_prefix
-    def get_covarianceMatrix(self):
-        return self.covarianceMatrix
-    def set_covarianceMatrix(self, covarianceMatrix):
-        self.covarianceMatrix = covarianceMatrix
-    def get_coverageFactor(self):
-        return self.coverageFactor
-    def set_coverageFactor(self, coverageFactor):
-        self.coverageFactor = coverageFactor
-    def get_coverageProbability(self):
-        return self.coverageProbability
-    def set_coverageProbability(self, coverageProbability):
-        self.coverageProbability = coverageProbability
-    def get_distribution(self):
-        return self.distribution
-    def set_distribution(self, distribution):
-        self.distribution = distribution
-    def validate_kValueType(self, value):
+    def get_label(self):
+        return self.label
+    def set_label(self, label):
+        self.label = label
+    def get_valueReal(self):
+        return self.valueReal
+    def set_valueReal(self, valueReal):
+        self.valueReal = valueReal
+    def get_valueImag(self):
+        return self.valueImag
+    def set_valueImag(self, valueImag):
+        self.valueImag = valueImag
+    def get_valueMagnitude(self):
+        return self.valueMagnitude
+    def set_valueMagnitude(self, valueMagnitude):
+        self.valueMagnitude = valueMagnitude
+    def get_valuePhase(self):
+        return self.valuePhase
+    def set_valuePhase(self, valuePhase):
+        self.valuePhase = valuePhase
+    def get_unit(self):
+        return self.unit
+    def set_unit(self, unit):
+        self.unit = unit
+    def get_unitPhase(self):
+        return self.unitPhase
+    def set_unitPhase(self, unitPhase):
+        self.unitPhase = unitPhase
+    def get_dateTime(self):
+        return self.dateTime
+    def set_dateTime(self, dateTime):
+        self.dateTime = dateTime
+    def get_ellipsoidalRegion(self):
+        return self.ellipsoidalRegion
+    def set_ellipsoidalRegion(self, ellipsoidalRegion):
+        self.ellipsoidalRegion = ellipsoidalRegion
+    def get_rectangularRegion(self):
+        return self.rectangularRegion
+    def set_rectangularRegion(self, rectangularRegion):
+        self.rectangularRegion = rectangularRegion
+    def validate_decimalType(self, value):
         result = True
-        # Validate type kValueType, a restriction on xs:double.
+        # Validate type decimalType, a restriction on xs:double.
         if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
             if not isinstance(value, float):
                 lineno = self.gds_get_node_lineno_()
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
                 return False
             if not self.gds_validate_simple_patterns(
-                    self.validate_kValueType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_kValueType_patterns_, ))
+                    self.validate_decimalType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_decimalType_patterns_, ))
                 result = False
         return result
-    validate_kValueType_patterns_ = [['^(\\+?(([1-9]\\d*\\.\\d*)|([1-9]\\d*)))$']]
-    def validate_probabilityValueType(self, value):
+    validate_decimalType_patterns_ = [['^([-+]?((\\d*\\.\\d+)|(\\d+\\.\\d*)|(\\d+\\.?))([Ee][-+]?\\d+)?)$']]
+    def validate_unitType(self, value):
         result = True
-        # Validate type probabilityValueType, a restriction on xs:double.
+        # Validate type unitType, a restriction on xs:string.
         if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, float):
+            if not isinstance(value, str):
                 lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
                 return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_probabilityValueType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_probabilityValueType_patterns_, ))
-                result = False
+            pass
         return result
-    validate_probabilityValueType_patterns_ = [['^(\\+?((0(\\.\\d*)?)|(1(\\.0*)?)))$']]
+    def validate_unitPhaseType(self, value):
+        result = True
+        # Validate type unitPhaseType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            pass
+        return result
     def hasContent_(self):
         if (
-            self.covarianceMatrix is not None or
-            self.coverageFactor is not None or
-            self.coverageProbability is not None or
-            self.distribution is not None
+            self.label is not None or
+            self.valueReal is not None or
+            self.valueImag is not None or
+            self.valueMagnitude is not None or
+            self.valuePhase is not None or
+            self.unit is not None or
+            self.unitPhase is not None or
+            self.dateTime is not None or
+            self.ellipsoidalRegion is not None or
+            self.rectangularRegion is not None
         ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='rectangularRegion', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('rectangularRegion')
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='complexInListType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('complexInListType')
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'rectangularRegion':
+        if self.original_tagname_ is not None and name_ == 'complexInListType':
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
             namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
         outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='rectangularRegion')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='complexInListType')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='rectangularRegion', pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='complexInListType', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
             outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='rectangularRegion'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='complexInListType'):
         pass
-    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='rectangularRegion', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='complexInListType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.covarianceMatrix is not None:
-            namespaceprefix_ = self.covarianceMatrix_nsprefix_ + ':' if (UseCapturedNS_ and self.covarianceMatrix_nsprefix_) else ''
-            self.covarianceMatrix.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='covarianceMatrix', pretty_print=pretty_print)
-        if self.coverageFactor is not None:
-            namespaceprefix_ = self.coverageFactor_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageFactor_nsprefix_) else ''
+        if self.label is not None:
+            namespaceprefix_ = self.label_nsprefix_ + ':' if (UseCapturedNS_ and self.label_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%scoverageFactor>%s</%scoverageFactor>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageFactor, input_name='coverageFactor'), namespaceprefix_ , eol_))
-        if self.coverageProbability is not None:
-            namespaceprefix_ = self.coverageProbability_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageProbability_nsprefix_) else ''
+            outfile.write('<%slabel>%s</%slabel>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.label), input_name='label')), namespaceprefix_ , eol_))
+        if self.valueReal is not None:
+            namespaceprefix_ = self.valueReal_nsprefix_ + ':' if (UseCapturedNS_ and self.valueReal_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%scoverageProbability>%s</%scoverageProbability>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageProbability, input_name='coverageProbability'), namespaceprefix_ , eol_))
-        if self.distribution is not None:
-            namespaceprefix_ = self.distribution_nsprefix_ + ':' if (UseCapturedNS_ and self.distribution_nsprefix_) else ''
+            outfile.write('<%svalueReal>%s</%svalueReal>%s' % (namespaceprefix_ , self.gds_format_double(self.valueReal, input_name='valueReal'), namespaceprefix_ , eol_))
+        if self.valueImag is not None:
+            namespaceprefix_ = self.valueImag_nsprefix_ + ':' if (UseCapturedNS_ and self.valueImag_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sdistribution>%s</%sdistribution>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.distribution), input_name='distribution')), namespaceprefix_ , eol_))
-    def to_etree(self, parent_element=None, name_='rectangularRegion', mapping_=None, nsmap_=None):
+            outfile.write('<%svalueImag>%s</%svalueImag>%s' % (namespaceprefix_ , self.gds_format_double(self.valueImag, input_name='valueImag'), namespaceprefix_ , eol_))
+        if self.valueMagnitude is not None:
+            namespaceprefix_ = self.valueMagnitude_nsprefix_ + ':' if (UseCapturedNS_ and self.valueMagnitude_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%svalueMagnitude>%s</%svalueMagnitude>%s' % (namespaceprefix_ , self.gds_format_double(self.valueMagnitude, input_name='valueMagnitude'), namespaceprefix_ , eol_))
+        if self.valuePhase is not None:
+            namespaceprefix_ = self.valuePhase_nsprefix_ + ':' if (UseCapturedNS_ and self.valuePhase_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%svaluePhase>%s</%svaluePhase>%s' % (namespaceprefix_ , self.gds_format_double(self.valuePhase, input_name='valuePhase'), namespaceprefix_ , eol_))
+        if self.unit is not None:
+            namespaceprefix_ = self.unit_nsprefix_ + ':' if (UseCapturedNS_ and self.unit_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sunit>%s</%sunit>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.unit), input_name='unit')), namespaceprefix_ , eol_))
+        if self.unitPhase is not None:
+            namespaceprefix_ = self.unitPhase_nsprefix_ + ':' if (UseCapturedNS_ and self.unitPhase_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sunitPhase>%s</%sunitPhase>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.unitPhase), input_name='unitPhase')), namespaceprefix_ , eol_))
+        if self.dateTime is not None:
+            namespaceprefix_ = self.dateTime_nsprefix_ + ':' if (UseCapturedNS_ and self.dateTime_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sdateTime>%s</%sdateTime>%s' % (namespaceprefix_ , self.gds_format_datetime(self.dateTime, input_name='dateTime'), namespaceprefix_ , eol_))
+        if self.ellipsoidalRegion is not None:
+            namespaceprefix_ = self.ellipsoidalRegion_nsprefix_ + ':' if (UseCapturedNS_ and self.ellipsoidalRegion_nsprefix_) else ''
+            self.ellipsoidalRegion.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ellipsoidalRegion', pretty_print=pretty_print)
+        if self.rectangularRegion is not None:
+            namespaceprefix_ = self.rectangularRegion_nsprefix_ + ':' if (UseCapturedNS_ and self.rectangularRegion_nsprefix_) else ''
+            self.rectangularRegion.export(outfile, level, namespaceprefix_, namespacedef_='', name_='rectangularRegion', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='complexInListType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
         else:
             element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
-        if self.covarianceMatrix is not None:
-            covarianceMatrix_ = self.covarianceMatrix
-            covarianceMatrix_.to_etree(element, name_='covarianceMatrix', mapping_=mapping_, nsmap_=nsmap_)
-        if self.coverageFactor is not None:
-            coverageFactor_ = self.coverageFactor
-            etree_.SubElement(element, '{https://ptb.de/si}coverageFactor').text = self.gds_format_double(coverageFactor_)
-        if self.coverageProbability is not None:
-            coverageProbability_ = self.coverageProbability
-            etree_.SubElement(element, '{https://ptb.de/si}coverageProbability').text = self.gds_format_double(coverageProbability_)
-        if self.distribution is not None:
-            distribution_ = self.distribution
-            etree_.SubElement(element, '{https://ptb.de/si}distribution').text = self.gds_format_string(distribution_)
+        if self.label is not None:
+            label_ = self.label
+            etree_.SubElement(element, '{https://ptb.de/si}label').text = self.gds_format_string(label_)
+        if self.valueReal is not None:
+            valueReal_ = self.valueReal
+            etree_.SubElement(element, '{https://ptb.de/si}valueReal').text = self.gds_format_double(valueReal_)
+        if self.valueImag is not None:
+            valueImag_ = self.valueImag
+            etree_.SubElement(element, '{https://ptb.de/si}valueImag').text = self.gds_format_double(valueImag_)
+        if self.valueMagnitude is not None:
+            valueMagnitude_ = self.valueMagnitude
+            etree_.SubElement(element, '{https://ptb.de/si}valueMagnitude').text = self.gds_format_double(valueMagnitude_)
+        if self.valuePhase is not None:
+            valuePhase_ = self.valuePhase
+            etree_.SubElement(element, '{https://ptb.de/si}valuePhase').text = self.gds_format_double(valuePhase_)
+        if self.unit is not None:
+            unit_ = self.unit
+            etree_.SubElement(element, '{https://ptb.de/si}unit').text = self.gds_format_string(unit_)
+        if self.unitPhase is not None:
+            unitPhase_ = self.unitPhase
+            etree_.SubElement(element, '{https://ptb.de/si}unitPhase').text = self.gds_format_string(unitPhase_)
+        if self.dateTime is not None:
+            dateTime_ = self.dateTime
+            etree_.SubElement(element, '{https://ptb.de/si}dateTime').text = self.gds_format_datetime(dateTime_)
+        if self.ellipsoidalRegion is not None:
+            ellipsoidalRegion_ = self.ellipsoidalRegion
+            ellipsoidalRegion_.to_etree(element, name_='ellipsoidalRegion', mapping_=mapping_, nsmap_=nsmap_)
+        if self.rectangularRegion is not None:
+            rectangularRegion_ = self.rectangularRegion
+            rectangularRegion_.to_etree(element, name_='rectangularRegion', mapping_=mapping_, nsmap_=nsmap_)
         if mapping_ is not None:
             mapping_[id(self)] = element
         return element
@@ -10216,57 +10399,84 @@ class rectangularRegion(GeneratedsSuper):
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'covarianceMatrix':
-            obj_ = covarianceMatrix.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.covarianceMatrix = obj_
-            obj_.original_tagname_ = 'covarianceMatrix'
-        elif nodeName_ == 'coverageFactor' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'coverageFactor')
-            fval_ = self.gds_validate_double(fval_, node, 'coverageFactor')
-            self.coverageFactor = fval_
-            self.coverageFactor_nsprefix_ = child_.prefix
-            # validate type kValueType
-            self.validate_kValueType(self.coverageFactor)
-        elif nodeName_ == 'coverageProbability' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'coverageProbability')
-            fval_ = self.gds_validate_double(fval_, node, 'coverageProbability')
-            self.coverageProbability = fval_
-            self.coverageProbability_nsprefix_ = child_.prefix
-            # validate type probabilityValueType
-            self.validate_probabilityValueType(self.coverageProbability)
-        elif nodeName_ == 'distribution':
+        if nodeName_ == 'label':
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'distribution')
-            value_ = self.gds_validate_string(value_, node, 'distribution')
-            self.distribution = value_
-            self.distribution_nsprefix_ = child_.prefix
-# end class rectangularRegion
+            value_ = self.gds_parse_string(value_, node, 'label')
+            value_ = self.gds_validate_string(value_, node, 'label')
+            self.label = value_
+            self.label_nsprefix_ = child_.prefix
+        elif nodeName_ == 'valueReal' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'valueReal')
+            fval_ = self.gds_validate_double(fval_, node, 'valueReal')
+            self.valueReal = fval_
+            self.valueReal_nsprefix_ = child_.prefix
+            # validate type decimalType
+            self.validate_decimalType(self.valueReal)
+        elif nodeName_ == 'valueImag' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'valueImag')
+            fval_ = self.gds_validate_double(fval_, node, 'valueImag')
+            self.valueImag = fval_
+            self.valueImag_nsprefix_ = child_.prefix
+            # validate type decimalType
+            self.validate_decimalType(self.valueImag)
+        elif nodeName_ == 'valueMagnitude' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'valueMagnitude')
+            fval_ = self.gds_validate_double(fval_, node, 'valueMagnitude')
+            self.valueMagnitude = fval_
+            self.valueMagnitude_nsprefix_ = child_.prefix
+            # validate type decimalType
+            self.validate_decimalType(self.valueMagnitude)
+        elif nodeName_ == 'valuePhase' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'valuePhase')
+            fval_ = self.gds_validate_double(fval_, node, 'valuePhase')
+            self.valuePhase = fval_
+            self.valuePhase_nsprefix_ = child_.prefix
+            # validate type decimalType
+            self.validate_decimalType(self.valuePhase)
+        elif nodeName_ == 'unit':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'unit')
+            value_ = self.gds_validate_string(value_, node, 'unit')
+            self.unit = value_
+            self.unit_nsprefix_ = child_.prefix
+            # validate type unitType
+            self.validate_unitType(self.unit)
+        elif nodeName_ == 'unitPhase':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'unitPhase')
+            value_ = self.gds_validate_string(value_, node, 'unitPhase')
+            self.unitPhase = value_
+            self.unitPhase_nsprefix_ = child_.prefix
+            # validate type unitPhaseType
+            self.validate_unitPhaseType(self.unitPhase)
+        elif nodeName_ == 'dateTime':
+            sval_ = child_.text
+            dval_ = self.gds_parse_datetime(sval_)
+            self.dateTime = dval_
+            self.dateTime_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ellipsoidalRegion':
+            obj_ = ellipsoidalRegionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ellipsoidalRegion = obj_
+            obj_.original_tagname_ = 'ellipsoidalRegion'
+        elif nodeName_ == 'rectangularRegion':
+            obj_ = rectangularRegionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.rectangularRegion = obj_
+            obj_.original_tagname_ = 'rectangularRegion'
+# end class complexInListType
 
 
-class list(GeneratedsSuper):
-    """Meta data element definition for a list of basic measurement quantities.
-    The list can represent independent measurement or multivariate vector
-    quantities.
-    A list can provide the following structures:
-    1: A list of si:real quantities
-    - optional list timestamp, list label and/or list unit
-    - optional list univariate uncertainty statement with list unit
-    - optional multivariate hyper-elliptical or hyper-rectangular coverage
-    region
-    2: A list of si:complex quantities
-    - optional list timestamp, list label and/or list unit(s)
-    - optional list bivariate uncertainty statement with list unit(s)
-    - optional multivariate hyper-elliptical or hyper-rectangular coverage
-    region
-    3: A recursive list of si:list elements
-    - optional global timestamp and/or global label"""
+class realListType(GeneratedsSuper):
+    """multivariate measurement uncertainty"""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, label=None, dateTime=None, listUnit=None, listUnivariateUnc=None, real=None, listUnitPhase=None, listBivariateUnc=None, complex=None, ellipsoidalRegion=None, rectangularRegion=None, list_member=None, gds_collector_=None, **kwargs_):
+    def __init__(self, label=None, dateTime=None, listUnit=None, listUnivariateUnc=None, real=None, ellipsoidalRegion=None, rectangularRegion=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -10289,35 +10499,21 @@ class list(GeneratedsSuper):
             self.real = []
         else:
             self.real = real
-        self.real_nsprefix_ = None
-        self.listUnitPhase = listUnitPhase
-        self.listUnitPhase_nsprefix_ = None
-        self.listBivariateUnc = listBivariateUnc
-        self.listBivariateUnc_nsprefix_ = "si"
-        if complex is None:
-            self.complex = []
-        else:
-            self.complex = complex
-        self.complex_nsprefix_ = None
+        self.real_nsprefix_ = "si"
         self.ellipsoidalRegion = ellipsoidalRegion
         self.ellipsoidalRegion_nsprefix_ = "si"
         self.rectangularRegion = rectangularRegion
         self.rectangularRegion_nsprefix_ = "si"
-        if list_member is None:
-            self.list = []
-        else:
-            self.list = list_member
-        self.list_nsprefix_ = "si"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, list)
+                CurrentSubclassModule_, realListType)
             if subclass is not None:
                 return subclass(*args_, **kwargs_)
-        if list.subclass:
-            return list.subclass(*args_, **kwargs_)
+        if realListType.subclass:
+            return realListType.subclass(*args_, **kwargs_)
         else:
-            return list(*args_, **kwargs_)
+            return realListType(*args_, **kwargs_)
     factory = staticmethod(factory)
     def get_ns_prefix_(self):
         return self.ns_prefix_
@@ -10349,24 +10545,6 @@ class list(GeneratedsSuper):
         self.real.insert(index, value)
     def replace_real_at(self, index, value):
         self.real[index] = value
-    def get_listUnitPhase(self):
-        return self.listUnitPhase
-    def set_listUnitPhase(self, listUnitPhase):
-        self.listUnitPhase = listUnitPhase
-    def get_listBivariateUnc(self):
-        return self.listBivariateUnc
-    def set_listBivariateUnc(self, listBivariateUnc):
-        self.listBivariateUnc = listBivariateUnc
-    def get_complex(self):
-        return self.complex
-    def set_complex(self, complex):
-        self.complex = complex
-    def add_complex(self, value):
-        self.complex.append(value)
-    def insert_complex_at(self, index, value):
-        self.complex.insert(index, value)
-    def replace_complex_at(self, index, value):
-        self.complex[index] = value
     def get_ellipsoidalRegion(self):
         return self.ellipsoidalRegion
     def set_ellipsoidalRegion(self, ellipsoidalRegion):
@@ -10375,16 +10553,6 @@ class list(GeneratedsSuper):
         return self.rectangularRegion
     def set_rectangularRegion(self, rectangularRegion):
         self.rectangularRegion = rectangularRegion
-    def get_list(self):
-        return self.list
-    def set_list(self, list):
-        self.list = list
-    def add_list(self, value):
-        self.list.append(value)
-    def insert_list_at(self, index, value):
-        self.list.insert(index, value)
-    def replace_list_at(self, index, value):
-        self.list[index] = value
     def validate_unitType(self, value):
         result = True
         # Validate type unitType, a restriction on xs:string.
@@ -10402,42 +10570,38 @@ class list(GeneratedsSuper):
             self.listUnit is not None or
             self.listUnivariateUnc is not None or
             self.real or
-            self.listUnitPhase is not None or
-            self.listBivariateUnc is not None or
-            self.complex or
             self.ellipsoidalRegion is not None or
-            self.rectangularRegion is not None or
-            self.list
+            self.rectangularRegion is not None
         ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='list', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('list')
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='realListType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('realListType')
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'list':
+        if self.original_tagname_ is not None and name_ == 'realListType':
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
             namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
         outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='list')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='realListType')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='list', pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='realListType', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
             outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='list'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='realListType'):
         pass
-    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='list', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='realListType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
@@ -10456,30 +10620,17 @@ class list(GeneratedsSuper):
             outfile.write('<%slistUnit>%s</%slistUnit>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.listUnit), input_name='listUnit')), namespaceprefix_ , eol_))
         if self.listUnivariateUnc is not None:
             namespaceprefix_ = self.listUnivariateUnc_nsprefix_ + ':' if (UseCapturedNS_ and self.listUnivariateUnc_nsprefix_) else ''
-            self.listUnivariateUnc.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='listUnivariateUnc', pretty_print=pretty_print)
+            self.listUnivariateUnc.export(outfile, level, namespaceprefix_, namespacedef_='', name_='listUnivariateUnc', pretty_print=pretty_print)
         for real_ in self.real:
             namespaceprefix_ = self.real_nsprefix_ + ':' if (UseCapturedNS_ and self.real_nsprefix_) else ''
             real_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='real', pretty_print=pretty_print)
-        if self.listUnitPhase is not None:
-            namespaceprefix_ = self.listUnitPhase_nsprefix_ + ':' if (UseCapturedNS_ and self.listUnitPhase_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%slistUnitPhase>%s</%slistUnitPhase>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.listUnitPhase), input_name='listUnitPhase')), namespaceprefix_ , eol_))
-        if self.listBivariateUnc is not None:
-            namespaceprefix_ = self.listBivariateUnc_nsprefix_ + ':' if (UseCapturedNS_ and self.listBivariateUnc_nsprefix_) else ''
-            self.listBivariateUnc.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='listBivariateUnc', pretty_print=pretty_print)
-        for complex_ in self.complex:
-            namespaceprefix_ = self.complex_nsprefix_ + ':' if (UseCapturedNS_ and self.complex_nsprefix_) else ''
-            complex_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='complex', pretty_print=pretty_print)
         if self.ellipsoidalRegion is not None:
             namespaceprefix_ = self.ellipsoidalRegion_nsprefix_ + ':' if (UseCapturedNS_ and self.ellipsoidalRegion_nsprefix_) else ''
-            self.ellipsoidalRegion.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='ellipsoidalRegion', pretty_print=pretty_print)
+            self.ellipsoidalRegion.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ellipsoidalRegion', pretty_print=pretty_print)
         if self.rectangularRegion is not None:
             namespaceprefix_ = self.rectangularRegion_nsprefix_ + ':' if (UseCapturedNS_ and self.rectangularRegion_nsprefix_) else ''
-            self.rectangularRegion.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='rectangularRegion', pretty_print=pretty_print)
-        for list_ in self.list:
-            namespaceprefix_ = self.list_nsprefix_ + ':' if (UseCapturedNS_ and self.list_nsprefix_) else ''
-            list_.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='list', pretty_print=pretty_print)
-    def to_etree(self, parent_element=None, name_='list', mapping_=None, nsmap_=None):
+            self.rectangularRegion.export(outfile, level, namespaceprefix_, namespacedef_='', name_='rectangularRegion', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='realListType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
         else:
@@ -10498,22 +10649,12 @@ class list(GeneratedsSuper):
             listUnivariateUnc_.to_etree(element, name_='listUnivariateUnc', mapping_=mapping_, nsmap_=nsmap_)
         for real_ in self.real:
             real_.to_etree(element, name_='real', mapping_=mapping_, nsmap_=nsmap_)
-        if self.listUnitPhase is not None:
-            listUnitPhase_ = self.listUnitPhase
-            etree_.SubElement(element, '{https://ptb.de/si}listUnitPhase').text = self.gds_format_string(listUnitPhase_)
-        if self.listBivariateUnc is not None:
-            listBivariateUnc_ = self.listBivariateUnc
-            listBivariateUnc_.to_etree(element, name_='listBivariateUnc', mapping_=mapping_, nsmap_=nsmap_)
-        for complex_ in self.complex:
-            complex_.to_etree(element, name_='complex', mapping_=mapping_, nsmap_=nsmap_)
         if self.ellipsoidalRegion is not None:
             ellipsoidalRegion_ = self.ellipsoidalRegion
             ellipsoidalRegion_.to_etree(element, name_='ellipsoidalRegion', mapping_=mapping_, nsmap_=nsmap_)
         if self.rectangularRegion is not None:
             rectangularRegion_ = self.rectangularRegion
             rectangularRegion_.to_etree(element, name_='rectangularRegion', mapping_=mapping_, nsmap_=nsmap_)
-        for list_ in self.list:
-            list_.to_etree(element, name_='list', mapping_=mapping_, nsmap_=nsmap_)
         if mapping_ is not None:
             mapping_[id(self)] = element
         return element
@@ -10551,190 +10692,59 @@ class list(GeneratedsSuper):
             # validate type unitType
             self.validate_unitType(self.listUnit)
         elif nodeName_ == 'listUnivariateUnc':
-            obj_ = listUnivariateUnc.factory(parent_object_=self)
+            obj_ = listUnivariateUncType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.listUnivariateUnc = obj_
             obj_.original_tagname_ = 'listUnivariateUnc'
         elif nodeName_ == 'real':
-            obj_ = realType.factory(parent_object_=self)
+            obj_ = realInListType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.real.append(obj_)
             obj_.original_tagname_ = 'real'
-        elif nodeName_ == 'listUnitPhase':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'listUnitPhase')
-            value_ = self.gds_validate_string(value_, node, 'listUnitPhase')
-            self.listUnitPhase = value_
-            self.listUnitPhase_nsprefix_ = child_.prefix
-        elif nodeName_ == 'listBivariateUnc':
-            obj_ = listBivariateUnc.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.listBivariateUnc = obj_
-            obj_.original_tagname_ = 'listBivariateUnc'
-        elif nodeName_ == 'complex':
-            obj_ = complexType.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.complex.append(obj_)
-            obj_.original_tagname_ = 'complex'
         elif nodeName_ == 'ellipsoidalRegion':
-            obj_ = ellipsoidalRegion.factory(parent_object_=self)
+            obj_ = ellipsoidalRegionType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.ellipsoidalRegion = obj_
             obj_.original_tagname_ = 'ellipsoidalRegion'
         elif nodeName_ == 'rectangularRegion':
-            obj_ = rectangularRegion.factory(parent_object_=self)
+            obj_ = rectangularRegionType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.rectangularRegion = obj_
             obj_.original_tagname_ = 'rectangularRegion'
-        elif nodeName_ == 'list':
-            obj_ = list.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.list.append(obj_)
-            obj_.original_tagname_ = 'list'
-# end class list
+# end class realListType
 
 
-class listUnivariateUnc(GeneratedsSuper):
-    """Definition of a structure, for a global univariate uncertainty, that
-    is used within the list structure with a list of real quantities.
-    The global univariate uncertainty can either be given as an expanded
-    measurement uncertainty or as a coverage interval."""
+class complexListType(GeneratedsSuper):
+    """multivariate measurement uncertainty"""
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, expandedUnc=None, coverageInterval=None, gds_collector_=None, **kwargs_):
+    def __init__(self, label=None, dateTime=None, listUnit=None, listUnitPhase=None, listBivariateUnc=None, complex=None, ellipsoidalRegion=None, rectangularRegion=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = "si"
-        self.expandedUnc = expandedUnc
-        self.expandedUnc_nsprefix_ = "si"
-        self.coverageInterval = coverageInterval
-        self.coverageInterval_nsprefix_ = "si"
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, listUnivariateUnc)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if listUnivariateUnc.subclass:
-            return listUnivariateUnc.subclass(*args_, **kwargs_)
+        self.label = label
+        self.label_nsprefix_ = None
+        if isinstance(dateTime, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M:%S')
         else:
-            return listUnivariateUnc(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def get_ns_prefix_(self):
-        return self.ns_prefix_
-    def set_ns_prefix_(self, ns_prefix):
-        self.ns_prefix_ = ns_prefix
-    def get_expandedUnc(self):
-        return self.expandedUnc
-    def set_expandedUnc(self, expandedUnc):
-        self.expandedUnc = expandedUnc
-    def get_coverageInterval(self):
-        return self.coverageInterval
-    def set_coverageInterval(self, coverageInterval):
-        self.coverageInterval = coverageInterval
-    def hasContent_(self):
-        if (
-            self.expandedUnc is not None or
-            self.coverageInterval is not None
-        ):
-            return True
+            initvalue_ = dateTime
+        self.dateTime = initvalue_
+        self.dateTime_nsprefix_ = None
+        self.listUnit = listUnit
+        self.validate_unitType(self.listUnit)
+        self.listUnit_nsprefix_ = "si"
+        self.listUnitPhase = listUnitPhase
+        self.listUnitPhase_nsprefix_ = None
+        self.listBivariateUnc = listBivariateUnc
+        self.listBivariateUnc_nsprefix_ = "si"
+        if complex is None:
+            self.complex = []
         else:
-            return False
-    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='listUnivariateUnc', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('listUnivariateUnc')
-        if imported_ns_def_ is not None:
-            namespacedef_ = imported_ns_def_
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'listUnivariateUnc':
-            name_ = self.original_tagname_
-        if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
-        showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='listUnivariateUnc')
-        if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='listUnivariateUnc', pretty_print=pretty_print)
-            showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
-        else:
-            outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='listUnivariateUnc'):
-        pass
-    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='listUnivariateUnc', fromsubclass_=False, pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.expandedUnc is not None:
-            namespaceprefix_ = self.expandedUnc_nsprefix_ + ':' if (UseCapturedNS_ and self.expandedUnc_nsprefix_) else ''
-            self.expandedUnc.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='expandedUnc', pretty_print=pretty_print)
-        if self.coverageInterval is not None:
-            namespaceprefix_ = self.coverageInterval_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageInterval_nsprefix_) else ''
-            self.coverageInterval.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='coverageInterval', pretty_print=pretty_print)
-    def to_etree(self, parent_element=None, name_='listUnivariateUnc', mapping_=None, nsmap_=None):
-        if parent_element is None:
-            element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
-        else:
-            element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
-        if self.expandedUnc is not None:
-            expandedUnc_ = self.expandedUnc
-            expandedUnc_.to_etree(element, name_='expandedUnc', mapping_=mapping_, nsmap_=nsmap_)
-        if self.coverageInterval is not None:
-            coverageInterval_ = self.coverageInterval
-            coverageInterval_.to_etree(element, name_='coverageInterval', mapping_=mapping_, nsmap_=nsmap_)
-        if mapping_ is not None:
-            mapping_[id(self)] = element
-        return element
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'expandedUnc':
-            obj_ = expandedUnc.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.expandedUnc = obj_
-            obj_.original_tagname_ = 'expandedUnc'
-        elif nodeName_ == 'coverageInterval':
-            obj_ = coverageInterval.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.coverageInterval = obj_
-            obj_.original_tagname_ = 'coverageInterval'
-# end class listUnivariateUnc
-
-
-class listBivariateUnc(GeneratedsSuper):
-    """Definition of a structure, for a global bivariate uncertainty, that
-    is used within the list structure with a list of complex quantities.
-    The global bivariate uncertainty can either be given as a hyper-ellipsoidal
-    coverage region or a hyper-rectangular coverage region. Both
-    coverage regions must provide a covariance matrix of dimension 2."""
-    __hash__ = GeneratedsSuper.__hash__
-    subclass = None
-    superclass = None
-    def __init__(self, ellipsoidalRegion=None, rectangularRegion=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = "si"
+            self.complex = complex
+        self.complex_nsprefix_ = "si"
         self.ellipsoidalRegion = ellipsoidalRegion
         self.ellipsoidalRegion_nsprefix_ = "si"
         self.rectangularRegion = rectangularRegion
@@ -10742,18 +10752,48 @@ class listBivariateUnc(GeneratedsSuper):
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, listBivariateUnc)
+                CurrentSubclassModule_, complexListType)
             if subclass is not None:
                 return subclass(*args_, **kwargs_)
-        if listBivariateUnc.subclass:
-            return listBivariateUnc.subclass(*args_, **kwargs_)
+        if complexListType.subclass:
+            return complexListType.subclass(*args_, **kwargs_)
         else:
-            return listBivariateUnc(*args_, **kwargs_)
+            return complexListType(*args_, **kwargs_)
     factory = staticmethod(factory)
     def get_ns_prefix_(self):
         return self.ns_prefix_
     def set_ns_prefix_(self, ns_prefix):
         self.ns_prefix_ = ns_prefix
+    def get_label(self):
+        return self.label
+    def set_label(self, label):
+        self.label = label
+    def get_dateTime(self):
+        return self.dateTime
+    def set_dateTime(self, dateTime):
+        self.dateTime = dateTime
+    def get_listUnit(self):
+        return self.listUnit
+    def set_listUnit(self, listUnit):
+        self.listUnit = listUnit
+    def get_listUnitPhase(self):
+        return self.listUnitPhase
+    def set_listUnitPhase(self, listUnitPhase):
+        self.listUnitPhase = listUnitPhase
+    def get_listBivariateUnc(self):
+        return self.listBivariateUnc
+    def set_listBivariateUnc(self, listBivariateUnc):
+        self.listBivariateUnc = listBivariateUnc
+    def get_complex(self):
+        return self.complex
+    def set_complex(self, complex):
+        self.complex = complex
+    def add_complex(self, value):
+        self.complex.append(value)
+    def insert_complex_at(self, index, value):
+        self.complex.insert(index, value)
+    def replace_complex_at(self, index, value):
+        self.complex[index] = value
     def get_ellipsoidalRegion(self):
         return self.ellipsoidalRegion
     def set_ellipsoidalRegion(self, ellipsoidalRegion):
@@ -10762,55 +10802,110 @@ class listBivariateUnc(GeneratedsSuper):
         return self.rectangularRegion
     def set_rectangularRegion(self, rectangularRegion):
         self.rectangularRegion = rectangularRegion
+    def validate_unitType(self, value):
+        result = True
+        # Validate type unitType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            pass
+        return result
     def hasContent_(self):
         if (
+            self.label is not None or
+            self.dateTime is not None or
+            self.listUnit is not None or
+            self.listUnitPhase is not None or
+            self.listBivariateUnc is not None or
+            self.complex or
             self.ellipsoidalRegion is not None or
             self.rectangularRegion is not None
         ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='listBivariateUnc', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('listBivariateUnc')
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='complexListType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('complexListType')
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'listBivariateUnc':
+        if self.original_tagname_ is not None and name_ == 'complexListType':
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
             namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
         outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='listBivariateUnc')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='complexListType')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='listBivariateUnc', pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='complexListType', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
             outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='listBivariateUnc'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='complexListType'):
         pass
-    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='listBivariateUnc', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='complexListType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.label is not None:
+            namespaceprefix_ = self.label_nsprefix_ + ':' if (UseCapturedNS_ and self.label_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%slabel>%s</%slabel>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.label), input_name='label')), namespaceprefix_ , eol_))
+        if self.dateTime is not None:
+            namespaceprefix_ = self.dateTime_nsprefix_ + ':' if (UseCapturedNS_ and self.dateTime_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sdateTime>%s</%sdateTime>%s' % (namespaceprefix_ , self.gds_format_datetime(self.dateTime, input_name='dateTime'), namespaceprefix_ , eol_))
+        if self.listUnit is not None:
+            namespaceprefix_ = self.listUnit_nsprefix_ + ':' if (UseCapturedNS_ and self.listUnit_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%slistUnit>%s</%slistUnit>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.listUnit), input_name='listUnit')), namespaceprefix_ , eol_))
+        if self.listUnitPhase is not None:
+            namespaceprefix_ = self.listUnitPhase_nsprefix_ + ':' if (UseCapturedNS_ and self.listUnitPhase_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%slistUnitPhase>%s</%slistUnitPhase>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.listUnitPhase), input_name='listUnitPhase')), namespaceprefix_ , eol_))
+        if self.listBivariateUnc is not None:
+            namespaceprefix_ = self.listBivariateUnc_nsprefix_ + ':' if (UseCapturedNS_ and self.listBivariateUnc_nsprefix_) else ''
+            self.listBivariateUnc.export(outfile, level, namespaceprefix_, namespacedef_='', name_='listBivariateUnc', pretty_print=pretty_print)
+        for complex_ in self.complex:
+            namespaceprefix_ = self.complex_nsprefix_ + ':' if (UseCapturedNS_ and self.complex_nsprefix_) else ''
+            complex_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='complex', pretty_print=pretty_print)
         if self.ellipsoidalRegion is not None:
             namespaceprefix_ = self.ellipsoidalRegion_nsprefix_ + ':' if (UseCapturedNS_ and self.ellipsoidalRegion_nsprefix_) else ''
-            self.ellipsoidalRegion.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='ellipsoidalRegion', pretty_print=pretty_print)
+            self.ellipsoidalRegion.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ellipsoidalRegion', pretty_print=pretty_print)
         if self.rectangularRegion is not None:
             namespaceprefix_ = self.rectangularRegion_nsprefix_ + ':' if (UseCapturedNS_ and self.rectangularRegion_nsprefix_) else ''
-            self.rectangularRegion.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='rectangularRegion', pretty_print=pretty_print)
-    def to_etree(self, parent_element=None, name_='listBivariateUnc', mapping_=None, nsmap_=None):
+            self.rectangularRegion.export(outfile, level, namespaceprefix_, namespacedef_='', name_='rectangularRegion', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='complexListType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
         else:
             element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        if self.label is not None:
+            label_ = self.label
+            etree_.SubElement(element, '{https://ptb.de/si}label').text = self.gds_format_string(label_)
+        if self.dateTime is not None:
+            dateTime_ = self.dateTime
+            etree_.SubElement(element, '{https://ptb.de/si}dateTime').text = self.gds_format_datetime(dateTime_)
+        if self.listUnit is not None:
+            listUnit_ = self.listUnit
+            etree_.SubElement(element, '{https://ptb.de/si}listUnit').text = self.gds_format_string(listUnit_)
+        if self.listUnitPhase is not None:
+            listUnitPhase_ = self.listUnitPhase
+            etree_.SubElement(element, '{https://ptb.de/si}listUnitPhase').text = self.gds_format_string(listUnitPhase_)
+        if self.listBivariateUnc is not None:
+            listBivariateUnc_ = self.listBivariateUnc
+            listBivariateUnc_.to_etree(element, name_='listBivariateUnc', mapping_=mapping_, nsmap_=nsmap_)
+        for complex_ in self.complex:
+            complex_.to_etree(element, name_='complex', mapping_=mapping_, nsmap_=nsmap_)
         if self.ellipsoidalRegion is not None:
             ellipsoidalRegion_ = self.ellipsoidalRegion
             ellipsoidalRegion_.to_etree(element, name_='ellipsoidalRegion', mapping_=mapping_, nsmap_=nsmap_)
@@ -10834,58 +10929,266 @@ class listBivariateUnc(GeneratedsSuper):
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'ellipsoidalRegion':
-            obj_ = ellipsoidalRegion.factory(parent_object_=self)
+        if nodeName_ == 'label':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'label')
+            value_ = self.gds_validate_string(value_, node, 'label')
+            self.label = value_
+            self.label_nsprefix_ = child_.prefix
+        elif nodeName_ == 'dateTime':
+            sval_ = child_.text
+            dval_ = self.gds_parse_datetime(sval_)
+            self.dateTime = dval_
+            self.dateTime_nsprefix_ = child_.prefix
+        elif nodeName_ == 'listUnit':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'listUnit')
+            value_ = self.gds_validate_string(value_, node, 'listUnit')
+            self.listUnit = value_
+            self.listUnit_nsprefix_ = child_.prefix
+            # validate type unitType
+            self.validate_unitType(self.listUnit)
+        elif nodeName_ == 'listUnitPhase':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'listUnitPhase')
+            value_ = self.gds_validate_string(value_, node, 'listUnitPhase')
+            self.listUnitPhase = value_
+            self.listUnitPhase_nsprefix_ = child_.prefix
+        elif nodeName_ == 'listBivariateUnc':
+            obj_ = listBivariateUncType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.listBivariateUnc = obj_
+            obj_.original_tagname_ = 'listBivariateUnc'
+        elif nodeName_ == 'complex':
+            obj_ = complexInListType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.complex.append(obj_)
+            obj_.original_tagname_ = 'complex'
+        elif nodeName_ == 'ellipsoidalRegion':
+            obj_ = ellipsoidalRegionType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.ellipsoidalRegion = obj_
             obj_.original_tagname_ = 'ellipsoidalRegion'
         elif nodeName_ == 'rectangularRegion':
-            obj_ = rectangularRegion.factory(parent_object_=self)
+            obj_ = rectangularRegionType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.rectangularRegion = obj_
             obj_.original_tagname_ = 'rectangularRegion'
-# end class listBivariateUnc
+# end class complexListType
 
 
-class hybrid(GeneratedsSuper):
-    """The hybrid elements allows to add quantities to the
-    machine readable D-SI format, with other units, than those allowed
-    to be used with the SI by means of the BIPM SI brochure.
-    The hybrid element can contain the following information
-    1. A set of real quantities
-    - all real elements provide a quantity value for one and the same measured
-    quantity
-    - each real element provides this quantity with a different unit
-    - at least one real element provides the quantity with a machine readable
-    SI unit
-    - the other real quantities can use any SI or non-SI unit
-    2. A set of complex quantities
-    - all complex elements provide a quantity value for one and the same
-    measured quantity
-    - each complex element provides this quantity with a different unit(s)
-    - at least one complex element provides the quantity with a machine
-    readable SI unit(s)
-    - the other complex quantities can use any SI or non-SI unit
-    3. A set of list element
-    - all list elements must provide the same quantity information and hence,
-    must have
-    an identical structure.
-    - the lists do only differ by using different units for each of the
-    quantities
-    - at least one list provides all quantities only with machine readable SI
-    units
-    - the other lists can use any other units for the quantities
-    4. A set of constant quantities
-    - all constant elements provide a quantity value for one and the same
-    quantity
-    - each constant element provides this quantity with a different unit
-    - at least one constant element provides the quantity with a machine
-    readable SI unit
-    - the other constant quantities can use any SI or non-SI unit"""
+class listType(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, real=None, complex=None, list=None, constant=None, gds_collector_=None, **kwargs_):
+    def __init__(self, label=None, dateTime=None, realList=None, complexList=None, list=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "si"
+        self.label = label
+        self.label_nsprefix_ = None
+        if isinstance(dateTime, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M:%S')
+        else:
+            initvalue_ = dateTime
+        self.dateTime = initvalue_
+        self.dateTime_nsprefix_ = None
+        if realList is None:
+            self.realList = []
+        else:
+            self.realList = realList
+        self.realList_nsprefix_ = "si"
+        if complexList is None:
+            self.complexList = []
+        else:
+            self.complexList = complexList
+        self.complexList_nsprefix_ = "si"
+        if list is None:
+            self.list = []
+        else:
+            self.list = list
+        self.list_nsprefix_ = "si"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, listType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if listType.subclass:
+            return listType.subclass(*args_, **kwargs_)
+        else:
+            return listType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_label(self):
+        return self.label
+    def set_label(self, label):
+        self.label = label
+    def get_dateTime(self):
+        return self.dateTime
+    def set_dateTime(self, dateTime):
+        self.dateTime = dateTime
+    def get_realList(self):
+        return self.realList
+    def set_realList(self, realList):
+        self.realList = realList
+    def add_realList(self, value):
+        self.realList.append(value)
+    def insert_realList_at(self, index, value):
+        self.realList.insert(index, value)
+    def replace_realList_at(self, index, value):
+        self.realList[index] = value
+    def get_complexList(self):
+        return self.complexList
+    def set_complexList(self, complexList):
+        self.complexList = complexList
+    def add_complexList(self, value):
+        self.complexList.append(value)
+    def insert_complexList_at(self, index, value):
+        self.complexList.insert(index, value)
+    def replace_complexList_at(self, index, value):
+        self.complexList[index] = value
+    def get_list(self):
+        return self.list
+    def set_list(self, list):
+        self.list = list
+    def add_list(self, value):
+        self.list.append(value)
+    def insert_list_at(self, index, value):
+        self.list.insert(index, value)
+    def replace_list_at(self, index, value):
+        self.list[index] = value
+    def hasContent_(self):
+        if (
+            self.label is not None or
+            self.dateTime is not None or
+            self.realList or
+            self.complexList or
+            self.list
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='listType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('listType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'listType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='listType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='listType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='listType'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='listType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.label is not None:
+            namespaceprefix_ = self.label_nsprefix_ + ':' if (UseCapturedNS_ and self.label_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%slabel>%s</%slabel>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.label), input_name='label')), namespaceprefix_ , eol_))
+        if self.dateTime is not None:
+            namespaceprefix_ = self.dateTime_nsprefix_ + ':' if (UseCapturedNS_ and self.dateTime_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sdateTime>%s</%sdateTime>%s' % (namespaceprefix_ , self.gds_format_datetime(self.dateTime, input_name='dateTime'), namespaceprefix_ , eol_))
+        for realList_ in self.realList:
+            namespaceprefix_ = self.realList_nsprefix_ + ':' if (UseCapturedNS_ and self.realList_nsprefix_) else ''
+            realList_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='realList', pretty_print=pretty_print)
+        for complexList_ in self.complexList:
+            namespaceprefix_ = self.complexList_nsprefix_ + ':' if (UseCapturedNS_ and self.complexList_nsprefix_) else ''
+            complexList_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='complexList', pretty_print=pretty_print)
+        for list_ in self.list:
+            namespaceprefix_ = self.list_nsprefix_ + ':' if (UseCapturedNS_ and self.list_nsprefix_) else ''
+            list_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='list', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='listType', mapping_=None, nsmap_=None):
+        if parent_element is None:
+            element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        else:
+            element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        if self.label is not None:
+            label_ = self.label
+            etree_.SubElement(element, '{https://ptb.de/si}label').text = self.gds_format_string(label_)
+        if self.dateTime is not None:
+            dateTime_ = self.dateTime
+            etree_.SubElement(element, '{https://ptb.de/si}dateTime').text = self.gds_format_datetime(dateTime_)
+        for realList_ in self.realList:
+            realList_.to_etree(element, name_='realList', mapping_=mapping_, nsmap_=nsmap_)
+        for complexList_ in self.complexList:
+            complexList_.to_etree(element, name_='complexList', mapping_=mapping_, nsmap_=nsmap_)
+        for list_ in self.list:
+            list_.to_etree(element, name_='list', mapping_=mapping_, nsmap_=nsmap_)
+        if mapping_ is not None:
+            mapping_[id(self)] = element
+        return element
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'label':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'label')
+            value_ = self.gds_validate_string(value_, node, 'label')
+            self.label = value_
+            self.label_nsprefix_ = child_.prefix
+        elif nodeName_ == 'dateTime':
+            sval_ = child_.text
+            dval_ = self.gds_parse_datetime(sval_)
+            self.dateTime = dval_
+            self.dateTime_nsprefix_ = child_.prefix
+        elif nodeName_ == 'realList':
+            obj_ = realListType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.realList.append(obj_)
+            obj_.original_tagname_ = 'realList'
+        elif nodeName_ == 'complexList':
+            obj_ = complexListType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.complexList.append(obj_)
+            obj_.original_tagname_ = 'complexList'
+        elif nodeName_ == 'list':
+            obj_ = listType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.list.append(obj_)
+            obj_.original_tagname_ = 'list'
+# end class listType
+
+
+class hybridType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, real=None, complex=None, list=None, realList=None, complexList=None, constant=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -10906,6 +11209,16 @@ class hybrid(GeneratedsSuper):
         else:
             self.list = list
         self.list_nsprefix_ = "si"
+        if realList is None:
+            self.realList = []
+        else:
+            self.realList = realList
+        self.realList_nsprefix_ = "si"
+        if complexList is None:
+            self.complexList = []
+        else:
+            self.complexList = complexList
+        self.complexList_nsprefix_ = "si"
         if constant is None:
             self.constant = []
         else:
@@ -10914,13 +11227,13 @@ class hybrid(GeneratedsSuper):
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, hybrid)
+                CurrentSubclassModule_, hybridType)
             if subclass is not None:
                 return subclass(*args_, **kwargs_)
-        if hybrid.subclass:
-            return hybrid.subclass(*args_, **kwargs_)
+        if hybridType.subclass:
+            return hybridType.subclass(*args_, **kwargs_)
         else:
-            return hybrid(*args_, **kwargs_)
+            return hybridType(*args_, **kwargs_)
     factory = staticmethod(factory)
     def get_ns_prefix_(self):
         return self.ns_prefix_
@@ -10956,6 +11269,26 @@ class hybrid(GeneratedsSuper):
         self.list.insert(index, value)
     def replace_list_at(self, index, value):
         self.list[index] = value
+    def get_realList(self):
+        return self.realList
+    def set_realList(self, realList):
+        self.realList = realList
+    def add_realList(self, value):
+        self.realList.append(value)
+    def insert_realList_at(self, index, value):
+        self.realList.insert(index, value)
+    def replace_realList_at(self, index, value):
+        self.realList[index] = value
+    def get_complexList(self):
+        return self.complexList
+    def set_complexList(self, complexList):
+        self.complexList = complexList
+    def add_complexList(self, value):
+        self.complexList.append(value)
+    def insert_complexList_at(self, index, value):
+        self.complexList.insert(index, value)
+    def replace_complexList_at(self, index, value):
+        self.complexList[index] = value
     def get_constant(self):
         return self.constant
     def set_constant(self, constant):
@@ -10971,54 +11304,62 @@ class hybrid(GeneratedsSuper):
             self.real or
             self.complex or
             self.list or
+            self.realList or
+            self.complexList or
             self.constant
         ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='hybrid', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('hybrid')
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='hybridType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('hybridType')
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'hybrid':
+        if self.original_tagname_ is not None and name_ == 'hybridType':
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
             namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
         outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='hybrid')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='hybridType')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='hybrid', pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='hybridType', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
             outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='hybrid'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='hybridType'):
         pass
-    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='hybrid', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='hybridType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for real_ in self.real:
             namespaceprefix_ = self.real_nsprefix_ + ':' if (UseCapturedNS_ and self.real_nsprefix_) else ''
-            real_.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='real', pretty_print=pretty_print)
+            real_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='real', pretty_print=pretty_print)
         for complex_ in self.complex:
             namespaceprefix_ = self.complex_nsprefix_ + ':' if (UseCapturedNS_ and self.complex_nsprefix_) else ''
-            complex_.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='complex', pretty_print=pretty_print)
+            complex_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='complex', pretty_print=pretty_print)
         for list_ in self.list:
             namespaceprefix_ = self.list_nsprefix_ + ':' if (UseCapturedNS_ and self.list_nsprefix_) else ''
-            list_.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='list', pretty_print=pretty_print)
+            list_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='list', pretty_print=pretty_print)
+        for realList_ in self.realList:
+            namespaceprefix_ = self.realList_nsprefix_ + ':' if (UseCapturedNS_ and self.realList_nsprefix_) else ''
+            realList_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='realList', pretty_print=pretty_print)
+        for complexList_ in self.complexList:
+            namespaceprefix_ = self.complexList_nsprefix_ + ':' if (UseCapturedNS_ and self.complexList_nsprefix_) else ''
+            complexList_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='complexList', pretty_print=pretty_print)
         for constant_ in self.constant:
             namespaceprefix_ = self.constant_nsprefix_ + ':' if (UseCapturedNS_ and self.constant_nsprefix_) else ''
-            constant_.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='constant', pretty_print=pretty_print)
-    def to_etree(self, parent_element=None, name_='hybrid', mapping_=None, nsmap_=None):
+            constant_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='constant', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='hybridType', mapping_=None, nsmap_=None):
         if parent_element is None:
             element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
         else:
@@ -11029,6 +11370,10 @@ class hybrid(GeneratedsSuper):
             complex_.to_etree(element, name_='complex', mapping_=mapping_, nsmap_=nsmap_)
         for list_ in self.list:
             list_.to_etree(element, name_='list', mapping_=mapping_, nsmap_=nsmap_)
+        for realList_ in self.realList:
+            realList_.to_etree(element, name_='realList', mapping_=mapping_, nsmap_=nsmap_)
+        for complexList_ in self.complexList:
+            complexList_.to_etree(element, name_='complexList', mapping_=mapping_, nsmap_=nsmap_)
         for constant_ in self.constant:
             constant_.to_etree(element, name_='constant', mapping_=mapping_, nsmap_=nsmap_)
         if mapping_ is not None:
@@ -11049,26 +11394,1247 @@ class hybrid(GeneratedsSuper):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'real':
-            obj_ = real.factory(parent_object_=self)
+            obj_ = realQuantityType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.real.append(obj_)
             obj_.original_tagname_ = 'real'
         elif nodeName_ == 'complex':
-            obj_ = complex.factory(parent_object_=self)
+            obj_ = complexQuantityType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.complex.append(obj_)
             obj_.original_tagname_ = 'complex'
         elif nodeName_ == 'list':
-            obj_ = list.factory(parent_object_=self)
+            obj_ = listType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.list.append(obj_)
             obj_.original_tagname_ = 'list'
+        elif nodeName_ == 'realList':
+            obj_ = realListType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.realList.append(obj_)
+            obj_.original_tagname_ = 'realList'
+        elif nodeName_ == 'complexList':
+            obj_ = complexListType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.complexList.append(obj_)
+            obj_.original_tagname_ = 'complexList'
         elif nodeName_ == 'constant':
-            obj_ = constant.factory(parent_object_=self)
+            obj_ = constantQuantityType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.constant.append(obj_)
             obj_.original_tagname_ = 'constant'
-# end class hybrid
+# end class hybridType
+
+
+class expandedUncType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, uncertainty=None, coverageFactor=None, coverageProbability=None, distribution=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "si"
+        self.uncertainty = uncertainty
+        self.validate_uncertaintyValueType(self.uncertainty)
+        self.uncertainty_nsprefix_ = "si"
+        self.coverageFactor = coverageFactor
+        self.validate_kValueType(self.coverageFactor)
+        self.coverageFactor_nsprefix_ = "si"
+        self.coverageProbability = coverageProbability
+        self.validate_probabilityValueType(self.coverageProbability)
+        self.coverageProbability_nsprefix_ = "si"
+        self.distribution = distribution
+        self.distribution_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, expandedUncType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if expandedUncType.subclass:
+            return expandedUncType.subclass(*args_, **kwargs_)
+        else:
+            return expandedUncType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_uncertainty(self):
+        return self.uncertainty
+    def set_uncertainty(self, uncertainty):
+        self.uncertainty = uncertainty
+    def get_coverageFactor(self):
+        return self.coverageFactor
+    def set_coverageFactor(self, coverageFactor):
+        self.coverageFactor = coverageFactor
+    def get_coverageProbability(self):
+        return self.coverageProbability
+    def set_coverageProbability(self, coverageProbability):
+        self.coverageProbability = coverageProbability
+    def get_distribution(self):
+        return self.distribution
+    def set_distribution(self, distribution):
+        self.distribution = distribution
+    def validate_uncertaintyValueType(self, value):
+        result = True
+        # Validate type uncertaintyValueType, a restriction on xs:double.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, float):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
+                return False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_uncertaintyValueType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_uncertaintyValueType_patterns_, ))
+                result = False
+        return result
+    validate_uncertaintyValueType_patterns_ = [['^(\\+?((\\d*\\.\\d+)|(\\d+\\.\\d*)|(\\d+\\.?))([Ee][-+]?\\d+)?)$']]
+    def validate_kValueType(self, value):
+        result = True
+        # Validate type kValueType, a restriction on xs:double.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, float):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
+                return False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_kValueType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_kValueType_patterns_, ))
+                result = False
+        return result
+    validate_kValueType_patterns_ = [['^(\\+?(([1-9]\\d*\\.\\d*)|([1-9]\\d*)))$']]
+    def validate_probabilityValueType(self, value):
+        result = True
+        # Validate type probabilityValueType, a restriction on xs:double.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, float):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
+                return False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_probabilityValueType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_probabilityValueType_patterns_, ))
+                result = False
+        return result
+    validate_probabilityValueType_patterns_ = [['^(\\+?((0(\\.\\d*)?)|(1(\\.0*)?)))$']]
+    def hasContent_(self):
+        if (
+            self.uncertainty is not None or
+            self.coverageFactor is not None or
+            self.coverageProbability is not None or
+            self.distribution is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='expandedUncType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('expandedUncType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'expandedUncType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='expandedUncType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='expandedUncType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='expandedUncType'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='expandedUncType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.uncertainty is not None:
+            namespaceprefix_ = self.uncertainty_nsprefix_ + ':' if (UseCapturedNS_ and self.uncertainty_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%suncertainty>%s</%suncertainty>%s' % (namespaceprefix_ , self.gds_format_double(self.uncertainty, input_name='uncertainty'), namespaceprefix_ , eol_))
+        if self.coverageFactor is not None:
+            namespaceprefix_ = self.coverageFactor_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageFactor_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%scoverageFactor>%s</%scoverageFactor>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageFactor, input_name='coverageFactor'), namespaceprefix_ , eol_))
+        if self.coverageProbability is not None:
+            namespaceprefix_ = self.coverageProbability_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageProbability_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%scoverageProbability>%s</%scoverageProbability>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageProbability, input_name='coverageProbability'), namespaceprefix_ , eol_))
+        if self.distribution is not None:
+            namespaceprefix_ = self.distribution_nsprefix_ + ':' if (UseCapturedNS_ and self.distribution_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sdistribution>%s</%sdistribution>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.distribution), input_name='distribution')), namespaceprefix_ , eol_))
+    def to_etree(self, parent_element=None, name_='expandedUncType', mapping_=None, nsmap_=None):
+        if parent_element is None:
+            element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        else:
+            element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        if self.uncertainty is not None:
+            uncertainty_ = self.uncertainty
+            etree_.SubElement(element, '{https://ptb.de/si}uncertainty').text = self.gds_format_double(uncertainty_)
+        if self.coverageFactor is not None:
+            coverageFactor_ = self.coverageFactor
+            etree_.SubElement(element, '{https://ptb.de/si}coverageFactor').text = self.gds_format_double(coverageFactor_)
+        if self.coverageProbability is not None:
+            coverageProbability_ = self.coverageProbability
+            etree_.SubElement(element, '{https://ptb.de/si}coverageProbability').text = self.gds_format_double(coverageProbability_)
+        if self.distribution is not None:
+            distribution_ = self.distribution
+            etree_.SubElement(element, '{https://ptb.de/si}distribution').text = self.gds_format_string(distribution_)
+        if mapping_ is not None:
+            mapping_[id(self)] = element
+        return element
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'uncertainty' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'uncertainty')
+            fval_ = self.gds_validate_double(fval_, node, 'uncertainty')
+            self.uncertainty = fval_
+            self.uncertainty_nsprefix_ = child_.prefix
+            # validate type uncertaintyValueType
+            self.validate_uncertaintyValueType(self.uncertainty)
+        elif nodeName_ == 'coverageFactor' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'coverageFactor')
+            fval_ = self.gds_validate_double(fval_, node, 'coverageFactor')
+            self.coverageFactor = fval_
+            self.coverageFactor_nsprefix_ = child_.prefix
+            # validate type kValueType
+            self.validate_kValueType(self.coverageFactor)
+        elif nodeName_ == 'coverageProbability' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'coverageProbability')
+            fval_ = self.gds_validate_double(fval_, node, 'coverageProbability')
+            self.coverageProbability = fval_
+            self.coverageProbability_nsprefix_ = child_.prefix
+            # validate type probabilityValueType
+            self.validate_probabilityValueType(self.coverageProbability)
+        elif nodeName_ == 'distribution':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'distribution')
+            value_ = self.gds_validate_string(value_, node, 'distribution')
+            self.distribution = value_
+            self.distribution_nsprefix_ = child_.prefix
+# end class expandedUncType
+
+
+class coverageIntervalType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, standardUnc=None, intervalMin=None, intervalMax=None, coverageProbability=None, distribution=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "si"
+        self.standardUnc = standardUnc
+        self.validate_uncertaintyValueType(self.standardUnc)
+        self.standardUnc_nsprefix_ = "si"
+        self.intervalMin = intervalMin
+        self.validate_decimalType(self.intervalMin)
+        self.intervalMin_nsprefix_ = "si"
+        self.intervalMax = intervalMax
+        self.validate_decimalType(self.intervalMax)
+        self.intervalMax_nsprefix_ = "si"
+        self.coverageProbability = coverageProbability
+        self.validate_probabilityValueType(self.coverageProbability)
+        self.coverageProbability_nsprefix_ = "si"
+        self.distribution = distribution
+        self.distribution_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, coverageIntervalType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if coverageIntervalType.subclass:
+            return coverageIntervalType.subclass(*args_, **kwargs_)
+        else:
+            return coverageIntervalType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_standardUnc(self):
+        return self.standardUnc
+    def set_standardUnc(self, standardUnc):
+        self.standardUnc = standardUnc
+    def get_intervalMin(self):
+        return self.intervalMin
+    def set_intervalMin(self, intervalMin):
+        self.intervalMin = intervalMin
+    def get_intervalMax(self):
+        return self.intervalMax
+    def set_intervalMax(self, intervalMax):
+        self.intervalMax = intervalMax
+    def get_coverageProbability(self):
+        return self.coverageProbability
+    def set_coverageProbability(self, coverageProbability):
+        self.coverageProbability = coverageProbability
+    def get_distribution(self):
+        return self.distribution
+    def set_distribution(self, distribution):
+        self.distribution = distribution
+    def validate_uncertaintyValueType(self, value):
+        result = True
+        # Validate type uncertaintyValueType, a restriction on xs:double.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, float):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
+                return False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_uncertaintyValueType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_uncertaintyValueType_patterns_, ))
+                result = False
+        return result
+    validate_uncertaintyValueType_patterns_ = [['^(\\+?((\\d*\\.\\d+)|(\\d+\\.\\d*)|(\\d+\\.?))([Ee][-+]?\\d+)?)$']]
+    def validate_decimalType(self, value):
+        result = True
+        # Validate type decimalType, a restriction on xs:double.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, float):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
+                return False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_decimalType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_decimalType_patterns_, ))
+                result = False
+        return result
+    validate_decimalType_patterns_ = [['^([-+]?((\\d*\\.\\d+)|(\\d+\\.\\d*)|(\\d+\\.?))([Ee][-+]?\\d+)?)$']]
+    def validate_probabilityValueType(self, value):
+        result = True
+        # Validate type probabilityValueType, a restriction on xs:double.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, float):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
+                return False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_probabilityValueType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_probabilityValueType_patterns_, ))
+                result = False
+        return result
+    validate_probabilityValueType_patterns_ = [['^(\\+?((0(\\.\\d*)?)|(1(\\.0*)?)))$']]
+    def hasContent_(self):
+        if (
+            self.standardUnc is not None or
+            self.intervalMin is not None or
+            self.intervalMax is not None or
+            self.coverageProbability is not None or
+            self.distribution is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='coverageIntervalType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('coverageIntervalType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'coverageIntervalType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='coverageIntervalType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='coverageIntervalType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='coverageIntervalType'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='coverageIntervalType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.standardUnc is not None:
+            namespaceprefix_ = self.standardUnc_nsprefix_ + ':' if (UseCapturedNS_ and self.standardUnc_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sstandardUnc>%s</%sstandardUnc>%s' % (namespaceprefix_ , self.gds_format_double(self.standardUnc, input_name='standardUnc'), namespaceprefix_ , eol_))
+        if self.intervalMin is not None:
+            namespaceprefix_ = self.intervalMin_nsprefix_ + ':' if (UseCapturedNS_ and self.intervalMin_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sintervalMin>%s</%sintervalMin>%s' % (namespaceprefix_ , self.gds_format_double(self.intervalMin, input_name='intervalMin'), namespaceprefix_ , eol_))
+        if self.intervalMax is not None:
+            namespaceprefix_ = self.intervalMax_nsprefix_ + ':' if (UseCapturedNS_ and self.intervalMax_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sintervalMax>%s</%sintervalMax>%s' % (namespaceprefix_ , self.gds_format_double(self.intervalMax, input_name='intervalMax'), namespaceprefix_ , eol_))
+        if self.coverageProbability is not None:
+            namespaceprefix_ = self.coverageProbability_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageProbability_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%scoverageProbability>%s</%scoverageProbability>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageProbability, input_name='coverageProbability'), namespaceprefix_ , eol_))
+        if self.distribution is not None:
+            namespaceprefix_ = self.distribution_nsprefix_ + ':' if (UseCapturedNS_ and self.distribution_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sdistribution>%s</%sdistribution>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.distribution), input_name='distribution')), namespaceprefix_ , eol_))
+    def to_etree(self, parent_element=None, name_='coverageIntervalType', mapping_=None, nsmap_=None):
+        if parent_element is None:
+            element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        else:
+            element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        if self.standardUnc is not None:
+            standardUnc_ = self.standardUnc
+            etree_.SubElement(element, '{https://ptb.de/si}standardUnc').text = self.gds_format_double(standardUnc_)
+        if self.intervalMin is not None:
+            intervalMin_ = self.intervalMin
+            etree_.SubElement(element, '{https://ptb.de/si}intervalMin').text = self.gds_format_double(intervalMin_)
+        if self.intervalMax is not None:
+            intervalMax_ = self.intervalMax
+            etree_.SubElement(element, '{https://ptb.de/si}intervalMax').text = self.gds_format_double(intervalMax_)
+        if self.coverageProbability is not None:
+            coverageProbability_ = self.coverageProbability
+            etree_.SubElement(element, '{https://ptb.de/si}coverageProbability').text = self.gds_format_double(coverageProbability_)
+        if self.distribution is not None:
+            distribution_ = self.distribution
+            etree_.SubElement(element, '{https://ptb.de/si}distribution').text = self.gds_format_string(distribution_)
+        if mapping_ is not None:
+            mapping_[id(self)] = element
+        return element
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'standardUnc' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'standardUnc')
+            fval_ = self.gds_validate_double(fval_, node, 'standardUnc')
+            self.standardUnc = fval_
+            self.standardUnc_nsprefix_ = child_.prefix
+            # validate type uncertaintyValueType
+            self.validate_uncertaintyValueType(self.standardUnc)
+        elif nodeName_ == 'intervalMin' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'intervalMin')
+            fval_ = self.gds_validate_double(fval_, node, 'intervalMin')
+            self.intervalMin = fval_
+            self.intervalMin_nsprefix_ = child_.prefix
+            # validate type decimalType
+            self.validate_decimalType(self.intervalMin)
+        elif nodeName_ == 'intervalMax' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'intervalMax')
+            fval_ = self.gds_validate_double(fval_, node, 'intervalMax')
+            self.intervalMax = fval_
+            self.intervalMax_nsprefix_ = child_.prefix
+            # validate type decimalType
+            self.validate_decimalType(self.intervalMax)
+        elif nodeName_ == 'coverageProbability' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'coverageProbability')
+            fval_ = self.gds_validate_double(fval_, node, 'coverageProbability')
+            self.coverageProbability = fval_
+            self.coverageProbability_nsprefix_ = child_.prefix
+            # validate type probabilityValueType
+            self.validate_probabilityValueType(self.coverageProbability)
+        elif nodeName_ == 'distribution':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'distribution')
+            value_ = self.gds_validate_string(value_, node, 'distribution')
+            self.distribution = value_
+            self.distribution_nsprefix_ = child_.prefix
+# end class coverageIntervalType
+
+
+class covarianceMatrixType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, column=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "si"
+        if column is None:
+            self.column = []
+        else:
+            self.column = column
+        self.column_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, covarianceMatrixType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if covarianceMatrixType.subclass:
+            return covarianceMatrixType.subclass(*args_, **kwargs_)
+        else:
+            return covarianceMatrixType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_column(self):
+        return self.column
+    def set_column(self, column):
+        self.column = column
+    def add_column(self, value):
+        self.column.append(value)
+    def insert_column_at(self, index, value):
+        self.column.insert(index, value)
+    def replace_column_at(self, index, value):
+        self.column[index] = value
+    def hasContent_(self):
+        if (
+            self.column
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='covarianceMatrixType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('covarianceMatrixType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'covarianceMatrixType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='covarianceMatrixType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='covarianceMatrixType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='covarianceMatrixType'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='covarianceMatrixType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for column_ in self.column:
+            namespaceprefix_ = self.column_nsprefix_ + ':' if (UseCapturedNS_ and self.column_nsprefix_) else ''
+            column_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='column', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='covarianceMatrixType', mapping_=None, nsmap_=None):
+        if parent_element is None:
+            element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        else:
+            element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        for column_ in self.column:
+            column_.to_etree(element, name_='column', mapping_=mapping_, nsmap_=nsmap_)
+        if mapping_ is not None:
+            mapping_[id(self)] = element
+        return element
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'column':
+            obj_ = columnType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.column.append(obj_)
+            obj_.original_tagname_ = 'column'
+# end class covarianceMatrixType
+
+
+class ellipsoidalRegionType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, covarianceMatrix=None, coverageFactor=None, coverageProbability=None, distribution=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "si"
+        self.covarianceMatrix = covarianceMatrix
+        self.covarianceMatrix_nsprefix_ = "si"
+        self.coverageFactor = coverageFactor
+        self.validate_kValueType(self.coverageFactor)
+        self.coverageFactor_nsprefix_ = "si"
+        self.coverageProbability = coverageProbability
+        self.validate_probabilityValueType(self.coverageProbability)
+        self.coverageProbability_nsprefix_ = "si"
+        self.distribution = distribution
+        self.distribution_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ellipsoidalRegionType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if ellipsoidalRegionType.subclass:
+            return ellipsoidalRegionType.subclass(*args_, **kwargs_)
+        else:
+            return ellipsoidalRegionType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_covarianceMatrix(self):
+        return self.covarianceMatrix
+    def set_covarianceMatrix(self, covarianceMatrix):
+        self.covarianceMatrix = covarianceMatrix
+    def get_coverageFactor(self):
+        return self.coverageFactor
+    def set_coverageFactor(self, coverageFactor):
+        self.coverageFactor = coverageFactor
+    def get_coverageProbability(self):
+        return self.coverageProbability
+    def set_coverageProbability(self, coverageProbability):
+        self.coverageProbability = coverageProbability
+    def get_distribution(self):
+        return self.distribution
+    def set_distribution(self, distribution):
+        self.distribution = distribution
+    def validate_kValueType(self, value):
+        result = True
+        # Validate type kValueType, a restriction on xs:double.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, float):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
+                return False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_kValueType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_kValueType_patterns_, ))
+                result = False
+        return result
+    validate_kValueType_patterns_ = [['^(\\+?(([1-9]\\d*\\.\\d*)|([1-9]\\d*)))$']]
+    def validate_probabilityValueType(self, value):
+        result = True
+        # Validate type probabilityValueType, a restriction on xs:double.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, float):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
+                return False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_probabilityValueType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_probabilityValueType_patterns_, ))
+                result = False
+        return result
+    validate_probabilityValueType_patterns_ = [['^(\\+?((0(\\.\\d*)?)|(1(\\.0*)?)))$']]
+    def hasContent_(self):
+        if (
+            self.covarianceMatrix is not None or
+            self.coverageFactor is not None or
+            self.coverageProbability is not None or
+            self.distribution is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='ellipsoidalRegionType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ellipsoidalRegionType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'ellipsoidalRegionType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ellipsoidalRegionType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='ellipsoidalRegionType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='ellipsoidalRegionType'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='ellipsoidalRegionType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.covarianceMatrix is not None:
+            namespaceprefix_ = self.covarianceMatrix_nsprefix_ + ':' if (UseCapturedNS_ and self.covarianceMatrix_nsprefix_) else ''
+            self.covarianceMatrix.export(outfile, level, namespaceprefix_, namespacedef_='', name_='covarianceMatrix', pretty_print=pretty_print)
+        if self.coverageFactor is not None:
+            namespaceprefix_ = self.coverageFactor_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageFactor_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%scoverageFactor>%s</%scoverageFactor>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageFactor, input_name='coverageFactor'), namespaceprefix_ , eol_))
+        if self.coverageProbability is not None:
+            namespaceprefix_ = self.coverageProbability_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageProbability_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%scoverageProbability>%s</%scoverageProbability>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageProbability, input_name='coverageProbability'), namespaceprefix_ , eol_))
+        if self.distribution is not None:
+            namespaceprefix_ = self.distribution_nsprefix_ + ':' if (UseCapturedNS_ and self.distribution_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sdistribution>%s</%sdistribution>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.distribution), input_name='distribution')), namespaceprefix_ , eol_))
+    def to_etree(self, parent_element=None, name_='ellipsoidalRegionType', mapping_=None, nsmap_=None):
+        if parent_element is None:
+            element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        else:
+            element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        if self.covarianceMatrix is not None:
+            covarianceMatrix_ = self.covarianceMatrix
+            covarianceMatrix_.to_etree(element, name_='covarianceMatrix', mapping_=mapping_, nsmap_=nsmap_)
+        if self.coverageFactor is not None:
+            coverageFactor_ = self.coverageFactor
+            etree_.SubElement(element, '{https://ptb.de/si}coverageFactor').text = self.gds_format_double(coverageFactor_)
+        if self.coverageProbability is not None:
+            coverageProbability_ = self.coverageProbability
+            etree_.SubElement(element, '{https://ptb.de/si}coverageProbability').text = self.gds_format_double(coverageProbability_)
+        if self.distribution is not None:
+            distribution_ = self.distribution
+            etree_.SubElement(element, '{https://ptb.de/si}distribution').text = self.gds_format_string(distribution_)
+        if mapping_ is not None:
+            mapping_[id(self)] = element
+        return element
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'covarianceMatrix':
+            obj_ = covarianceMatrixType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.covarianceMatrix = obj_
+            obj_.original_tagname_ = 'covarianceMatrix'
+        elif nodeName_ == 'coverageFactor' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'coverageFactor')
+            fval_ = self.gds_validate_double(fval_, node, 'coverageFactor')
+            self.coverageFactor = fval_
+            self.coverageFactor_nsprefix_ = child_.prefix
+            # validate type kValueType
+            self.validate_kValueType(self.coverageFactor)
+        elif nodeName_ == 'coverageProbability' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'coverageProbability')
+            fval_ = self.gds_validate_double(fval_, node, 'coverageProbability')
+            self.coverageProbability = fval_
+            self.coverageProbability_nsprefix_ = child_.prefix
+            # validate type probabilityValueType
+            self.validate_probabilityValueType(self.coverageProbability)
+        elif nodeName_ == 'distribution':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'distribution')
+            value_ = self.gds_validate_string(value_, node, 'distribution')
+            self.distribution = value_
+            self.distribution_nsprefix_ = child_.prefix
+# end class ellipsoidalRegionType
+
+
+class rectangularRegionType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, covarianceMatrix=None, coverageFactor=None, coverageProbability=None, distribution=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "si"
+        self.covarianceMatrix = covarianceMatrix
+        self.covarianceMatrix_nsprefix_ = "si"
+        self.coverageFactor = coverageFactor
+        self.validate_kValueType(self.coverageFactor)
+        self.coverageFactor_nsprefix_ = "si"
+        self.coverageProbability = coverageProbability
+        self.validate_probabilityValueType(self.coverageProbability)
+        self.coverageProbability_nsprefix_ = "si"
+        self.distribution = distribution
+        self.distribution_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, rectangularRegionType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if rectangularRegionType.subclass:
+            return rectangularRegionType.subclass(*args_, **kwargs_)
+        else:
+            return rectangularRegionType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_covarianceMatrix(self):
+        return self.covarianceMatrix
+    def set_covarianceMatrix(self, covarianceMatrix):
+        self.covarianceMatrix = covarianceMatrix
+    def get_coverageFactor(self):
+        return self.coverageFactor
+    def set_coverageFactor(self, coverageFactor):
+        self.coverageFactor = coverageFactor
+    def get_coverageProbability(self):
+        return self.coverageProbability
+    def set_coverageProbability(self, coverageProbability):
+        self.coverageProbability = coverageProbability
+    def get_distribution(self):
+        return self.distribution
+    def set_distribution(self, distribution):
+        self.distribution = distribution
+    def validate_kValueType(self, value):
+        result = True
+        # Validate type kValueType, a restriction on xs:double.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, float):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
+                return False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_kValueType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_kValueType_patterns_, ))
+                result = False
+        return result
+    validate_kValueType_patterns_ = [['^(\\+?(([1-9]\\d*\\.\\d*)|([1-9]\\d*)))$']]
+    def validate_probabilityValueType(self, value):
+        result = True
+        # Validate type probabilityValueType, a restriction on xs:double.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, float):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
+                return False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_probabilityValueType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_probabilityValueType_patterns_, ))
+                result = False
+        return result
+    validate_probabilityValueType_patterns_ = [['^(\\+?((0(\\.\\d*)?)|(1(\\.0*)?)))$']]
+    def hasContent_(self):
+        if (
+            self.covarianceMatrix is not None or
+            self.coverageFactor is not None or
+            self.coverageProbability is not None or
+            self.distribution is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='rectangularRegionType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('rectangularRegionType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'rectangularRegionType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='rectangularRegionType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='rectangularRegionType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='rectangularRegionType'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='rectangularRegionType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.covarianceMatrix is not None:
+            namespaceprefix_ = self.covarianceMatrix_nsprefix_ + ':' if (UseCapturedNS_ and self.covarianceMatrix_nsprefix_) else ''
+            self.covarianceMatrix.export(outfile, level, namespaceprefix_, namespacedef_='', name_='covarianceMatrix', pretty_print=pretty_print)
+        if self.coverageFactor is not None:
+            namespaceprefix_ = self.coverageFactor_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageFactor_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%scoverageFactor>%s</%scoverageFactor>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageFactor, input_name='coverageFactor'), namespaceprefix_ , eol_))
+        if self.coverageProbability is not None:
+            namespaceprefix_ = self.coverageProbability_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageProbability_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%scoverageProbability>%s</%scoverageProbability>%s' % (namespaceprefix_ , self.gds_format_double(self.coverageProbability, input_name='coverageProbability'), namespaceprefix_ , eol_))
+        if self.distribution is not None:
+            namespaceprefix_ = self.distribution_nsprefix_ + ':' if (UseCapturedNS_ and self.distribution_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sdistribution>%s</%sdistribution>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.distribution), input_name='distribution')), namespaceprefix_ , eol_))
+    def to_etree(self, parent_element=None, name_='rectangularRegionType', mapping_=None, nsmap_=None):
+        if parent_element is None:
+            element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        else:
+            element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        if self.covarianceMatrix is not None:
+            covarianceMatrix_ = self.covarianceMatrix
+            covarianceMatrix_.to_etree(element, name_='covarianceMatrix', mapping_=mapping_, nsmap_=nsmap_)
+        if self.coverageFactor is not None:
+            coverageFactor_ = self.coverageFactor
+            etree_.SubElement(element, '{https://ptb.de/si}coverageFactor').text = self.gds_format_double(coverageFactor_)
+        if self.coverageProbability is not None:
+            coverageProbability_ = self.coverageProbability
+            etree_.SubElement(element, '{https://ptb.de/si}coverageProbability').text = self.gds_format_double(coverageProbability_)
+        if self.distribution is not None:
+            distribution_ = self.distribution
+            etree_.SubElement(element, '{https://ptb.de/si}distribution').text = self.gds_format_string(distribution_)
+        if mapping_ is not None:
+            mapping_[id(self)] = element
+        return element
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'covarianceMatrix':
+            obj_ = covarianceMatrixType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.covarianceMatrix = obj_
+            obj_.original_tagname_ = 'covarianceMatrix'
+        elif nodeName_ == 'coverageFactor' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'coverageFactor')
+            fval_ = self.gds_validate_double(fval_, node, 'coverageFactor')
+            self.coverageFactor = fval_
+            self.coverageFactor_nsprefix_ = child_.prefix
+            # validate type kValueType
+            self.validate_kValueType(self.coverageFactor)
+        elif nodeName_ == 'coverageProbability' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'coverageProbability')
+            fval_ = self.gds_validate_double(fval_, node, 'coverageProbability')
+            self.coverageProbability = fval_
+            self.coverageProbability_nsprefix_ = child_.prefix
+            # validate type probabilityValueType
+            self.validate_probabilityValueType(self.coverageProbability)
+        elif nodeName_ == 'distribution':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'distribution')
+            value_ = self.gds_validate_string(value_, node, 'distribution')
+            self.distribution = value_
+            self.distribution_nsprefix_ = child_.prefix
+# end class rectangularRegionType
+
+
+class listUnivariateUncType(GeneratedsSuper):
+    """univariate measurement uncertainty"""
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, expandedUnc=None, coverageInterval=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "si"
+        self.expandedUnc = expandedUnc
+        self.expandedUnc_nsprefix_ = "si"
+        self.coverageInterval = coverageInterval
+        self.coverageInterval_nsprefix_ = "si"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, listUnivariateUncType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if listUnivariateUncType.subclass:
+            return listUnivariateUncType.subclass(*args_, **kwargs_)
+        else:
+            return listUnivariateUncType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_expandedUnc(self):
+        return self.expandedUnc
+    def set_expandedUnc(self, expandedUnc):
+        self.expandedUnc = expandedUnc
+    def get_coverageInterval(self):
+        return self.coverageInterval
+    def set_coverageInterval(self, coverageInterval):
+        self.coverageInterval = coverageInterval
+    def hasContent_(self):
+        if (
+            self.expandedUnc is not None or
+            self.coverageInterval is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='listUnivariateUncType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('listUnivariateUncType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'listUnivariateUncType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='listUnivariateUncType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='listUnivariateUncType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='listUnivariateUncType'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='listUnivariateUncType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.expandedUnc is not None:
+            namespaceprefix_ = self.expandedUnc_nsprefix_ + ':' if (UseCapturedNS_ and self.expandedUnc_nsprefix_) else ''
+            self.expandedUnc.export(outfile, level, namespaceprefix_, namespacedef_='', name_='expandedUnc', pretty_print=pretty_print)
+        if self.coverageInterval is not None:
+            namespaceprefix_ = self.coverageInterval_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageInterval_nsprefix_) else ''
+            self.coverageInterval.export(outfile, level, namespaceprefix_, namespacedef_='', name_='coverageInterval', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='listUnivariateUncType', mapping_=None, nsmap_=None):
+        if parent_element is None:
+            element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        else:
+            element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        if self.expandedUnc is not None:
+            expandedUnc_ = self.expandedUnc
+            expandedUnc_.to_etree(element, name_='expandedUnc', mapping_=mapping_, nsmap_=nsmap_)
+        if self.coverageInterval is not None:
+            coverageInterval_ = self.coverageInterval
+            coverageInterval_.to_etree(element, name_='coverageInterval', mapping_=mapping_, nsmap_=nsmap_)
+        if mapping_ is not None:
+            mapping_[id(self)] = element
+        return element
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'expandedUnc':
+            obj_ = expandedUncType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expandedUnc = obj_
+            obj_.original_tagname_ = 'expandedUnc'
+        elif nodeName_ == 'coverageInterval':
+            obj_ = coverageIntervalType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.coverageInterval = obj_
+            obj_.original_tagname_ = 'coverageInterval'
+# end class listUnivariateUncType
+
+
+class listBivariateUncType(GeneratedsSuper):
+    """bivariate measurement uncertainty"""
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, ellipsoidalRegion=None, rectangularRegion=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "si"
+        self.ellipsoidalRegion = ellipsoidalRegion
+        self.ellipsoidalRegion_nsprefix_ = "si"
+        self.rectangularRegion = rectangularRegion
+        self.rectangularRegion_nsprefix_ = "si"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, listBivariateUncType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if listBivariateUncType.subclass:
+            return listBivariateUncType.subclass(*args_, **kwargs_)
+        else:
+            return listBivariateUncType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_ellipsoidalRegion(self):
+        return self.ellipsoidalRegion
+    def set_ellipsoidalRegion(self, ellipsoidalRegion):
+        self.ellipsoidalRegion = ellipsoidalRegion
+    def get_rectangularRegion(self):
+        return self.rectangularRegion
+    def set_rectangularRegion(self, rectangularRegion):
+        self.rectangularRegion = rectangularRegion
+    def hasContent_(self):
+        if (
+            self.ellipsoidalRegion is not None or
+            self.rectangularRegion is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='listBivariateUncType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('listBivariateUncType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'listBivariateUncType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='listBivariateUncType')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='listBivariateUncType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='si:', name_='listBivariateUncType'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='si:', namespacedef_='xmlns:si="https://ptb.de/si"', name_='listBivariateUncType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.ellipsoidalRegion is not None:
+            namespaceprefix_ = self.ellipsoidalRegion_nsprefix_ + ':' if (UseCapturedNS_ and self.ellipsoidalRegion_nsprefix_) else ''
+            self.ellipsoidalRegion.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ellipsoidalRegion', pretty_print=pretty_print)
+        if self.rectangularRegion is not None:
+            namespaceprefix_ = self.rectangularRegion_nsprefix_ + ':' if (UseCapturedNS_ and self.rectangularRegion_nsprefix_) else ''
+            self.rectangularRegion.export(outfile, level, namespaceprefix_, namespacedef_='', name_='rectangularRegion', pretty_print=pretty_print)
+    def to_etree(self, parent_element=None, name_='listBivariateUncType', mapping_=None, nsmap_=None):
+        if parent_element is None:
+            element = etree_.Element('{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        else:
+            element = etree_.SubElement(parent_element, '{https://ptb.de/si}' + name_, nsmap=nsmap_)
+        if self.ellipsoidalRegion is not None:
+            ellipsoidalRegion_ = self.ellipsoidalRegion
+            ellipsoidalRegion_.to_etree(element, name_='ellipsoidalRegion', mapping_=mapping_, nsmap_=nsmap_)
+        if self.rectangularRegion is not None:
+            rectangularRegion_ = self.rectangularRegion
+            rectangularRegion_.to_etree(element, name_='rectangularRegion', mapping_=mapping_, nsmap_=nsmap_)
+        if mapping_ is not None:
+            mapping_[id(self)] = element
+        return element
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'ellipsoidalRegion':
+            obj_ = ellipsoidalRegionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ellipsoidalRegion = obj_
+            obj_.original_tagname_ = 'ellipsoidalRegion'
+        elif nodeName_ == 'rectangularRegion':
+            obj_ = rectangularRegionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.rectangularRegion = obj_
+            obj_.original_tagname_ = 'rectangularRegion'
+# end class listBivariateUncType
 
 
 class commentType(GeneratedsSuper):
@@ -11452,588 +13018,20 @@ class covarianceType(GeneratedsSuper):
 # end class covarianceType
 
 
-class realType(GeneratedsSuper):
-    """Meta data element definition for a real measurement quantity in list.
-    This implementation differs from the pure real quantity in the way that
-    the unit component is optional in order to allow a combination with
-    a global unit in the list of real quantities."""
-    __hash__ = GeneratedsSuper.__hash__
-    subclass = None
-    superclass = None
-    def __init__(self, label=None, value=None, unit=None, dateTime=None, expandedUnc=None, coverageInterval=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-        self.label = label
-        self.label_nsprefix_ = None
-        self.value = value
-        self.validate_decimalType(self.value)
-        self.value_nsprefix_ = None
-        self.unit = unit
-        self.validate_unitType(self.unit)
-        self.unit_nsprefix_ = None
-        if isinstance(dateTime, BaseStrType_):
-            initvalue_ = datetime_.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M:%S')
-        else:
-            initvalue_ = dateTime
-        self.dateTime = initvalue_
-        self.dateTime_nsprefix_ = None
-        self.expandedUnc = expandedUnc
-        self.expandedUnc_nsprefix_ = None
-        self.coverageInterval = coverageInterval
-        self.coverageInterval_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, realType)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if realType.subclass:
-            return realType.subclass(*args_, **kwargs_)
-        else:
-            return realType(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def get_ns_prefix_(self):
-        return self.ns_prefix_
-    def set_ns_prefix_(self, ns_prefix):
-        self.ns_prefix_ = ns_prefix
-    def get_label(self):
-        return self.label
-    def set_label(self, label):
-        self.label = label
-    def get_value(self):
-        return self.value
-    def set_value(self, value):
-        self.value = value
-    def get_unit(self):
-        return self.unit
-    def set_unit(self, unit):
-        self.unit = unit
-    def get_dateTime(self):
-        return self.dateTime
-    def set_dateTime(self, dateTime):
-        self.dateTime = dateTime
-    def get_expandedUnc(self):
-        return self.expandedUnc
-    def set_expandedUnc(self, expandedUnc):
-        self.expandedUnc = expandedUnc
-    def get_coverageInterval(self):
-        return self.coverageInterval
-    def set_coverageInterval(self, coverageInterval):
-        self.coverageInterval = coverageInterval
-    def validate_decimalType(self, value):
-        result = True
-        # Validate type decimalType, a restriction on xs:double.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, float):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_decimalType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_decimalType_patterns_, ))
-                result = False
-        return result
-    validate_decimalType_patterns_ = [['^([-+]?((\\d*\\.\\d+)|(\\d+\\.\\d*)|(\\d+\\.?))([Ee][-+]?\\d+)?)$']]
-    def validate_unitType(self, value):
-        result = True
-        # Validate type unitType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            pass
-        return result
-    def hasContent_(self):
-        if (
-            self.label is not None or
-            self.value is not None or
-            self.unit is not None or
-            self.dateTime is not None or
-            self.expandedUnc is not None or
-            self.coverageInterval is not None
-        ):
-            return True
-        else:
-            return False
-    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc" xmlns:si="https://ptb.de/si" ', name_='realType', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('realType')
-        if imported_ns_def_ is not None:
-            namespacedef_ = imported_ns_def_
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'realType':
-            name_ = self.original_tagname_
-        if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
-        showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='realType')
-        if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='realType', pretty_print=pretty_print)
-            showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
-        else:
-            outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='realType'):
-        pass
-    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc" xmlns:si="https://ptb.de/si" ', name_='realType', fromsubclass_=False, pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.label is not None:
-            namespaceprefix_ = self.label_nsprefix_ + ':' if (UseCapturedNS_ and self.label_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%slabel>%s</%slabel>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.label), input_name='label')), namespaceprefix_ , eol_))
-        if self.value is not None:
-            namespaceprefix_ = self.value_nsprefix_ + ':' if (UseCapturedNS_ and self.value_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%svalue>%s</%svalue>%s' % (namespaceprefix_ , self.gds_format_double(self.value, input_name='value'), namespaceprefix_ , eol_))
-        if self.unit is not None:
-            namespaceprefix_ = self.unit_nsprefix_ + ':' if (UseCapturedNS_ and self.unit_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sunit>%s</%sunit>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.unit), input_name='unit')), namespaceprefix_ , eol_))
-        if self.dateTime is not None:
-            namespaceprefix_ = self.dateTime_nsprefix_ + ':' if (UseCapturedNS_ and self.dateTime_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sdateTime>%s</%sdateTime>%s' % (namespaceprefix_ , self.gds_format_datetime(self.dateTime, input_name='dateTime'), namespaceprefix_ , eol_))
-        if self.expandedUnc is not None:
-            namespaceprefix_ = self.expandedUnc_nsprefix_ + ':' if (UseCapturedNS_ and self.expandedUnc_nsprefix_) else ''
-            self.expandedUnc.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='expandedUnc', pretty_print=pretty_print)
-        if self.coverageInterval is not None:
-            namespaceprefix_ = self.coverageInterval_nsprefix_ + ':' if (UseCapturedNS_ and self.coverageInterval_nsprefix_) else ''
-            self.coverageInterval.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='coverageInterval', pretty_print=pretty_print)
-    def to_etree(self, parent_element=None, name_='realType', mapping_=None, nsmap_=None):
-        if parent_element is None:
-            element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
-        else:
-            element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
-        if self.label is not None:
-            label_ = self.label
-            etree_.SubElement(element, '{https://ptb.de/dcc}label').text = self.gds_format_string(label_)
-        if self.value is not None:
-            value_ = self.value
-            etree_.SubElement(element, '{https://ptb.de/dcc}value').text = self.gds_format_double(value_)
-        if self.unit is not None:
-            unit_ = self.unit
-            etree_.SubElement(element, '{https://ptb.de/dcc}unit').text = self.gds_format_string(unit_)
-        if self.dateTime is not None:
-            dateTime_ = self.dateTime
-            etree_.SubElement(element, '{https://ptb.de/dcc}dateTime').text = self.gds_format_datetime(dateTime_)
-        if self.expandedUnc is not None:
-            expandedUnc_ = self.expandedUnc
-            expandedUnc_.to_etree(element, name_='expandedUnc', mapping_=mapping_, nsmap_=nsmap_)
-        if self.coverageInterval is not None:
-            coverageInterval_ = self.coverageInterval
-            coverageInterval_.to_etree(element, name_='coverageInterval', mapping_=mapping_, nsmap_=nsmap_)
-        if mapping_ is not None:
-            mapping_[id(self)] = element
-        return element
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'label':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'label')
-            value_ = self.gds_validate_string(value_, node, 'label')
-            self.label = value_
-            self.label_nsprefix_ = child_.prefix
-        elif nodeName_ == 'value' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'value')
-            fval_ = self.gds_validate_double(fval_, node, 'value')
-            self.value = fval_
-            self.value_nsprefix_ = child_.prefix
-            # validate type decimalType
-            self.validate_decimalType(self.value)
-        elif nodeName_ == 'unit':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'unit')
-            value_ = self.gds_validate_string(value_, node, 'unit')
-            self.unit = value_
-            self.unit_nsprefix_ = child_.prefix
-            # validate type unitType
-            self.validate_unitType(self.unit)
-        elif nodeName_ == 'dateTime':
-            sval_ = child_.text
-            dval_ = self.gds_parse_datetime(sval_)
-            self.dateTime = dval_
-            self.dateTime_nsprefix_ = child_.prefix
-        elif nodeName_ == 'expandedUnc':
-            obj_ = expandedUnc.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.expandedUnc = obj_
-            obj_.original_tagname_ = 'expandedUnc'
-        elif nodeName_ == 'coverageInterval':
-            obj_ = coverageInterval.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.coverageInterval = obj_
-            obj_.original_tagname_ = 'coverageInterval'
-# end class realType
-
-
-class complexType(GeneratedsSuper):
-    """Meta data element definition for a complex measurement quantity in list.
-    This implementation differs from the pure complex quantity, in the way that
-    the unit components are optional in order to allow a combination with
-    a global unit in the list of complex quantities."""
-    __hash__ = GeneratedsSuper.__hash__
-    subclass = None
-    superclass = None
-    def __init__(self, label=None, valueReal=None, valueImag=None, valueMagnitude=None, valuePhase=None, unit=None, unitPhase=None, dateTime=None, ellipsoidalRegion=None, rectangularRegion=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-        self.label = label
-        self.label_nsprefix_ = None
-        self.valueReal = valueReal
-        self.validate_decimalType(self.valueReal)
-        self.valueReal_nsprefix_ = None
-        self.valueImag = valueImag
-        self.validate_decimalType(self.valueImag)
-        self.valueImag_nsprefix_ = None
-        self.valueMagnitude = valueMagnitude
-        self.validate_decimalType(self.valueMagnitude)
-        self.valueMagnitude_nsprefix_ = None
-        self.valuePhase = valuePhase
-        self.validate_decimalType(self.valuePhase)
-        self.valuePhase_nsprefix_ = None
-        self.unit = unit
-        self.validate_unitType(self.unit)
-        self.unit_nsprefix_ = None
-        self.unitPhase = unitPhase
-        self.validate_unitPhaseType(self.unitPhase)
-        self.unitPhase_nsprefix_ = None
-        if isinstance(dateTime, BaseStrType_):
-            initvalue_ = datetime_.datetime.strptime(dateTime, '%Y-%m-%dT%H:%M:%S')
-        else:
-            initvalue_ = dateTime
-        self.dateTime = initvalue_
-        self.dateTime_nsprefix_ = None
-        self.ellipsoidalRegion = ellipsoidalRegion
-        self.ellipsoidalRegion_nsprefix_ = None
-        self.rectangularRegion = rectangularRegion
-        self.rectangularRegion_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, complexType)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if complexType.subclass:
-            return complexType.subclass(*args_, **kwargs_)
-        else:
-            return complexType(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def get_ns_prefix_(self):
-        return self.ns_prefix_
-    def set_ns_prefix_(self, ns_prefix):
-        self.ns_prefix_ = ns_prefix
-    def get_label(self):
-        return self.label
-    def set_label(self, label):
-        self.label = label
-    def get_valueReal(self):
-        return self.valueReal
-    def set_valueReal(self, valueReal):
-        self.valueReal = valueReal
-    def get_valueImag(self):
-        return self.valueImag
-    def set_valueImag(self, valueImag):
-        self.valueImag = valueImag
-    def get_valueMagnitude(self):
-        return self.valueMagnitude
-    def set_valueMagnitude(self, valueMagnitude):
-        self.valueMagnitude = valueMagnitude
-    def get_valuePhase(self):
-        return self.valuePhase
-    def set_valuePhase(self, valuePhase):
-        self.valuePhase = valuePhase
-    def get_unit(self):
-        return self.unit
-    def set_unit(self, unit):
-        self.unit = unit
-    def get_unitPhase(self):
-        return self.unitPhase
-    def set_unitPhase(self, unitPhase):
-        self.unitPhase = unitPhase
-    def get_dateTime(self):
-        return self.dateTime
-    def set_dateTime(self, dateTime):
-        self.dateTime = dateTime
-    def get_ellipsoidalRegion(self):
-        return self.ellipsoidalRegion
-    def set_ellipsoidalRegion(self, ellipsoidalRegion):
-        self.ellipsoidalRegion = ellipsoidalRegion
-    def get_rectangularRegion(self):
-        return self.rectangularRegion
-    def set_rectangularRegion(self, rectangularRegion):
-        self.rectangularRegion = rectangularRegion
-    def validate_decimalType(self, value):
-        result = True
-        # Validate type decimalType, a restriction on xs:double.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, float):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (float)' % {"value": value, "lineno": lineno, })
-                return False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_decimalType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_decimalType_patterns_, ))
-                result = False
-        return result
-    validate_decimalType_patterns_ = [['^([-+]?((\\d*\\.\\d+)|(\\d+\\.\\d*)|(\\d+\\.?))([Ee][-+]?\\d+)?)$']]
-    def validate_unitType(self, value):
-        result = True
-        # Validate type unitType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            pass
-        return result
-    def validate_unitPhaseType(self, value):
-        result = True
-        # Validate type unitPhaseType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            pass
-        return result
-    def hasContent_(self):
-        if (
-            self.label is not None or
-            self.valueReal is not None or
-            self.valueImag is not None or
-            self.valueMagnitude is not None or
-            self.valuePhase is not None or
-            self.unit is not None or
-            self.unitPhase is not None or
-            self.dateTime is not None or
-            self.ellipsoidalRegion is not None or
-            self.rectangularRegion is not None
-        ):
-            return True
-        else:
-            return False
-    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc" xmlns:si="https://ptb.de/si" ', name_='complexType', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('complexType')
-        if imported_ns_def_ is not None:
-            namespacedef_ = imported_ns_def_
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'complexType':
-            name_ = self.original_tagname_
-        if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
-        showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='complexType')
-        if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='complexType', pretty_print=pretty_print)
-            showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
-        else:
-            outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='complexType'):
-        pass
-    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:dcc="https://ptb.de/dcc" xmlns:si="https://ptb.de/si" ', name_='complexType', fromsubclass_=False, pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.label is not None:
-            namespaceprefix_ = self.label_nsprefix_ + ':' if (UseCapturedNS_ and self.label_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%slabel>%s</%slabel>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.label), input_name='label')), namespaceprefix_ , eol_))
-        if self.valueReal is not None:
-            namespaceprefix_ = self.valueReal_nsprefix_ + ':' if (UseCapturedNS_ and self.valueReal_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%svalueReal>%s</%svalueReal>%s' % (namespaceprefix_ , self.gds_format_double(self.valueReal, input_name='valueReal'), namespaceprefix_ , eol_))
-        if self.valueImag is not None:
-            namespaceprefix_ = self.valueImag_nsprefix_ + ':' if (UseCapturedNS_ and self.valueImag_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%svalueImag>%s</%svalueImag>%s' % (namespaceprefix_ , self.gds_format_double(self.valueImag, input_name='valueImag'), namespaceprefix_ , eol_))
-        if self.valueMagnitude is not None:
-            namespaceprefix_ = self.valueMagnitude_nsprefix_ + ':' if (UseCapturedNS_ and self.valueMagnitude_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%svalueMagnitude>%s</%svalueMagnitude>%s' % (namespaceprefix_ , self.gds_format_double(self.valueMagnitude, input_name='valueMagnitude'), namespaceprefix_ , eol_))
-        if self.valuePhase is not None:
-            namespaceprefix_ = self.valuePhase_nsprefix_ + ':' if (UseCapturedNS_ and self.valuePhase_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%svaluePhase>%s</%svaluePhase>%s' % (namespaceprefix_ , self.gds_format_double(self.valuePhase, input_name='valuePhase'), namespaceprefix_ , eol_))
-        if self.unit is not None:
-            namespaceprefix_ = self.unit_nsprefix_ + ':' if (UseCapturedNS_ and self.unit_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sunit>%s</%sunit>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.unit), input_name='unit')), namespaceprefix_ , eol_))
-        if self.unitPhase is not None:
-            namespaceprefix_ = self.unitPhase_nsprefix_ + ':' if (UseCapturedNS_ and self.unitPhase_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sunitPhase>%s</%sunitPhase>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.unitPhase), input_name='unitPhase')), namespaceprefix_ , eol_))
-        if self.dateTime is not None:
-            namespaceprefix_ = self.dateTime_nsprefix_ + ':' if (UseCapturedNS_ and self.dateTime_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sdateTime>%s</%sdateTime>%s' % (namespaceprefix_ , self.gds_format_datetime(self.dateTime, input_name='dateTime'), namespaceprefix_ , eol_))
-        if self.ellipsoidalRegion is not None:
-            namespaceprefix_ = self.ellipsoidalRegion_nsprefix_ + ':' if (UseCapturedNS_ and self.ellipsoidalRegion_nsprefix_) else ''
-            self.ellipsoidalRegion.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='ellipsoidalRegion', pretty_print=pretty_print)
-        if self.rectangularRegion is not None:
-            namespaceprefix_ = self.rectangularRegion_nsprefix_ + ':' if (UseCapturedNS_ and self.rectangularRegion_nsprefix_) else ''
-            self.rectangularRegion.export(outfile, level, namespaceprefix_='si:', namespacedef_='', name_='rectangularRegion', pretty_print=pretty_print)
-    def to_etree(self, parent_element=None, name_='complexType', mapping_=None, nsmap_=None):
-        if parent_element is None:
-            element = etree_.Element('{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
-        else:
-            element = etree_.SubElement(parent_element, '{https://ptb.de/dcc}' + name_, nsmap=nsmap_)
-        if self.label is not None:
-            label_ = self.label
-            etree_.SubElement(element, '{https://ptb.de/dcc}label').text = self.gds_format_string(label_)
-        if self.valueReal is not None:
-            valueReal_ = self.valueReal
-            etree_.SubElement(element, '{https://ptb.de/dcc}valueReal').text = self.gds_format_double(valueReal_)
-        if self.valueImag is not None:
-            valueImag_ = self.valueImag
-            etree_.SubElement(element, '{https://ptb.de/dcc}valueImag').text = self.gds_format_double(valueImag_)
-        if self.valueMagnitude is not None:
-            valueMagnitude_ = self.valueMagnitude
-            etree_.SubElement(element, '{https://ptb.de/dcc}valueMagnitude').text = self.gds_format_double(valueMagnitude_)
-        if self.valuePhase is not None:
-            valuePhase_ = self.valuePhase
-            etree_.SubElement(element, '{https://ptb.de/dcc}valuePhase').text = self.gds_format_double(valuePhase_)
-        if self.unit is not None:
-            unit_ = self.unit
-            etree_.SubElement(element, '{https://ptb.de/dcc}unit').text = self.gds_format_string(unit_)
-        if self.unitPhase is not None:
-            unitPhase_ = self.unitPhase
-            etree_.SubElement(element, '{https://ptb.de/dcc}unitPhase').text = self.gds_format_string(unitPhase_)
-        if self.dateTime is not None:
-            dateTime_ = self.dateTime
-            etree_.SubElement(element, '{https://ptb.de/dcc}dateTime').text = self.gds_format_datetime(dateTime_)
-        if self.ellipsoidalRegion is not None:
-            ellipsoidalRegion_ = self.ellipsoidalRegion
-            ellipsoidalRegion_.to_etree(element, name_='ellipsoidalRegion', mapping_=mapping_, nsmap_=nsmap_)
-        if self.rectangularRegion is not None:
-            rectangularRegion_ = self.rectangularRegion
-            rectangularRegion_.to_etree(element, name_='rectangularRegion', mapping_=mapping_, nsmap_=nsmap_)
-        if mapping_ is not None:
-            mapping_[id(self)] = element
-        return element
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'label':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'label')
-            value_ = self.gds_validate_string(value_, node, 'label')
-            self.label = value_
-            self.label_nsprefix_ = child_.prefix
-        elif nodeName_ == 'valueReal' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'valueReal')
-            fval_ = self.gds_validate_double(fval_, node, 'valueReal')
-            self.valueReal = fval_
-            self.valueReal_nsprefix_ = child_.prefix
-            # validate type decimalType
-            self.validate_decimalType(self.valueReal)
-        elif nodeName_ == 'valueImag' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'valueImag')
-            fval_ = self.gds_validate_double(fval_, node, 'valueImag')
-            self.valueImag = fval_
-            self.valueImag_nsprefix_ = child_.prefix
-            # validate type decimalType
-            self.validate_decimalType(self.valueImag)
-        elif nodeName_ == 'valueMagnitude' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'valueMagnitude')
-            fval_ = self.gds_validate_double(fval_, node, 'valueMagnitude')
-            self.valueMagnitude = fval_
-            self.valueMagnitude_nsprefix_ = child_.prefix
-            # validate type decimalType
-            self.validate_decimalType(self.valueMagnitude)
-        elif nodeName_ == 'valuePhase' and child_.text:
-            sval_ = child_.text
-            fval_ = self.gds_parse_double(sval_, node, 'valuePhase')
-            fval_ = self.gds_validate_double(fval_, node, 'valuePhase')
-            self.valuePhase = fval_
-            self.valuePhase_nsprefix_ = child_.prefix
-            # validate type decimalType
-            self.validate_decimalType(self.valuePhase)
-        elif nodeName_ == 'unit':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'unit')
-            value_ = self.gds_validate_string(value_, node, 'unit')
-            self.unit = value_
-            self.unit_nsprefix_ = child_.prefix
-            # validate type unitType
-            self.validate_unitType(self.unit)
-        elif nodeName_ == 'unitPhase':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'unitPhase')
-            value_ = self.gds_validate_string(value_, node, 'unitPhase')
-            self.unitPhase = value_
-            self.unitPhase_nsprefix_ = child_.prefix
-            # validate type unitPhaseType
-            self.validate_unitPhaseType(self.unitPhase)
-        elif nodeName_ == 'dateTime':
-            sval_ = child_.text
-            dval_ = self.gds_parse_datetime(sval_)
-            self.dateTime = dval_
-            self.dateTime_nsprefix_ = child_.prefix
-        elif nodeName_ == 'ellipsoidalRegion':
-            obj_ = ellipsoidalRegion.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.ellipsoidalRegion = obj_
-            obj_.original_tagname_ = 'ellipsoidalRegion'
-        elif nodeName_ == 'rectangularRegion':
-            obj_ = rectangularRegion.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.rectangularRegion = obj_
-            obj_.original_tagname_ = 'rectangularRegion'
-# end class complexType
-
-
 GDSClassesMapping = {
+    'complex': complexQuantityType,
+    'complexList': complexListType,
+    'constant': constantQuantityType,
+    'covarianceMatrix': covarianceMatrixType,
+    'coverageInterval': coverageIntervalType,
     'digitalCalibrationCertificate': digitalCalibrationCertificateType,
+    'ellipsoidalRegion': ellipsoidalRegionType,
+    'expandedUnc': expandedUncType,
+    'hybrid': hybridType,
+    'list': listType,
+    'real': realQuantityType,
+    'realList': realListType,
+    'rectangularRegion': rectangularRegionType,
 }
 
 
@@ -12192,8 +13190,8 @@ def parseLiteral(inFileName, silence=False, print_warnings=True):
         doc = None
         rootNode = None
     if not silence:
-        sys.stdout.write('#from dcc1 import *\n\n')
-        sys.stdout.write('import dcc1 as model_\n\n')
+        sys.stdout.write('#from dcc import *\n\n')
+        sys.stdout.write('import dcc as model_\n\n')
         sys.stdout.write('rootObj = model_.rootClass(\n')
         rootObj.exportLiteral(sys.stdout, 0, name_=rootTag)
         sys.stdout.write(')\n')
@@ -12220,165 +13218,179 @@ if __name__ == '__main__':
     main()
 
 RenameMappings_ = {
+    "{https://ptb.de/dcc}listType": "listType1",
 }
 
 #
 # Mapping of namespaces to types defined in them
 # and the file in which each is defined.
 # simpleTypes are marked "ST" and complexTypes "CT".
-NamespaceToDefMappings_ = {'https://ptb.de/dcc': [('stringISO3166Type',
-                         '../xsd-dcc-master/dcc.xsd',
+NamespaceToDefMappings_ = {'https://ptb.de/dcc': [('stringPerformanceLocationType', 'dcc.xsd', 'ST'),
+                        ('stringConformityStatementStatusType',
+                         'dcc.xsd',
                          'ST'),
-                        ('stringISO639Type', '../xsd-dcc-master/dcc.xsd', 'ST'),
-                        ('stringRefType', '../xsd-dcc-master/dcc.xsd', 'ST'),
-                        ('digitalCalibrationCertificateType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('administrativeDataType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('softwareListType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('softwareType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('measuringEquipmentListType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('measuringEquipmentType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('coreDataType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('equipmentClassType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('itemListType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('itemType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('identificationListType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('identificationType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('calibrationLaboratoryType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('respPersonListType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('respPersonType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('statementListType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('measurementResultListType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('measurementResultType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('usedMethodListType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('usedMethodType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('influenceConditionListType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('calibrationLocationListType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('calibrationLocationType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('conditionType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('resultType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('resultListType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('dataType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('quantityType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('listType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('measurementMetaDataListType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('statementMetaDataType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('stringWithLangType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('locationType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('contactType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('contactNotStrictType',
-                         '../xsd-dcc-master/dcc.xsd',
-                         'CT'),
-                        ('hashType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('textType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('byteDataType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('formulaType', '../xsd-dcc-master/dcc.xsd', 'CT'),
-                        ('xmlType', '../xsd-dcc-master/dcc.xsd', 'CT')],
+                        ('stringISO3166Type', 'dcc.xsd', 'ST'),
+                        ('stringISO639Type', 'dcc.xsd', 'ST'),
+                        ('digitalCalibrationCertificateType', 'dcc.xsd', 'CT'),
+                        ('administrativeDataType', 'dcc.xsd', 'CT'),
+                        ('softwareListType', 'dcc.xsd', 'CT'),
+                        ('softwareType', 'dcc.xsd', 'CT'),
+                        ('measuringEquipmentListType', 'dcc.xsd', 'CT'),
+                        ('measuringEquipmentType', 'dcc.xsd', 'CT'),
+                        ('coreDataType', 'dcc.xsd', 'CT'),
+                        ('equipmentClassType', 'dcc.xsd', 'CT'),
+                        ('itemListType', 'dcc.xsd', 'CT'),
+                        ('itemType', 'dcc.xsd', 'CT'),
+                        ('identificationListType', 'dcc.xsd', 'CT'),
+                        ('identificationType', 'dcc.xsd', 'CT'),
+                        ('performanceLocationType', 'dcc.xsd', 'CT'),
+                        ('calibrationLaboratoryType', 'dcc.xsd', 'CT'),
+                        ('respPersonListType', 'dcc.xsd', 'CT'),
+                        ('respPersonType', 'dcc.xsd', 'CT'),
+                        ('statementListType', 'dcc.xsd', 'CT'),
+                        ('measurementResultListType', 'dcc.xsd', 'CT'),
+                        ('measurementResultType', 'dcc.xsd', 'CT'),
+                        ('usedMethodListType', 'dcc.xsd', 'CT'),
+                        ('usedMethodType', 'dcc.xsd', 'CT'),
+                        ('influenceConditionListType', 'dcc.xsd', 'CT'),
+                        ('conditionType', 'dcc.xsd', 'CT'),
+                        ('resultListType', 'dcc.xsd', 'CT'),
+                        ('resultType', 'dcc.xsd', 'CT'),
+                        ('dataType', 'dcc.xsd', 'CT'),
+                        ('quantityType', 'dcc.xsd', 'CT'),
+                        ('listType', 'dcc.xsd', 'CT'),
+                        ('measurementMetaDataListType', 'dcc.xsd', 'CT'),
+                        ('statementMetaDataType', 'dcc.xsd', 'CT'),
+                        ('stringWithLangType', 'dcc.xsd', 'CT'),
+                        ('locationType', 'dcc.xsd', 'CT'),
+                        ('positionCoordinatesType', 'dcc.xsd', 'CT'),
+                        ('contactType', 'dcc.xsd', 'CT'),
+                        ('contactNotStrictType', 'dcc.xsd', 'CT'),
+                        ('hashType', 'dcc.xsd', 'CT'),
+                        ('textType', 'dcc.xsd', 'CT'),
+                        ('richContentType', 'dcc.xsd', 'CT'),
+                        ('byteDataType', 'dcc.xsd', 'CT'),
+                        ('formulaType', 'dcc.xsd', 'CT'),
+                        ('xmlType', 'dcc.xsd', 'CT')],
  'https://ptb.de/si': [('unitType',
-                        'https://ptb.de/si/v1.3.1/SI_Format.xsd',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
                         'ST'),
                        ('unitPhaseType',
-                        'https://ptb.de/si/v1.3.1/SI_Format.xsd',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
                         'ST'),
                        ('decimalType',
-                        'https://ptb.de/si/v1.3.1/SI_Format.xsd',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
                         'ST'),
                        ('uncertaintyValueType',
-                        'https://ptb.de/si/v1.3.1/SI_Format.xsd',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
                         'ST'),
                        ('kValueType',
-                        'https://ptb.de/si/v1.3.1/SI_Format.xsd',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
                         'ST'),
                        ('probabilityValueType',
-                        'https://ptb.de/si/v1.3.1/SI_Format.xsd',
-                        'ST')]}
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'ST'),
+                       ('realQuantityType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('constantQuantityType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('complexQuantityType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('realInListType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('complexInListType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('realListType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('complexListType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('listType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('hybridType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('expandedUncType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('coverageIntervalType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('covarianceMatrixType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('ellipsoidalRegionType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('rectangularRegionType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('listUnivariateUncType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT'),
+                       ('listBivariateUncType',
+                        'https://ptb.de/si/v2.0.0/SI_Format.xsd',
+                        'CT')]}
 
 __all__ = [
     "administrativeDataType",
     "byteDataType",
     "calibrationLaboratoryType",
-    "calibrationLocationListType",
-    "calibrationLocationType",
     "columnType",
     "commentType",
-    "complex",
-    "complexType",
+    "complexInListType",
+    "complexListType",
+    "complexQuantityType",
     "conditionType",
-    "constant",
+    "constantQuantityType",
     "contactNotStrictType",
     "contactType",
     "coreDataType",
-    "covarianceMatrix",
+    "covarianceMatrixType",
     "covarianceType",
-    "coverageInterval",
+    "coverageIntervalType",
     "dataType",
     "digitalCalibrationCertificateType",
-    "ellipsoidalRegion",
+    "ellipsoidalRegionType",
     "equipmentClassType",
-    "expandedUnc",
+    "expandedUncType",
     "formulaType",
     "hashType",
-    "hybrid",
+    "hybridType",
     "identificationListType",
     "identificationType",
     "influenceConditionListType",
     "itemListType",
     "itemType",
-    "list",
-    "listBivariateUnc",
+    "listBivariateUncType",
     "listType",
-    "listUnivariateUnc",
+    "listType1",
+    "listUnivariateUncType",
     "locationType",
     "measurementMetaDataListType",
     "measurementResultListType",
     "measurementResultType",
     "measuringEquipmentListType",
     "measuringEquipmentType",
+    "performanceLocationType",
+    "positionCoordinatesType",
     "quantityType",
-    "real",
-    "realType",
-    "rectangularRegion",
+    "realInListType",
+    "realListType",
+    "realQuantityType",
+    "rectangularRegionType",
     "respPersonListType",
     "respPersonType",
     "resultListType",
     "resultType",
+    "richContentType",
     "softwareListType",
     "softwareType",
     "statementListType",

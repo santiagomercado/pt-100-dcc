@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Sat Jun 26 08:21:50 2021 by generateDS.py version 2.38.6.
+# Generated Sat Jul  3 13:51:56 2021 by generateDS.py version 2.38.6.
 # Python 3.9.4 (default, Apr  9 2021, 16:34:09)  [GCC 7.3.0]
 #
 # Command line options:
-#   ('-o', 'SI_Format1.py')
-#   ('-s', 'SI_Formatsubs1.py')
+#   ('-o', 'SI_Format.py')
 #   ('--external-encoding', 'utf-8')
 #   ('--export', 'write etree')
 #
@@ -15,10 +14,10 @@
 #   SI_Format.xsd
 #
 # Command line:
-#   generateds/generateDS.py -o "SI_Format1.py" -s "SI_Formatsubs1.py" --external-encoding="utf-8" --export="write etree" SI_Format.xsd
+#   /home/santiago/Beca/genxsd/generateds/generateDS.py -o "SI_Format.py" --external-encoding="utf-8" --export="write etree" SI_Format.xsd
 #
 # Current working directory (os.getcwd()):
-#   genxsd
+#   v1_3_1
 #
 
 import sys
@@ -4764,8 +4763,8 @@ def parseLiteral(inFileName, silence=False, print_warnings=True):
         doc = None
         rootNode = None
     if not silence:
-        sys.stdout.write('#from SI_Format1 import *\n\n')
-        sys.stdout.write('import SI_Format1 as model_\n\n')
+        sys.stdout.write('#from SI_Format import *\n\n')
+        sys.stdout.write('import SI_Format as model_\n\n')
         sys.stdout.write('rootObj = model_.rootClass(\n')
         rootObj.exportLiteral(sys.stdout, 0, name_=rootTag)
         sys.stdout.write(')\n')

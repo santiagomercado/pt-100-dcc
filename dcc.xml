@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<dcc:digitalCalibrationCertificate xmlns:dcc="https://ptb.de/dcc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:si="https://ptb.de/si" schemaVersion="2.4.0" xsi:schemaLocation="https://ptb.de/dcc https://ptb.de/dcc/v2.4.0/dcc.xsd">
+<dcc:digitalCalibrationCertificate xmlns:dcc="https://ptb.de/dcc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:si="https://ptb.de/si" schemaVersion="3.0.0-rc.4" xsi:schemaLocation="https://ptb.de/dcc https://ptb.de/dcc/v2.4.0/dcc.xsd">
   <dcc:administrativeData>
     <dcc:dccSoftware>
       <dcc:software>
@@ -17,6 +17,7 @@
       <dcc:receiptDate>2020-03-05</dcc:receiptDate>
       <dcc:beginPerformanceDate>2020-03-11</dcc:beginPerformanceDate>
       <dcc:endPerformanceDate>2020-03-16</dcc:endPerformanceDate>
+      <dcc:performanceLocation>laboratory</dcc:performanceLocation>
     </dcc:coreData>
     <dcc:items>
       <dcc:item>
@@ -36,9 +37,9 @@
           <dcc:identification>
             <dcc:issuer>manufacturer</dcc:issuer>
             <dcc:value>#03-36</dcc:value>
-            <dcc:description>
+            <dcc:name>
               <dcc:content lang="es">Numero de serie</dcc:content>
-            </dcc:description>
+            </dcc:name>
           </dcc:identification>
         </dcc:identifications>
       </dcc:item>
@@ -134,6 +135,9 @@
   </dcc:administrativeData>
   <dcc:measurementResults>
     <dcc:measurementResult>
+      <dcc:name>
+        <dcc:content>Resultados pt-100</dcc:content>
+      </dcc:name>
       <dcc:usedMethods>
         <dcc:usedMethod>
           <dcc:name>
