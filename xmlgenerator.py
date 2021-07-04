@@ -369,217 +369,82 @@ def administrativeData(adm_df):
     administrativeData_.set_statements(statements)
     return administrativeData_
 
+# res_df y administrativeData_ no se usan pq el measurementResult que genero
+# es apartir de todos datos hardcodeados.
 def measurementResults(res_df, administrativeData_):
 
-    """
-    measurementResults():
+    DCC_PREFIX = "{https://ptb.de/dcc}"
+    SI_PREFIX = "{https://ptb.de/si}"
+    CONTENT = "content"
+    SOME_TEXT = "some text"
+    NUMBER = "4"
 
-    input:
-    res_df (dataframe) => data retrieved from the spreadsheet to create the
-    ring 2
-    administrativeData_ (administrativeDataType) => some information from ring 1
-    will be used in ring 2
+    #measurementResults = etree.SubElement(dcc, DCC_PREFIX+"measurementResults")
+    measurementResults_ = etree.Element(DCC_PREFIX+"measurementResults")
+    measurementResult = etree.SubElement(measurementResults_, DCC_PREFIX+"measurementResult")
+    name = etree.SubElement(measurementResult, DCC_PREFIX+"name")
+    etree.SubElement(name, DCC_PREFIX+CONTENT).text = SOME_TEXT
+    usedMethods = etree.SubElement(measurementResult, DCC_PREFIX+"usedMethods")
+    usedMethod = etree.SubElement(usedMethods, DCC_PREFIX+"usedMethod")
+    name = etree.SubElement(usedMethod, DCC_PREFIX+"name")
+    etree.SubElement(name, DCC_PREFIX+CONTENT, lang="es").text = SOME_TEXT
+    description = etree.SubElement(usedMethod, DCC_PREFIX+"description")
+    etree.SubElement(description, DCC_PREFIX+CONTENT, lang="es").text = SOME_TEXT
+    usedSoftware = etree.SubElement(measurementResult, DCC_PREFIX+"usedSoftware")
+    software = etree.SubElement(usedSoftware, DCC_PREFIX+"software")
+    name = etree.SubElement(software, DCC_PREFIX+"name")
+    etree.SubElement(name, DCC_PREFIX+CONTENT).text = SOME_TEXT
+    release = etree.SubElement(software, DCC_PREFIX+"release").text = SOME_TEXT
 
-    output: measurementResults_ (measurementResultListType) => ring 2
+    influenceConditions = etree.SubElement(measurementResult, DCC_PREFIX+"influenceConditions")
+    influenceCondition = etree.SubElement(influenceConditions, DCC_PREFIX+"influenceCondition")
+    name = etree.SubElement(influenceCondition, DCC_PREFIX+"name")
+    etree.SubElement(name, DCC_PREFIX+CONTENT, lang="es").text = SOME_TEXT
+    data = etree.SubElement(influenceCondition, DCC_PREFIX+"data")
+    list = etree.SubElement(data, DCC_PREFIX+"list")
+    name = etree.SubElement(list, DCC_PREFIX+"name")
+    etree.SubElement(name, DCC_PREFIX+CONTENT, lang="es").text = SOME_TEXT
+    list = etree.SubElement(list, DCC_PREFIX+"list", id="temperature")
+    name = etree.SubElement(list, DCC_PREFIX+"name")
+    etree.SubElement(name, DCC_PREFIX+CONTENT, lang="es").text = "temperature"
 
+    quantity = etree.SubElement(list, DCC_PREFIX+"quantity")
+    name = etree.SubElement(quantity, DCC_PREFIX+"name")
+    etree.SubElement(name, DCC_PREFIX+CONTENT, lang="es").text = "Temperatura >"
+    real = etree.SubElement(quantity, SI_PREFIX+"real")
+    value = etree.SubElement(real, SI_PREFIX+"value").text = NUMBER
+    unit = etree.SubElement(real, SI_PREFIX+"unit").text = "\degreeCelsius"
+    expandedUnc = etree.SubElement(real, SI_PREFIX+"expandedUnc")
+    etree.SubElement(expandedUnc, SI_PREFIX+"uncertainty").text = "0.5"
+    etree.SubElement(expandedUnc, SI_PREFIX+"coverageFactor").text = "2"
+    etree.SubElement(expandedUnc, SI_PREFIX+"coverageProbability").text = "0.95"
 
-    name.add_prueba
+    quantity = etree.SubElement(list, DCC_PREFIX+"quantity")
+    name = etree.SubElement(quantity, DCC_PREFIX+"name")
+    etree.SubElement(name, DCC_PREFIX+CONTENT, lang="es").text = "Temperatura <"
+    real = etree.SubElement(quantity, SI_PREFIX+"real")
+    value = etree.SubElement(real, SI_PREFIX+"value").text = NUMBER
+    unit = etree.SubElement(real, SI_PREFIX+"unit").text = "\degreeCelsius"
+    expandedUnc = etree.SubElement(real, SI_PREFIX+"expandedUnc")
+    etree.SubElement(expandedUnc, SI_PREFIX+"uncertainty").text = "0.5"
+    etree.SubElement(expandedUnc, SI_PREFIX+"coverageFactor").text = "2"
+    etree.SubElement(expandedUnc, SI_PREFIX+"coverageProbability").text = "0.95"
 
+    results = etree.SubElement(measurementResult, DCC_PREFIX+"results")
+    result = etree.SubElement(results, DCC_PREFIX+"result")
+    name = etree.SubElement(result, DCC_PREFIX+"name")
+    etree.SubElement(name, DCC_PREFIX+CONTENT, lang="es").text = \
+    "Conventional mass and maximum permissible error corresponding to OIML R 111"
 
-    """
-    #El día que lo presentemos va a ser lo mejor usar una jupyter notebook.
-    #
-    #https://www.ptb.de/dcc/v2.4.0/en/measurementResult/#tree-structure
-    #
-    #alrazonar las estructuras, hay que tener en cuenta que los métodos
-    #ya saben a que padre tiene que linkearse y no hace falta referenciarlos.
-    #
+    data = etree.SubElement(result, DCC_PREFIX+"data", id="OIML_R_111")
+    list = etree.SubElement(data, DCC_PREFIX+"list")
+    quantity = etree.SubElement(list, DCC_PREFIX+"quantity")
+    name = etree.SubElement(quantity, DCC_PREFIX+"name")
+    etree.SubElement(name, DCC_PREFIX+CONTENT, lang="es").text = "Nominal value"
+    noQuantity = etree.SubElement(quantity, DCC_PREFIX+"noQuantity")
+    etree.SubElement(noQuantity, DCC_PREFIX+CONTENT).text = "10 g"
 
-    measurementResults_ = dcc.measurementResultListType()
-    #creo un dcc:measurementResults
-
-    measurementResult = dcc.measurementResultType(
-        name=dcc.textType(content=[
-            dcc.stringWithLangType(valueOf_="Resultados pt-100")]),
-        usedSoftware=administrativeData_.get_dccSoftware())
-    #creo un dcc:measurementResult
-
-    usedMethods = dcc.usedMethodListType()
-    #creo un dcc:usedMethods
-
-    usedSoftware = dcc.softwareListType()
-    #creo un dcc:usedSoftware
-
-    influenceConditions = dcc.influenceConditionListType()
-    #genero el influence conditions
-
-    influenceCondition = dcc.conditionType()
-    #genero el influence condition
-
-    results = dcc.resultListType()
-    #genero el results
-
-    #
-    #arriba genero todos los elementos ppales
-    #
-
-    # Gets the used languages from the ring 1. This a first approach.
-    # Retrieves the first language that will be used.
-    # In the future, this will get the whole list.
-    lang = administrativeData_.get_coreData().get_usedLangCodeISO639_1()[0]
-
-    cell = res_df.iloc
-    #modifico el df para leer las columnas con números y no letras desde cell[]
-
-    table = {item:idx for idx,item in enumerate(cell[:,0]) if item in CONST}
-    #asigno una tabla de índices(row-1) respecto a cada asignación {índice = [número|letra]}
-
-    for name, idx in table.items():
-        #itero todos los items de la tabla uqe generé antes: 0A, 0B, 0C ...
-        if name == '0A':
-            usedMethod_name = dcc.textType()
-            usedMethod_name.add_content(
-            #al name que cree le agrego el dcc:content
-                dcc.stringWithLangType(
-                    lang=lang,
-                    #para cuando haya mas de un idioma.
-                    #el idioma debería ser un vector.
-                    valueOf_=cell[idx,1]
-                    #agrega el valor de "Met..." dentro del contenido
-                )
-            )
-
-            usedMethod_description = dcc.richContentType()
-            #agrego dcc:description al method a usedMethod
-
-            usedMethod_description.add_content(
-                dcc.stringWithLangType(
-                    lang=lang,
-                    valueOf_=cell[idx,3]
-                )
-            )
-
-            usedMethod = dcc.usedMethodType(
-                name=usedMethod_name,
-                description=usedMethod_description
-                )
-            usedMethods.add_usedMethod(usedMethod)
-        elif name == '0B':
-            influenceCondition_name = dcc.textType()
-            influenceCondition_name.add_content(
-                dcc.stringWithLangType(
-                    valueOf_=cell[idx,3]
-                )
-            )
-            influenceCondition.set_name(influenceCondition_name)
-        elif name == '0C':
-            data = dcc.dataType()
-            uncertaintyTemperature,uncertaintyRelativeHumidity =\
-            cell[idx+3,3],cell[idx+6,3]
-            environmentalCondition = (
-                ("Temperatura mayor a",cell[idx+1,3],DEGREECELSIUS,
-                 uncertaintyTemperature),
-                ("Temperatura menor a",cell[idx+2,3],DEGREECELSIUS,
-                 uncertaintyTemperature),
-                ("Humedad Relativa menor a",cell[idx+5,3],RELATIVEHUMIDITY,
-                 uncertaintyRelativeHumidity)
-                )
-
-            for name,value,unit,uncertainty in environmentalCondition:
-                quantity_name = dcc.textType()
-                quantity_name.add_content(
-                    dcc.stringWithLangType(
-                        lang=lang,
-                        valueOf_=name
-                    )
-                )
-                expandedUnc = SI_Format.expandedUncType(uncertainty=uncertainty,
-                                                    coverageFactor=2,
-                                                    coverageProbability=0.95)
-                real = SI_Format.realQuantityType(value=float(value),
-                                      unit=unit,
-                                      expandedUnc=expandedUnc)
-                quantity = dcc.quantityType(name=quantity_name,real=real)
-                data.add_quantity(quantity)
-
-            influenceCondition.set_data(data)
-            influenceConditions.add_influenceCondition(influenceCondition)
-        elif name == '0D':
-            #res_data[name] = (cell[idx+3, 3],cell[idx+6,3],
-            #                  cell[idx+7,3],cell[idx+8,3],
-            #                  cell[idx+9,3],cell[idx+10,3])
-            pass
-        elif name == '0E':
-            #res_data[name] = (cell[idx+1, 3],cell[idx+2,3],cell[idx+3,3])
-            pass
-        elif name == '0F':
-            #for j in range(idx,table['0G']-4):
-            #    if not pd.isna(cell[j,3]):
-            #        obs = cell[j,3]
-            #        if name in res_data:
-            #            res_data[name].append(obs)
-            #        else:
-            #            res_data[name] = [obs]
-            pass
-        elif name == '0G':
-            k, prob = cell[idx-2,6],cell[idx-1,6]
-            data = dcc.dataType()
-            for j in range(idx+2, len(res_df)):
-                temperature,resistance,uncertainty = \
-                float(cell[j,3]),float(cell[j,4]),float(cell[j,5])
-
-                quantity_nominal_name = dcc.textType()
-                quantity_nominal_name.add_content(
-                    dcc.stringWithLangType(
-                        lang=lang,
-                        valueOf_="Valor nominal"
-                    )
-                )
-                noQuantity = dcc.textType()
-                noQuantity.add_content(
-                    dcc.stringWithLangType(
-                        valueOf_= str(temperature)
-                    )
-                )
-                noQuantity.add_content(
-                    dcc.stringWithLangType(
-                        valueOf_= DEGREECELSIUS
-                    )
-                )
-
-                quantity_nominal = dcc.quantityType(name=quantity_nominal_name,
-                                                    noQuantity=noQuantity)
-
-                expandedUnc = SI_Format.expandedUncType(uncertainty=uncertainty,
-                                                    coverageFactor=k,
-                                                    coverageProbability=prob)
-                real = SI_Format.realQuantityType(value=resistance,
-                                      unit=OHM,
-                                      expandedUnc=expandedUnc)
-                quantity = dcc.quantityType(real=real)
-
-                list_ = dcc.listType1()
-                list_.add_quantity(quantity_nominal)
-                list_.add_quantity(quantity)
-                data.add_list(list_)
-
-            result_name = dcc.textType()
-            result_name.add_content(
-                dcc.stringWithLangType(
-                    lang=lang,
-                    valueOf_="Resultados"
-                )
-            )
-            result = dcc.resultType(name=result_name,data=data)
-            results.add_result(result)
-
-    measurementResult.set_usedMethods(usedMethods)
-    measurementResult.set_influenceConditions(influenceConditions)
-    measurementResult.set_results(results)
-
-    measurementResults_.add_measurementResult(measurementResult)
     return measurementResults_
-
 
 def read(file_path):
     # Lee la primera hoja del excel. Devuelve la informacion
@@ -613,12 +478,10 @@ def main():
     # Genera el measurementResults
     measurementResults_ = measurementResults(res_df, administrativeData_)
 
-    # Integra toda la informacion del administrativeData y measurementResults
-    # para generar el digitalCalibrationCertificate
+    # Comienzo a crear el dcc
     digitalCalibrationCertificate = dcc.digitalCalibrationCertificateType(
         schemaVersion="3.0.0-rc.4",
-        administrativeData=administrativeData_,
-        measurementResults=measurementResults_
+        administrativeData=administrativeData_
     )
     nsmap_ = {
         'dcc' : 'https://ptb.de/dcc',
@@ -635,7 +498,8 @@ def main():
     elem.attrib['{{{pre}}}schemaLocation'.format(pre=NS)] = \
     'https://ptb.de/dcc https://ptb.de/dcc/v2.4.0/dcc.xsd'
 
-    # Genera el xml
+    # Integro el measurementResult_ (tipo lxml Element) al Element del dcc
+    elem.append(measurementResults_)
     tree = etree.ElementTree(elem)
     tree.write('dcc.xml', encoding='UTF-8',
                               xml_declaration=True,
