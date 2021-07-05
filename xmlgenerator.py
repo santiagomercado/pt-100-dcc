@@ -528,40 +528,25 @@ def measurementResults(res_df, administrativeData_):
                 temperature,resistance,uncertainty = \
                 float(cell[j,3]),float(cell[j,4]),float(cell[j,5])
 
-                quantity_nominal_name = dcc.textType()
-                quantity_nominal_name.add_content(
-                    dcc.stringWithLangType(
-                        lang=lang,
-                        valueOf_="Valor nominal"
-                    )
-                )
-                noQuantity = dcc.textType()
-                noQuantity.add_content(
-                    dcc.stringWithLangType(
-                        valueOf_= str(temperature)
-                    )
-                )
-                noQuantity.add_content(
-                    dcc.stringWithLangType(
-                        valueOf_= DEGREECELSIUS
-                    )
-                )
-
-                quantity_nominal = dcc.quantityType(name=quantity_nominal_name,
-                                                    noQuantity=noQuantity)
-
-                expandedUnc = SI_Format.expandedUncType(uncertainty=uncertainty,
-                                                    coverageFactor=k,
-                                                    coverageProbability=prob)
                 real = SI_Format.realQuantityType(value=resistance,
                                       unit=OHM,
                                       expandedUnc=expandedUnc)
-                quantity = dcc.quantityType(real=real)
 
-                list_ = dcc.listType1()
-                list_.add_quantity(quantity_nominal)
-                list_.add_quantity(quantity)
-                data.add_list(list_)
+                real1 = SI_Format.realInListType(value=temperature,
+                                                   unit=DEGREECELSIUS)
+                real2 = SI_Format.realInListType(value=resistance,
+                                                   unit=OHM)
+                expandedUnc = SI_Format.expandedUncType(uncertainty=uncertainty,
+                                                    coverageFactor=k,
+                                                    coverageProbability=prob)
+                real2.set_expandedUnc(expandedUnc)
+                realList = SI_Format.realListType(real=[real1,real2])
+                si_list = SI_Format.listType(realList=[realList])
+                quantity = dcc.quantityType(list=si_list)
+
+                dcc_list = dcc.listType1()
+                dcc_list.add_quantity(quantity)
+                data.add_list(dcc_list)
 
             result_name = dcc.textType()
             result_name.add_content(
