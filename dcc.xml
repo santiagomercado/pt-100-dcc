@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<dcc:digitalCalibrationCertificate xmlns:dcc="https://ptb.de/dcc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:si="https://ptb.de/si" schemaVersion="3.0.0-rc.4" xsi:schemaLocation="https://ptb.de/dcc https://ptb.de/dcc/v2.4.0/dcc.xsd">
+<dcc:digitalCalibrationCertificate xmlns:dcc="https://ptb.de/dcc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:si="https://ptb.de/si" schemaVersion="3.0.0" xsi:schemaLocation="https://ptb.de/dcc https://ptb.de/dcc/v3.0.0/dcc.xsd">
   <dcc:administrativeData>
     <dcc:dccSoftware>
       <dcc:software>
@@ -13,13 +13,16 @@
       <dcc:countryCodeISO3166_1>AR</dcc:countryCodeISO3166_1>
       <dcc:usedLangCodeISO639_1>es</dcc:usedLangCodeISO639_1>
       <dcc:mandatoryLangCodeISO639_1>es</dcc:mandatoryLangCodeISO639_1>
-      <dcc:uniqueIdentifier>OT 0000#222-000#1423 Único</dcc:uniqueIdentifier>
+      <dcc:uniqueIdentifier>OT 00000222-00001423-Único</dcc:uniqueIdentifier>
       <dcc:receiptDate>2020-03-05</dcc:receiptDate>
       <dcc:beginPerformanceDate>2020-03-11</dcc:beginPerformanceDate>
       <dcc:endPerformanceDate>2020-03-16</dcc:endPerformanceDate>
       <dcc:performanceLocation>laboratory</dcc:performanceLocation>
     </dcc:coreData>
     <dcc:items>
+      <dcc:description>
+        <dcc:content lang="es">Curva de calibración entre -20°C y 200°C</dcc:content>
+      </dcc:description>
       <dcc:item>
         <dcc:name>
           <dcc:content lang="es">qwerty</dcc:content>
@@ -32,11 +35,11 @@
             <dcc:content>---</dcc:content>
           </dcc:name>
         </dcc:manufacturer>
-        <dcc:model>#asdas123</dcc:model>
+        <dcc:model>asdas123</dcc:model>
         <dcc:identifications>
           <dcc:identification>
             <dcc:issuer>manufacturer</dcc:issuer>
-            <dcc:value>#03-36</dcc:value>
+            <dcc:value>03-36</dcc:value>
             <dcc:name>
               <dcc:content lang="es">Numero de serie</dcc:content>
             </dcc:name>
@@ -50,21 +53,31 @@
           <dcc:content lang="es">Instituto Nacional de Tecnología Industrial (INTI)</dcc:content>
         </dcc:name>
         <dcc:eMail>consultas@inti.gob.ar</dcc:eMail>
-        <dcc:phone>(54 11) 4724-6200</dcc:phone>
+        <dcc:phone>(54 11) 4724-6200 / (54 11) 4724 6300</dcc:phone>
         <dcc:location>
-          <dcc:city>Provincia de Buenos Aires, Partido de General San Martín</dcc:city>
+          <dcc:city>Partido de General San Martín, Provincia de Buenos Aires</dcc:city>
           <dcc:countryCode>AR</dcc:countryCode>
-          <dcc:postCode>#1650</dcc:postCode>
-          <dcc:postOfficeBox>#---</dcc:postOfficeBox>
+          <dcc:postCode>1650</dcc:postCode>
+          <dcc:postOfficeBox>---</dcc:postOfficeBox>
           <dcc:state>República Argentina</dcc:state>
           <dcc:street>Avenida General Paz</dcc:street>
-          <dcc:streetNo>#5445</dcc:streetNo>
+          <dcc:streetNo>5445</dcc:streetNo>
           <dcc:further>
-            <dcc:content>Partido de General San Martín</dcc:content>
-            <dcc:content>(54 11) 4724 6300</dcc:content>
-            <dcc:content>Edificio 3 y 44</dcc:content>
-            <dcc:content>GOMYC</dcc:content>
-            <dcc:content>SOMCEI</dcc:content>
+            <dcc:content id="inm">INTI</dcc:content>
+            <dcc:content id="management">GOMYC</dcc:content>
+            <dcc:content id="assistantManagement">SOMCEI</dcc:content>
+            <dcc:content id="inmDepartment">Depto. De Termodinámica</dcc:content>
+            <dcc:content id="street">Avenida General Paz</dcc:content>
+            <dcc:content id="streetNo">5445</dcc:content>
+            <dcc:content id="other">Edificio 3 y 44</dcc:content>
+            <dcc:content id="postCode">1650</dcc:content>
+            <dcc:content id="department">San Martín</dcc:content>
+            <dcc:content id="province">Provincia de Buenos Aires</dcc:content>
+            <dcc:content id="country">República Argentina</dcc:content>
+            <dcc:content id="phone1">(54 11) 4752 5402</dcc:content>
+            <dcc:content id="phone2">(54 11) 4724 6200</dcc:content>
+            <dcc:content id="extensionNumber">7444</dcc:content>
+            <dcc:content id="eMail">fisicaymetrologia@inti.gob.ar</dcc:content>
           </dcc:further>
         </dcc:location>
       </dcc:contact>
@@ -100,17 +113,17 @@
         <dcc:content lang="es">Metrólogos Argenciados S.A.</dcc:content>
       </dcc:name>
       <dcc:eMail>metrologos@asociados.com.ar</dcc:eMail>
-      <dcc:phone>#49845456</dcc:phone>
+      <dcc:phone>49845456</dcc:phone>
       <dcc:location>
-        <dcc:city>Provincia de Buenos Aires, Partido de La matanza</dcc:city>
+        <dcc:city>Partido de La matanza, Provincia de Buenos Aires</dcc:city>
         <dcc:countryCode>AR</dcc:countryCode>
-        <dcc:postCode>#5456</dcc:postCode>
-        <dcc:postOfficeBox>#---</dcc:postOfficeBox>
+        <dcc:postCode>5456</dcc:postCode>
+        <dcc:postOfficeBox>---</dcc:postOfficeBox>
         <dcc:state>República Argentina</dcc:state>
-        <dcc:street>#Perito Moreno</dcc:street>
-        <dcc:streetNo>#5845</dcc:streetNo>
+        <dcc:street>Perito Moreno</dcc:street>
+        <dcc:streetNo>5845</dcc:streetNo>
         <dcc:further>
-          <dcc:content>#45624587</dcc:content>
+          <dcc:content>45624587</dcc:content>
         </dcc:further>
       </dcc:location>
     </dcc:customer>
@@ -144,7 +157,7 @@
             <dcc:content lang="es">Metodología Empleada</dcc:content>
           </dcc:name>
           <dcc:description>
-            <dcc:content lang="es">Por comparación con termómetros patrones de resistencia de platino, en baños, hornos y cámara climática con temperatura estabilizada, según procedimiento de PET08C, revisión abril 2019</dcc:content>
+            <dcc:content lang="es">Por comparación con termómetros patrones de resistencia de platino, en baños, hornos y cámara climática con temperatura estabilizada, según procedimiento de PET08C, revisión abril 2019.</dcc:content>
           </dcc:description>
         </dcc:usedMethod>
       </dcc:usedMethods>
@@ -159,7 +172,17 @@
       <dcc:influenceConditions>
         <dcc:influenceCondition>
           <dcc:name>
-            <dcc:content>Los valores de resistencia fueron determinados con una corriente de 1 mA.</dcc:content>
+            <dcc:content>Condiciones de medición</dcc:content>
+          </dcc:name>
+          <dcc:data>
+            <dcc:text>
+              <dcc:content lang="es">Los valores de resistencia fueron determinados con una corriente de 1 mA.</dcc:content>
+            </dcc:text>
+          </dcc:data>
+        </dcc:influenceCondition>
+        <dcc:influenceCondition>
+          <dcc:name>
+            <dcc:content>Condiciones ambientales</dcc:content>
           </dcc:name>
           <dcc:data>
             <dcc:quantity>

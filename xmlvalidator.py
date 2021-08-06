@@ -32,7 +32,7 @@ def main():
         xml_file = sys.argv[1]
     else:
         xml_file = 'dcc.xml'
-    xmlvalid(xml_file,'./schemas/dcc/v3_0_0_rc_4/dcc.xsd')
+    xmlvalid(xml_file,'./schemas/dcc/v3_0_0/dcc.xsd')
 
 if __name__ == '__main__':
     main()

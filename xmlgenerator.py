@@ -1,9 +1,11 @@
-from schemas.dcc.v3_0_0_rc_4 import dcc
+from schemas.dcc.v3_0_0 import dcc
 from schemas.SI_Format.v2_0_0 import SI_Format
 import sys
 from lxml import etree
 import xml.etree.ElementTree as ET
 import pandas as pd
+import numpy as np
+import datetime
 
 DEGREECELSIUS = '\\degreeCelsius'
 
@@ -38,14 +40,15 @@ def administrativeData(adm_df):
     items = dcc.itemListType()
     calibrationLaboratory = dcc.calibrationLaboratoryType()
     respPersons = dcc.respPersonListType()
-    customer = dcc.contactType()
     statements = dcc.statementListType()
 
-    cell = adm_df.iloc
-    table = {item:idx for idx,item in enumerate(cell[:,0]) if item in CONST}
+    calibrationLaboratory_contact_location_further = dcc.textType()
+
+    cell = adm_df.loc
+    table = {item:idx for idx,item in enumerate(cell[:,'A']) if item in CONST}
     for name, idx in table.items():
         if name == '0A':
-            usedSoftware,version = cell[idx,3],cell[idx+1,6]
+            usedSoftware,version = cell[idx,'D'],cell[idx+1,'D']
             software_name = dcc.textType()
             software_name.add_content(
                 dcc.stringWithLangType(
@@ -54,39 +57,39 @@ def administrativeData(adm_df):
                     )
             )
             software = dcc.softwareType(name=software_name,
-                                        release=str(version)[1:])
+                                        release=version)
             dccSoftware.add_software(software)
         if name == '0B':
-            coreData.set_countryCodeISO3166_1(cell[idx,3])
+            coreData.set_countryCodeISO3166_1(cell[idx,'D'])
         elif name == '0C':
             # puede haber varios pero inicialmente asumo que hay 1.
             # Proximamente lo modificaremos para leer mas de 1.
-            coreData.add_usedLangCodeISO639_1(cell[idx,3])
+            coreData.add_usedLangCodeISO639_1(cell[idx,'D'])
         elif name == '0D':
             # puede haber varios pero inicialmente asumo que hay 1.
             # Proximamente lo modificaremos para leer mas de 1.
-            coreData.add_mandatoryLangCodeISO639_1(cell[idx,3])
+            coreData.add_mandatoryLangCodeISO639_1(cell[idx,'D'])
         elif name == '0E':
             type,cc,certificateNumber,part,total = tuple(
-                cell[idx+j,3 if j not in (1,2) else 6] for j in range(5)
+                cell[idx+j,'D'] for j in range(5)
                 )
             uniqueIdenPrefix = type+' '+('0'*(8-len(cc)))+cc+'-'+\
                                ('0'*(8-len(certificateNumber)))+\
-                               certificateNumber+' '
+                               certificateNumber+'-'
             if part == 'Único':
                 coreData.set_uniqueIdentifier(uniqueIdenPrefix+part)
             else:
                 coreData.set_uniqueIdentifier(uniqueIdenPrefix+'Parcial '+
-                                              str(part)+' de '+
-                                              str(total))
+                                              part+' de '+
+                                              total)
         elif name == '0F':
-            coreData.set_receiptDate(cell[idx,3])
+            coreData.set_receiptDate(cell[idx,'D'])
         elif name == '0G':
-            coreData.set_beginPerformanceDate(cell[idx+1,3])
-            coreData.set_endPerformanceDate(cell[idx+2,3])
+            coreData.set_beginPerformanceDate(cell[idx+1,'D'])
+            coreData.set_endPerformanceDate(cell[idx+2,'D'])
         elif name == '0H':
-            object,description = cell[idx+1,3],cell[idx+2,3]
-            if not pd.isna(object):
+            object,description = cell[idx+1,'D'],cell[idx+2,'D']
+            if object:
                 items_name = dcc.textType()
                 items_name.add_content(
                     dcc.stringWithLangType(
@@ -94,7 +97,7 @@ def administrativeData(adm_df):
                         )
                     )
                 items.set_name(items_name)
-            if not pd.isna(description):
+            if description:
                 items_description = dcc.richContentType()
                 items_description.add_content(
                     dcc.stringWithLangType(
@@ -105,10 +108,7 @@ def administrativeData(adm_df):
         elif name == '0I':
             oname,street,number,other,pc,postOfficeBox,department,\
             province,country,phone1,phone2,email,countryCode,adInfo = \
-            tuple(
-                cell[idx+j,3
-                     if j not in (2,3,4,5,6,10,11) else 6] for j in range(1,15)
-                )
+            tuple(cell[idx+j,'D'] for j in range(1,15))
             owner_name = dcc.textType()
             owner_name.add_content(
                 dcc.stringWithLangType(
@@ -139,16 +139,10 @@ def administrativeData(adm_df):
                                       location=owner_location)
         elif name == '0J':
             for i in range(idx, table['0K']-9,10):
-                t = tuple(
-                    cell[i+j,3 if j not in (6,7) else 6] for j in range(1,9)
-                    )
                 object,description,adInfo,manufacturer,\
                 brand,model,serialNumber,userId = \
-                tuple(
-                    cell[i+j,3 if j not in (6,7) else 6] for j in range(1,9)
-                    )
-                if not(pd.isna(object) or pd.isna(description) or
-                       pd.isna(manufacturer) or pd.isna(serialNumber)):
+                tuple(cell[i+j,'D'] for j in range(1,9))
+                if object and description and manufacturer and serialNumber:
                     item_name = dcc.textType()
                     item_name.add_content(
                         dcc.stringWithLangType(
@@ -186,23 +180,49 @@ def administrativeData(adm_df):
                     identification.set_name(identification_name)
                     identifications.add_identification(identification)
 
-                    item = dcc.itemType(name=item_name,manufacturer=manufacturer,
+                    item = dcc.itemType(name=item_name,
+                                        manufacturer=manufacturer,
                                         model=model,
                                         identifications=identifications)
                     item.set_description(item_description)
                     items.add_item(item)
         elif name == '0K':
-            # Usar para generar el pdf
-            # Preguntar dónde se ponen estos datos
-            #adm_data[name] = (cell[idx+1,6],cell[idx+2,6])
-            pass
+            description = cell[idx+1,'B'] +' '+cell[idx+1,'D']+'°C '+\
+            cell[idx+2,'B'] + ' '+cell[idx+2,'D'] + '°C'
+            items_description = dcc.richContentType()
+            items_description.add_content(
+                dcc.stringWithLangType(
+                    lang="es",
+                    valueOf_=description
+                )
+            )
+            items.set_description(items_description)
         elif name == '0L':
-            # Usa para generar el pdf
-            # Preguntar dónde se ponen estos datos
-            #adm_data[name] = tuple(
-            #    cell[idx+j,3 if j not in (6,8) else 6] for j in range(1,16)
-            #    )
-            pass
+            ID = {
+                'INM':'inm',
+                'Gerencia':'management',
+                'Subgerencia':'assistantManagement',
+                'Departamento':'inmDepartment',
+                'Calle':'street',
+                'Número':'streetNo',
+                'Otro':'other',
+                'CP':'postCode',
+                'Partido':'department',
+                'Provincia':'province',
+                'País':'country',
+                'Teléfono 1':'phone1',
+                'Teléfono 2':'phone2',
+                'Interno':'extensionNumber',
+                'E-mail':'eMail'
+            }
+
+            for j in range(1,16):
+                calibrationLaboratory_contact_location_further.add_content(
+                    dcc.stringWithLangType(
+                        id=ID[cell[idx+j,'B']],
+                        valueOf_=cell[idx+j,'D']
+                    )
+                )
         elif name == '0M':
             # Usar para generar el pdf
             # Preguntar dónde se ponen estos datos
@@ -212,10 +232,8 @@ def administrativeData(adm_df):
             cname,management,assistantManager,department,\
             internalNameDepartment,street,number,other,pc,postOfficeBox,\
             department,province,country,phone1,phone2,email,countryCode,\
-            adInfo = \
-            tuple(
-                cell[idx+j,3 if j not in (7,9,10) else 6] for j in range(1,19)
-                )
+            adInfo = tuple(cell[idx+j,'D'] for j in range(1,19))
+            phone = phone1 + ' / ' + phone2
             contact_name = dcc.textType()
             contact_name.add_content(
                 dcc.stringWithLangType(
@@ -224,33 +242,25 @@ def administrativeData(adm_df):
                 )
             )
 
-            further = dcc.textType()
-            for data in [department,phone2,other,management,assistantManager]:
-                further.add_content(
-                    dcc.stringWithLangType(
-                        valueOf_=data
-                    )
-                )
-
             location = dcc.locationType(
-                city=[province+', '+department],
+                city=[department+', '+province],
                 countryCode=[countryCode],
                 postCode=[pc],
                 postOfficeBox=[postOfficeBox],
                 state=[country],
                 street=[street],
                 streetNo=[number],
-                further=[further]
+                further=[calibrationLaboratory_contact_location_further]
                 )
             contact = dcc.contactType(id=internalNameDepartment,
                                       name=contact_name,
-                                      eMail=email,phone=phone1,
+                                      eMail=email,phone=phone,
                                       location=location)
             calibrationLaboratory.set_contact(contact)
         elif name == '0P':
             responsible,responsibleEmail,technician,\
             technicianEmail,signer,signerEmail = \
-            tuple(cell[idx+j,3] for j in range(1,7))
+            tuple(cell[idx+j,'D'] for j in range(1,7))
             respPersons.add_respPerson(
                 dcc.respPersonType(
                     id="Responsible",
@@ -299,10 +309,7 @@ def administrativeData(adm_df):
         elif name == '0Q':
             cname,street,number,other,pc,postOfficeBox,department,province,\
             country,phone1,phone2,email,countryCode,adInfo = \
-            tuple(
-                cell[idx+j,3
-                     if j not in (2,3,4,5,6,10,11) else 6] for j in range(1,15)
-                )
+            tuple(cell[idx+j,'D'] for j in range(1,15))
             customer_name = dcc.textType()
             customer_name.add_content(
                 dcc.stringWithLangType(
@@ -317,10 +324,9 @@ def administrativeData(adm_df):
                     valueOf_=phone2
                 )
             )
-
             location = dcc.locationType(
-                city=[province+\
-                      ', '+department],countryCode=[countryCode],
+                city=[department+', '+province],
+                countryCode=[countryCode],
                 postCode=[pc],
                 postOfficeBox=[postOfficeBox],
                 state=[country],
@@ -337,18 +343,18 @@ def administrativeData(adm_df):
             # MOSTRAR esquema y charlarlo.
             for i in range(idx, len(cell[:])-5,6):
                 id,convention,norm,reference,declaration = \
-                tuple(cell[i+j,3] for j in range(1,6))
+                tuple(cell[i+j,'D'] for j in range(1,6))
 
                 statement = dcc.statementMetaDataType()
-                if not pd.isna(id):
+                if id:
                     statement.set_id = id
-                if not pd.isna(convention):
+                if convention:
                     statement.set_convention = convention
-                if not pd.isna(norm):
+                if norm:
                     statement.set_norm = norm
-                if not pd.isna(reference):
+                if reference:
                     statement.set_reference = reference
-                if not pd.isna(declaration):
+                if declaration:
                     statement_declaration = dcc.textType()
                     statement_declaration.add_content(
                         dcc.stringWithLangType(
@@ -413,7 +419,7 @@ def measurementResults(res_df, administrativeData_):
     influenceConditions = dcc.influenceConditionListType()
     #genero el influence conditions
 
-    influenceCondition = dcc.conditionType()
+    #influenceCondition = dcc.conditionType()
     #genero el influence condition
 
     results = dcc.resultListType()
@@ -468,11 +474,30 @@ def measurementResults(res_df, administrativeData_):
             influenceCondition_name = dcc.textType()
             influenceCondition_name.add_content(
                 dcc.stringWithLangType(
+                    valueOf_=cell[idx,1]
+                )
+            )
+            data_text = dcc.richContentType()
+            data_text.add_content(
+                dcc.stringWithLangType(
+                    lang=lang,
                     valueOf_=cell[idx,3]
                 )
             )
-            influenceCondition.set_name(influenceCondition_name)
+            data = dcc.dataType(text=[data_text])
+            influenceCondition = dcc.conditionType(
+                name=influenceCondition_name,
+                data=data
+                )
+            influenceConditions.add_influenceCondition(influenceCondition)
+
         elif name == '0C':
+            influenceCondition_name = dcc.textType()
+            influenceCondition_name.add_content(
+                dcc.stringWithLangType(
+                    valueOf_=cell[idx,1]
+                )
+            )
             data = dcc.dataType()
             uncertaintyTemperature,uncertaintyRelativeHumidity =\
             cell[idx+3,3],cell[idx+6,3]
@@ -502,6 +527,8 @@ def measurementResults(res_df, administrativeData_):
                 quantity = dcc.quantityType(name=quantity_name,real=real)
                 data.add_quantity(quantity)
 
+            influenceCondition = dcc.conditionType(name=influenceCondition_name,
+                                                   data=data)
             influenceCondition.set_data(data)
             influenceConditions.add_influenceCondition(influenceCondition)
         elif name == '0D':
@@ -552,7 +579,7 @@ def measurementResults(res_df, administrativeData_):
             result_name.add_content(
                 dcc.stringWithLangType(
                     lang=lang,
-                    valueOf_="Resultados"
+                    valueOf_=cell[idx,1]
                 )
             )
             result = dcc.resultType(name=result_name,data=data)
@@ -566,13 +593,23 @@ def measurementResults(res_df, administrativeData_):
     return measurementResults_
 
 
+def change_dtype(value):
+    if not isinstance(value, datetime.datetime):
+        return str(value)
+    else:
+        return value
+
 def read(file_path):
     # Lee la primera hoja del excel. Devuelve la informacion
     # en un dataframe de pandas.
     adm_df = pd.read_excel(file_path,
                            sheet_name='Administrativo',
                            header=None,
-                           usecols="A:G")
+                           usecols="A:G",
+                           names=['A','B','C','D','E','F','G'])
+
+    adm_df = adm_df.replace(np.nan, '', regex=True)
+    adm_df.loc[:, 'D'] = adm_df['D'].apply(change_dtype)
 
     # Lee la segunda hoja del excel.
     res_df = pd.read_excel(file_path,
@@ -601,7 +638,7 @@ def main():
     # Integra toda la informacion del administrativeData y measurementResults
     # para generar el digitalCalibrationCertificate
     digitalCalibrationCertificate = dcc.digitalCalibrationCertificateType(
-        schemaVersion="3.0.0-rc.4",
+        schemaVersion="3.0.0",
         administrativeData=administrativeData_,
         measurementResults=measurementResults_
     )
@@ -618,7 +655,7 @@ def main():
 
     # Agrega el schemaLocation al xml
     elem.attrib['{{{pre}}}schemaLocation'.format(pre=NS)] = \
-    'https://ptb.de/dcc https://ptb.de/dcc/v2.4.0/dcc.xsd'
+    'https://ptb.de/dcc https://ptb.de/dcc/v3.0.0/dcc.xsd'
 
     # Genera el xml
     tree = etree.ElementTree(elem)
