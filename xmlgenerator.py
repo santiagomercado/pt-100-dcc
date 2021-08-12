@@ -425,6 +425,9 @@ def measurementResults(res_df, administrativeData_):
     results = dcc.resultListType()
     #genero el results
 
+    #genero el result
+    result = dcc.resultType(data=dcc.dataType())
+
     #
     #arriba genero todos los elementos ppales
     #
@@ -434,10 +437,10 @@ def measurementResults(res_df, administrativeData_):
     # In the future, this will get the whole list.
     lang = administrativeData_.get_coreData().get_usedLangCodeISO639_1()[0]
 
-    cell = res_df.iloc
+    cell = res_df.loc
     #modifico el df para leer las columnas con números y no letras desde cell[]
 
-    table = {item:idx for idx,item in enumerate(cell[:,0]) if item in CONST}
+    table = {item:idx for idx,item in enumerate(cell[:,'A']) if item in CONST}
     #asigno una tabla de índices(row-1) respecto a cada asignación {índice = [número|letra]}
 
     for name, idx in table.items():
@@ -450,7 +453,7 @@ def measurementResults(res_df, administrativeData_):
                     lang=lang,
                     #para cuando haya mas de un idioma.
                     #el idioma debería ser un vector.
-                    valueOf_=cell[idx,1]
+                    valueOf_=cell[idx,'B']
                     #agrega el valor de "Met..." dentro del contenido
                 )
             )
@@ -461,7 +464,7 @@ def measurementResults(res_df, administrativeData_):
             usedMethod_description.add_content(
                 dcc.stringWithLangType(
                     lang=lang,
-                    valueOf_=cell[idx,3]
+                    valueOf_=cell[idx,'D']
                 )
             )
 
@@ -474,14 +477,14 @@ def measurementResults(res_df, administrativeData_):
             influenceCondition_name = dcc.textType()
             influenceCondition_name.add_content(
                 dcc.stringWithLangType(
-                    valueOf_=cell[idx,1]
+                    valueOf_=cell[idx,'B']
                 )
             )
             data_text = dcc.richContentType()
             data_text.add_content(
                 dcc.stringWithLangType(
                     lang=lang,
-                    valueOf_=cell[idx,3]
+                    valueOf_=cell[idx,'D']
                 )
             )
             data = dcc.dataType(text=[data_text])
@@ -495,18 +498,18 @@ def measurementResults(res_df, administrativeData_):
             influenceCondition_name = dcc.textType()
             influenceCondition_name.add_content(
                 dcc.stringWithLangType(
-                    valueOf_=cell[idx,1]
+                    valueOf_=cell[idx,'B']
                 )
             )
             data = dcc.dataType()
             uncertaintyTemperature,uncertaintyRelativeHumidity =\
-            cell[idx+3,3],cell[idx+6,3]
+            cell[idx+3,'D'],cell[idx+6,'D']
             environmentalCondition = (
-                ("Temperatura mayor a",cell[idx+1,3],DEGREECELSIUS,
+                (cell[idx+1,'B'],cell[idx+1,'D'],DEGREECELSIUS,
                  uncertaintyTemperature),
-                ("Temperatura menor a",cell[idx+2,3],DEGREECELSIUS,
+                (cell[idx+2,'B'],cell[idx+2,'D'],DEGREECELSIUS,
                  uncertaintyTemperature),
-                ("Humedad Relativa menor a",cell[idx+5,3],RELATIVEHUMIDITY,
+                (cell[idx+5,'B'],cell[idx+5,'D'],RELATIVEHUMIDITY,
                  uncertaintyRelativeHumidity)
                 )
 
@@ -532,10 +535,30 @@ def measurementResults(res_df, administrativeData_):
             influenceCondition.set_data(data)
             influenceConditions.add_influenceCondition(influenceCondition)
         elif name == '0D':
-            #res_data[name] = (cell[idx+3, 3],cell[idx+6,3],
-            #                  cell[idx+7,3],cell[idx+8,3],
-            #                  cell[idx+9,3],cell[idx+10,3])
-            pass
+            data = result.get_data()
+            description_name = dcc.richContentType()
+            description_name.add_content(
+                dcc.stringWithLangType(
+                    lang=lang,
+                    valueOf_=cell[idx+1,'B']
+                )
+            )
+            description = dcc.richContentType(name=description_name)
+            description.add_formula(dcc.formulaType(latex=cell[idx+2,'E']))
+            for j in range(4,10):
+                var,_,value,unit,des = cell[idx+j,'B':'F']
+
+                quantity = dcc.quantityType(
+                    description=dcc.richContentType(
+                        formula=[dcc.formulaType(latex=var)]),
+                    real=SI_Format.realQuantityType(
+                        value=value,
+                        unit=unit
+                        )
+                    )
+                data.add_quantity(quantity)
+            result.set_description(description)
+
         elif name == '0E':
             #res_data[name] = (cell[idx+1, 3],cell[idx+2,3],cell[idx+3,3])
             pass
@@ -549,40 +572,44 @@ def measurementResults(res_df, administrativeData_):
             #            res_data[name] = [obs]
             pass
         elif name == '0G':
-            k, prob = cell[idx-2,6],cell[idx-1,6]
-            data = dcc.dataType()
+            k, prob = cell[idx-2,'G'],cell[idx-1,'G']
+            data = result.get_data()
+            list_ = dcc.listType1()
             for j in range(idx+2, len(res_df)):
                 temperature,resistance,uncertainty = \
-                float(cell[j,3]),float(cell[j,4]),float(cell[j,5])
+                cell[j,'D'],cell[j,'E'],cell[j,'F']
 
-                real = SI_Format.realQuantityType(value=resistance,
-                                      unit=OHM,
-                                      expandedUnc=expandedUnc)
+                quantity1 = dcc.quantityType(
+                    real=SI_Format.realQuantityType(
+                        value=temperature,
+                        unit=DEGREECELSIUS
+                        )
+                    )
 
-                real1 = SI_Format.realInListType(value=temperature,
-                                                   unit=DEGREECELSIUS)
-                real2 = SI_Format.realInListType(value=resistance,
-                                                   unit=OHM)
-                expandedUnc = SI_Format.expandedUncType(uncertainty=uncertainty,
-                                                    coverageFactor=k,
-                                                    coverageProbability=prob)
-                real2.set_expandedUnc(expandedUnc)
-                realList = SI_Format.realListType(real=[real1,real2])
-                si_list = SI_Format.listType(realList=[realList])
-                quantity = dcc.quantityType(list=si_list)
+                quantity2 = dcc.quantityType(
+                    real=SI_Format.realQuantityType(
+                        value=resistance,
+                        unit=OHM,
+                        expandedUnc=SI_Format.expandedUncType(
+                            uncertainty=uncertainty,
+                            coverageFactor=k,
+                            coverageProbability=prob
+                            )
+                        )
+                    )
 
-                dcc_list = dcc.listType1()
-                dcc_list.add_quantity(quantity)
-                data.add_list(dcc_list)
+                innerList = dcc.listType1(quantity=[quantity1,quantity2])
+                list_.add_list(innerList)
+            data.add_list(list_)
 
             result_name = dcc.textType()
             result_name.add_content(
                 dcc.stringWithLangType(
                     lang=lang,
-                    valueOf_=cell[idx,1]
+                    valueOf_=cell[idx,'B']
                 )
             )
-            result = dcc.resultType(name=result_name,data=data)
+            result.set_name(result_name)
             results.add_result(result)
 
     measurementResult.set_usedMethods(usedMethods)
@@ -591,7 +618,6 @@ def measurementResults(res_df, administrativeData_):
 
     measurementResults_.add_measurementResult(measurementResult)
     return measurementResults_
-
 
 def change_dtype(value):
     if not isinstance(value, datetime.datetime):
@@ -615,7 +641,9 @@ def read(file_path):
     res_df = pd.read_excel(file_path,
                            sheet_name="Resultados",
                            header=None,
-                           usecols="A:J")
+                           usecols="A:J",
+                           names=['A','B','C','D','E','F','G','H','I','J'])
+    res_df = res_df.replace(np.nan, '', regex=True)
 
     return adm_df,res_df
 
