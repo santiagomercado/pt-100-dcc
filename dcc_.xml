@@ -161,6 +161,14 @@
           </dcc:description>
         </dcc:usedMethod>
       </dcc:usedMethods>
+      <dcc:usedSoftware>
+        <dcc:software>
+          <dcc:name>
+            <dcc:content lang="en">SoftTemp</dcc:content>
+          </dcc:name>
+          <dcc:release>1548</dcc:release>
+        </dcc:software>
+      </dcc:usedSoftware>
       <dcc:influenceConditions>
         <dcc:influenceCondition>
           <dcc:name>

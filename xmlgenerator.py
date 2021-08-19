@@ -19,6 +19,9 @@ CONST = {
     '0I','0J','0K','0L','0M','0N','0O','0P','0Q','0R','0S'
 }
 
+#cosas generales: si no sirven, borrá las celdas con el "#" en el excel
+#
+
 def administrativeData(adm_df):
 
     """
@@ -197,8 +200,11 @@ def administrativeData(adm_df):
                 )
             )
             items.set_description(items_description)
+            #habría que ver como arreglamos que los grados centígrados se
+            #traten como el resultado de medición
+            
         elif name == '0L':
-            ID = {
+            ID = {#nmi, national metrology institute en castellano, instituto ...
                 'INM':'inm',
                 'Gerencia':'management',
                 'Subgerencia':'assistantManagement',
@@ -390,26 +396,24 @@ def measurementResults(res_df, administrativeData_):
 
 
     name.add_prueba
+.
 
 
     """
-    #El día que lo presentemos va a ser lo mejor usar una jupyter notebook.
-    #
-    #https://www.ptb.de/dcc/v2.4.0/en/measurementResult/#tree-structure
-    #
-    #alrazonar las estructuras, hay que tener en cuenta que los métodos
-    #ya saben a que padre tiene que linkearse y no hace falta referenciarlos.
-    #
-
     measurementResults_ = dcc.measurementResultListType()
-    #creo un dcc:measurementResults
+    #creo un método dcc:measurementResults ¿por qué está con guión bajo?
+
+    #dcc.measurementResultType()
 
     measurementResult = dcc.measurementResultType(
-        name=dcc.textType(content=[
-            dcc.stringWithLangType(valueOf_="Resultados pt-100")]),
-        usedSoftware=administrativeData_.get_dccSoftware())
-    #creo un dcc:measurementResult
-
+        name=dcc.textType(content=[dcc.stringWithLangType
+                                   (valueOf_="Resultados pt-100")]),
+                        )
+    
+        
+    #creo un método dcc:measurementResult
+    
+        
     usedMethods = dcc.usedMethodListType()
     #creo un dcc:usedMethods
 
@@ -423,9 +427,8 @@ def measurementResults(res_df, administrativeData_):
     #genero el influence condition
 
     results = dcc.resultListType()
-    #genero el results
-
-    #genero el result
+    #genero el método de results
+    
     result = dcc.resultType(data=dcc.dataType())
 
     #
@@ -445,18 +448,41 @@ def measurementResults(res_df, administrativeData_):
 
     for name, idx in table.items():
         #itero todos los items de la tabla uqe generé antes: 0A, 0B, 0C ...
+        
         if name == '0A':
             usedMethod_name = dcc.textType()
+            #genero el método
+            
             usedMethod_name.add_content(
-            #al name que cree le agrego el dcc:content
                 dcc.stringWithLangType(
                     lang=lang,
-                    #para cuando haya mas de un idioma.
-                    #el idioma debería ser un vector.
                     valueOf_=cell[idx,'B']
-                    #agrega el valor de "Met..." dentro del contenido
                 )
             )
+            #primero, si esto fuese necesario
+            #debo asociar el contenido de un elemento al idioma:
+            #dcc.stringWithLangType(lang, valueOf)
+            #[lang]= idioma al que se le va relacionar
+            #[valueOf_]= el contenido del elemento(la celda del excel)
+            
+            #
+            # padre_hijo.add_nieto()
+            #
+            #Una vez asociado contenido con idioma uso el método "add_content"
+            #donde "add_" es para adherir al elemento "content"
+            #"add_"+"content"
+            #dentro del usedMethod_name para asociarlo al elemento "content"
+            #debo llamar al elemento "name" hijo del elemento usedMethod    
+            # usedMethod_name.add_content(...)
+            #
+            #como resultado agrega a <dcc:usedMethod> lo siguiente:
+            #<dcc:usedMethod>
+            #   <dcc:content lang="es">Por comparación con termómetros patrones de resistencia de platino, en baños, hornos y cámara climática con temperatura estabilizada, según procedimiento de PET08C, revisión abril 2019.</dcc:content>
+            #...
+            #</dcc:usedMethod>
+            #usedMethod_name.add_content( dcc.stringWithLangType(lang=lang,valueOf_=cell[idx,'B']) )
+
+
 
             usedMethod_description = dcc.richContentType()
             #agrego dcc:description al method a usedMethod
@@ -473,6 +499,8 @@ def measurementResults(res_df, administrativeData_):
                 description=usedMethod_description
                 )
             usedMethods.add_usedMethod(usedMethod)
+            
+            
         elif name == '0B':
             influenceCondition_name = dcc.textType()
             influenceCondition_name.add_content(
