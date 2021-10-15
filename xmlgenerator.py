@@ -1,11 +1,13 @@
 from schemas.dcc.v3_0_0 import dcc
 from schemas.SI_Format.v2_0_0 import SI_Format
+from schemas.statement import statement
 import sys
 from lxml import etree
 import xml.etree.ElementTree as ET
 import pandas as pd
 import numpy as np
 import datetime
+import copy
 
 DEGREECELSIUS = '\\degreeCelsius'
 
@@ -18,9 +20,6 @@ CONST = {
     '0A','0B','0C','0D','0E','0F','0G','0H',
     '0I','0J','0K','0L','0M','0N','0O','0P','0Q','0R','0S'
 }
-
-#cosas generales: si no sirven, borrá las celdas con el "#" en el excel
-#
 
 def administrativeData(adm_df):
 
@@ -200,11 +199,8 @@ def administrativeData(adm_df):
                 )
             )
             items.set_description(items_description)
-            #habría que ver como arreglamos que los grados centígrados se
-            #traten como el resultado de medición
-            
         elif name == '0L':
-            ID = {#nmi, national metrology institute en castellano, instituto ...
+            ID = {
                 'INM':'inm',
                 'Gerencia':'management',
                 'Subgerencia':'assistantManagement',
@@ -396,24 +392,26 @@ def measurementResults(res_df, administrativeData_):
 
 
     name.add_prueba
-.
 
 
     """
-    measurementResults_ = dcc.measurementResultListType()
-    #creo un método dcc:measurementResults ¿por qué está con guión bajo?
+    #El día que lo presentemos va a ser lo mejor usar una jupyter notebook.
+    #
+    #https://www.ptb.de/dcc/v2.4.0/en/measurementResult/#tree-structure
+    #
+    #alrazonar las estructuras, hay que tener en cuenta que los métodos
+    #ya saben a que padre tiene que linkearse y no hace falta referenciarlos.
+    #
 
-    #dcc.measurementResultType()
+    measurementResults_ = dcc.measurementResultListType()
+    #creo un dcc:measurementResults
 
     measurementResult = dcc.measurementResultType(
-        name=dcc.textType(content=[dcc.stringWithLangType
-                                   (valueOf_="Resultados pt-100")]),
-                        )
-    
-        
-    #creo un método dcc:measurementResult
-    
-        
+        name=dcc.textType(content=[
+            dcc.stringWithLangType(valueOf_="Resultados pt-100")]),
+        usedSoftware=administrativeData_.get_dccSoftware())
+    #creo un dcc:measurementResult
+
     usedMethods = dcc.usedMethodListType()
     #creo un dcc:usedMethods
 
@@ -427,8 +425,9 @@ def measurementResults(res_df, administrativeData_):
     #genero el influence condition
 
     results = dcc.resultListType()
-    #genero el método de results
-    
+    #genero el results
+
+    #genero el result
     result = dcc.resultType(data=dcc.dataType())
 
     #
@@ -448,41 +447,18 @@ def measurementResults(res_df, administrativeData_):
 
     for name, idx in table.items():
         #itero todos los items de la tabla uqe generé antes: 0A, 0B, 0C ...
-        
         if name == '0A':
             usedMethod_name = dcc.textType()
-            #genero el método
-            
             usedMethod_name.add_content(
+            #al name que cree le agrego el dcc:content
                 dcc.stringWithLangType(
                     lang=lang,
+                    #para cuando haya mas de un idioma.
+                    #el idioma debería ser un vector.
                     valueOf_=cell[idx,'B']
+                    #agrega el valor de "Met..." dentro del contenido
                 )
             )
-            #primero, si esto fuese necesario
-            #debo asociar el contenido de un elemento al idioma:
-            #dcc.stringWithLangType(lang, valueOf)
-            #[lang]= idioma al que se le va relacionar
-            #[valueOf_]= el contenido del elemento(la celda del excel)
-            
-            #
-            # padre_hijo.add_nieto()
-            #
-            #Una vez asociado contenido con idioma uso el método "add_content"
-            #donde "add_" es para adherir al elemento "content"
-            #"add_"+"content"
-            #dentro del usedMethod_name para asociarlo al elemento "content"
-            #debo llamar al elemento "name" hijo del elemento usedMethod    
-            # usedMethod_name.add_content(...)
-            #
-            #como resultado agrega a <dcc:usedMethod> lo siguiente:
-            #<dcc:usedMethod>
-            #   <dcc:content lang="es">Por comparación con termómetros patrones de resistencia de platino, en baños, hornos y cámara climática con temperatura estabilizada, según procedimiento de PET08C, revisión abril 2019.</dcc:content>
-            #...
-            #</dcc:usedMethod>
-            #usedMethod_name.add_content( dcc.stringWithLangType(lang=lang,valueOf_=cell[idx,'B']) )
-
-
 
             usedMethod_description = dcc.richContentType()
             #agrego dcc:description al method a usedMethod
@@ -499,8 +475,6 @@ def measurementResults(res_df, administrativeData_):
                 description=usedMethod_description
                 )
             usedMethods.add_usedMethod(usedMethod)
-            
-            
         elif name == '0B':
             influenceCondition_name = dcc.textType()
             influenceCondition_name.add_content(
@@ -530,33 +504,37 @@ def measurementResults(res_df, administrativeData_):
                 )
             )
             data = dcc.dataType()
-            uncertaintyTemperature,uncertaintyRelativeHumidity =\
-            cell[idx+3,'D'],cell[idx+6,'D']
-            environmentalCondition = (
-                (cell[idx+1,'B'],cell[idx+1,'D'],DEGREECELSIUS,
-                 uncertaintyTemperature),
-                (cell[idx+2,'B'],cell[idx+2,'D'],DEGREECELSIUS,
-                 uncertaintyTemperature),
-                (cell[idx+5,'B'],cell[idx+5,'D'],RELATIVEHUMIDITY,
-                 uncertaintyRelativeHumidity)
-                )
+            from_, to = cell[idx+1,'C'], cell[idx+1, 'D']
+            for i in range(2):
+                j = idx+i+2
+                name,lower_value,upper_value,uncertainty,unit = cell[j,'B':'F']
 
-            for name,value,unit,uncertainty in environmentalCondition:
-                quantity_name = dcc.textType()
-                quantity_name.add_content(
-                    dcc.stringWithLangType(
-                        lang=lang,
-                        valueOf_=name
+                list_ = dcc.listType1(
+                    name=dcc.textType(
+                        content=[
+                            dcc.stringWithLangType(lang=lang,valueOf_=name)
+                            ]
+                        )
                     )
-                )
-                expandedUnc = SI_Format.expandedUncType(uncertainty=uncertainty,
-                                                    coverageFactor=2,
-                                                    coverageProbability=0.95)
-                real = SI_Format.realQuantityType(value=float(value),
-                                      unit=unit,
-                                      expandedUnc=expandedUnc)
-                quantity = dcc.quantityType(name=quantity_name,real=real)
-                data.add_quantity(quantity)
+
+                for bound,value in [(from_,lower_value), (to,upper_value)]:
+                    if value:
+                        quantity_name = dcc.textType()
+                        quantity_name.add_content(
+                            dcc.stringWithLangType(
+                                lang=lang,
+                                valueOf_=bound
+                            )
+                        )
+                        expandedUnc = SI_Format.expandedUncType(uncertainty=uncertainty,
+                                                            coverageFactor=2,
+                                                            coverageProbability=0.95)
+                        real = SI_Format.realQuantityType(value=value,
+                                              unit=unit,
+                                              expandedUnc=expandedUnc)
+                        quantity = dcc.quantityType(name=quantity_name,real=real)
+                        list_.add_quantity(quantity)
+                data.add_list(list_)
 
             influenceCondition = dcc.conditionType(name=influenceCondition_name,
                                                    data=data)
@@ -588,19 +566,32 @@ def measurementResults(res_df, administrativeData_):
             result.set_description(description)
 
         elif name == '0E':
-            #res_data[name] = (cell[idx+1, 3],cell[idx+2,3],cell[idx+3,3])
-            pass
+            quantity,u = cell[idx+2,'B'],cell[idx+1,'E']
+            lower_value,upper_value,uncertainty,unit=cell[idx+2,'C':'F']
+            usedMethod = dcc.usedMethodType(
+                name=dcc.textType(
+                    content=[
+                        dcc.stringWithLangType(
+                            lang=lang,
+                            valueOf_=cell[idx,'B']
+                        )
+                    ]
+                ),
+                description=dcc.richContentType(
+                    formula=[
+                        dcc.formulaType(
+                            latex="\SI{{{}}}{{{}}} \( \leq \) {} \( \leq \)" \
+                            "\SI{{{}}}{{{}}} \\\ {} = \SI{{+-{}}}{{{}}}"
+                            .format(lower_value,unit,quantity,upper_value,unit,
+                                    u,uncertainty,unit)
+                            )
+                        ]
+                    )
+                )
+            usedMethods.add_usedMethod(usedMethod)
+
         elif name == '0F':
-            #for j in range(idx,table['0G']-4):
-            #    if not pd.isna(cell[j,3]):
-            #        obs = cell[j,3]
-            #        if name in res_data:
-            #            res_data[name].append(obs)
-            #        else:
-            #            res_data[name] = [obs]
-            pass
-        elif name == '0G':
-            k, prob = cell[idx-2,'G'],cell[idx-1,'G']
+            k, prob = cell[idx,'I'],cell[idx+1,'I']
             data = result.get_data()
             list_ = dcc.listType1()
             for j in range(idx+2, len(res_df)):
@@ -647,6 +638,30 @@ def measurementResults(res_df, administrativeData_):
     measurementResults_.add_measurementResult(measurementResult)
     return measurementResults_
 
+
+def comment(com_df):
+    cell = com_df.loc
+    title = cell[0,'A']
+    comment_ = dcc.commentType()
+    statements = statement.statements(title=title)
+    allow_substatement = False
+    for j in range(1,cell[:,'A'].size):
+        lvl1,lvl2 = cell[j,'B':'C']
+        if lvl1:
+            #add new statement
+            statements.add_statement(statement.statementType(content=lvl1))
+            allow_substatement = True
+        elif allow_substatement:
+            if lvl2:
+                #add new substatement
+                statements.get_statement()[-1].add_statement(
+                    statement.statementType(content=lvl2))
+            else:
+                allow_substatement = False
+
+    comment_.add_anytypeobjs_(statements)
+    return comment_
+
 def change_dtype(value):
     if not isinstance(value, datetime.datetime):
         return str(value)
@@ -673,7 +688,14 @@ def read(file_path):
                            names=['A','B','C','D','E','F','G','H','I','J'])
     res_df = res_df.replace(np.nan, '', regex=True)
 
-    return adm_df,res_df
+    com_df = pd.read_excel(file_path,
+                           sheet_name="Comentarios",
+                           header=None,
+                           usecols="A:C",
+                           names=['A','B','C'])
+    com_df = com_df.replace(np.nan, '', regex=True)
+
+    return adm_df,res_df,com_df
 
 def main():
     # Toma el nombre de archivo como argumento
@@ -683,7 +705,7 @@ def main():
         file_name = 'Certificado.ods'
 
     # Lee spreadsheet
-    adm_df,res_df = read(file_name)
+    adm_df,res_df,com_df = read(file_name)
 
     # Genera el administrativeData
     administrativeData_ = administrativeData(adm_df)
@@ -691,17 +713,22 @@ def main():
     # Genera el measurementResults
     measurementResults_ = measurementResults(res_df, administrativeData_)
 
+    # Genera el comment
+    comment_ = comment(com_df)
+
     # Integra toda la informacion del administrativeData y measurementResults
     # para generar el digitalCalibrationCertificate
     digitalCalibrationCertificate = dcc.digitalCalibrationCertificateType(
         schemaVersion="3.0.0",
         administrativeData=administrativeData_,
-        measurementResults=measurementResults_
+        measurementResults=measurementResults_,
+        comment=comment_
     )
     nsmap_ = {
         'dcc' : 'https://ptb.de/dcc',
         'xsi' : 'http://www.w3.org/2001/XMLSchema-instance',
-        'si' : 'https://ptb.de/si'
+        'si' : 'https://ptb.de/si',
+        'ext' : 'extension'
     }
     name_ = 'digitalCalibrationCertificate'
     NS = "http://www.w3.org/2001/XMLSchema-instance"

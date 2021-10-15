@@ -3,6 +3,7 @@
                 xmlns:dcc="https://ptb.de/dcc"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xmlns:si="https://ptb.de/si"
+                xmlns:ext="extension"
                 version="1.0">
     <xsl:strip-space elements="*" />
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
@@ -38,7 +39,7 @@
             </xsl:when>
 
             <xsl:when test="$head = '%' ">
-                <xsl:value-of select=" '\percent' " />
+                <xsl:value-of select=" '\%' " />
             </xsl:when>
 
             <xsl:when test="$head = '&amp;' ">

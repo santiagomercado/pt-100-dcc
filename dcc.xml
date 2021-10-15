@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<dcc:digitalCalibrationCertificate xmlns:dcc="https://ptb.de/dcc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:si="https://ptb.de/si" schemaVersion="3.0.0" xsi:schemaLocation="https://ptb.de/dcc https://ptb.de/dcc/v3.0.0/dcc.xsd">
+<dcc:digitalCalibrationCertificate xmlns:dcc="https://ptb.de/dcc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:si="https://ptb.de/si" xmlns:ext="extension" schemaVersion="3.0.0" xsi:schemaLocation="https://ptb.de/dcc https://ptb.de/dcc/v3.0.0/dcc.xsd">
   <dcc:administrativeData>
     <dcc:dccSoftware>
       <dcc:software>
@@ -21,7 +21,7 @@
     </dcc:coreData>
     <dcc:items>
       <dcc:description>
-        <dcc:content lang="es">Curva de calibración entre -20°C y 200°C</dcc:content>
+        <dcc:content lang="es"> -20°C y 200°C</dcc:content>
       </dcc:description>
       <dcc:item>
         <dcc:name>
@@ -160,7 +160,25 @@
             <dcc:content lang="es">Por comparación con termómetros patrones de resistencia de platino, en baños, hornos y cámara climática con temperatura estabilizada, según procedimiento de PET08C, revisión abril 2019.</dcc:content>
           </dcc:description>
         </dcc:usedMethod>
+        <dcc:usedMethod>
+          <dcc:name>
+            <dcc:content lang="es">Incertidumbre de medición</dcc:content>
+          </dcc:name>
+          <dcc:description>
+            <dcc:formula>
+              <dcc:latex>\SI{-20}{\degreeCelsius} \( \leq \) T \( \leq \)\SI{200}{\degreeCelsius} \\ U = \SI{+-0.07}{\degreeCelsius}</dcc:latex>
+            </dcc:formula>
+          </dcc:description>
+        </dcc:usedMethod>
       </dcc:usedMethods>
+      <dcc:usedSoftware>
+        <dcc:software>
+          <dcc:name>
+            <dcc:content lang="en">SoftTemp</dcc:content>
+          </dcc:name>
+          <dcc:release>1548</dcc:release>
+        </dcc:software>
+      </dcc:usedSoftware>
       <dcc:influenceConditions>
         <dcc:influenceCondition>
           <dcc:name>
@@ -177,48 +195,58 @@
             <dcc:content>Condiciones ambientales</dcc:content>
           </dcc:name>
           <dcc:data>
-            <dcc:quantity>
+            <dcc:list>
               <dcc:name>
-                <dcc:content lang="es">Temperatura &gt;</dcc:content>
+                <dcc:content lang="es">T</dcc:content>
               </dcc:name>
-              <si:real>
-                <si:value>18.0</si:value>
-                <si:unit>\degreeCelsius</si:unit>
-                <si:expandedUnc>
-                  <si:uncertainty>0.2</si:uncertainty>
-                  <si:coverageFactor>2</si:coverageFactor>
-                  <si:coverageProbability>0.95</si:coverageProbability>
-                </si:expandedUnc>
-              </si:real>
-            </dcc:quantity>
-            <dcc:quantity>
+              <dcc:quantity>
+                <dcc:name>
+                  <dcc:content lang="es">Desde</dcc:content>
+                </dcc:name>
+                <si:real>
+                  <si:value>18</si:value>
+                  <si:unit>\degreeCelsius</si:unit>
+                  <si:expandedUnc>
+                    <si:uncertainty>0.2</si:uncertainty>
+                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageProbability>0.95</si:coverageProbability>
+                  </si:expandedUnc>
+                </si:real>
+              </dcc:quantity>
+              <dcc:quantity>
+                <dcc:name>
+                  <dcc:content lang="es">Hasta</dcc:content>
+                </dcc:name>
+                <si:real>
+                  <si:value>28</si:value>
+                  <si:unit>\degreeCelsius</si:unit>
+                  <si:expandedUnc>
+                    <si:uncertainty>0.2</si:uncertainty>
+                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageProbability>0.95</si:coverageProbability>
+                  </si:expandedUnc>
+                </si:real>
+              </dcc:quantity>
+            </dcc:list>
+            <dcc:list>
               <dcc:name>
-                <dcc:content lang="es">Temperatura &lt;</dcc:content>
+                <dcc:content lang="es">Hr</dcc:content>
               </dcc:name>
-              <si:real>
-                <si:value>28.0</si:value>
-                <si:unit>\degreeCelsius</si:unit>
-                <si:expandedUnc>
-                  <si:uncertainty>0.2</si:uncertainty>
-                  <si:coverageFactor>2</si:coverageFactor>
-                  <si:coverageProbability>0.95</si:coverageProbability>
-                </si:expandedUnc>
-              </si:real>
-            </dcc:quantity>
-            <dcc:quantity>
-              <dcc:name>
-                <dcc:content lang="es">Humedad Relativa &lt;</dcc:content>
-              </dcc:name>
-              <si:real>
-                <si:value>80.0</si:value>
-                <si:unit>\kilogram\tothe{1}\metre\tothe{-3}\kilogram\tothe{-1}\metre\tothe{3}</si:unit>
-                <si:expandedUnc>
-                  <si:uncertainty>0.8</si:uncertainty>
-                  <si:coverageFactor>2</si:coverageFactor>
-                  <si:coverageProbability>0.95</si:coverageProbability>
-                </si:expandedUnc>
-              </si:real>
-            </dcc:quantity>
+              <dcc:quantity>
+                <dcc:name>
+                  <dcc:content lang="es">Hasta</dcc:content>
+                </dcc:name>
+                <si:real>
+                  <si:value>80</si:value>
+                  <si:unit>\percent</si:unit>
+                  <si:expandedUnc>
+                    <si:uncertainty>0.8</si:uncertainty>
+                    <si:coverageFactor>2</si:coverageFactor>
+                    <si:coverageProbability>0.95</si:coverageProbability>
+                  </si:expandedUnc>
+                </si:real>
+              </dcc:quantity>
+            </dcc:list>
           </dcc:data>
         </dcc:influenceCondition>
       </dcc:influenceConditions>
@@ -255,7 +283,7 @@
               </dcc:description>
               <si:real>
                 <si:value>0.0039115922</si:value>
-                <si:unit>\per\degreeCelsius\tothe{1}</si:unit>
+                <si:unit>\degreeCelsius\tothe{-1}</si:unit>
               </si:real>
             </dcc:quantity>
             <dcc:quantity>
@@ -266,7 +294,7 @@
               </dcc:description>
               <si:real>
                 <si:value>-5.8345704e-07</si:value>
-                <si:unit>\per\degreeCelsius\tothe{2}</si:unit>
+                <si:unit>\degreeCelsius\tothe{-2}</si:unit>
               </si:real>
             </dcc:quantity>
             <dcc:quantity>
@@ -277,7 +305,7 @@
               </dcc:description>
               <si:real>
                 <si:value>-1.2248743e-10</si:value>
-                <si:unit>\per\degreeCelsius\tothe{4}</si:unit>
+                <si:unit>\degreeCelsius\tothe{-4}</si:unit>
               </si:real>
             </dcc:quantity>
             <dcc:quantity>
@@ -288,7 +316,7 @@
               </dcc:description>
               <si:real>
                 <si:value>0</si:value>
-                <si:unit>\per\degreeCelsius\tothe{4}</si:unit>
+                <si:unit>\degreeCelsius\tothe{-4}</si:unit>
               </si:real>
             </dcc:quantity>
             <dcc:quantity>
@@ -299,7 +327,7 @@
               </dcc:description>
               <si:real>
                 <si:value>0.003853</si:value>
-                <si:unit>\per\degreeCelsius\tothe{1}</si:unit>
+                <si:unit>\degreeCelsius\tothe{-1}</si:unit>
               </si:real>
             </dcc:quantity>
             <dcc:list>
@@ -1202,4 +1230,33 @@
       </dcc:results>
     </dcc:measurementResult>
   </dcc:measurementResults>
+  <dcc:comment>
+    <ext:statements>
+      <ext:title>Observaciones</ext:title>
+      <ext:statement>
+        <ext:content>Las mediciones fueron realizadas según el procedimiento PET08C, pero debido a mejoras implementadas en el laboratorio, resulta que:</ext:content>
+        <ext:statement>
+          <ext:content>Los valores de temperatura informados corresponden a la Temperatura Celsius Internacional (t90), según la escala internacional de temperatura de 1990 (Ref. ”Metrología” 27, 3-10, 1990).</ext:content>
+        </ext:statement>
+      </ext:statement>
+      <ext:statement>
+        <ext:content>La incertidumbre de medición expandida informada fue calculada multiplicando la incertidumbre estándar combinada por un factor de cubrimiento k= 2, que corresponde a un nivel aproximado de confianza del 95 %, bajo distribución normal.</ext:content>
+      </ext:statement>
+      <ext:statement>
+        <ext:content>Los resultados contenidos en el presente certificado se refieren a las condiciones en que se realizaron las mediciones.</ext:content>
+      </ext:statement>
+      <ext:statement>
+        <ext:content>El usuario es responsable de la calibración a intervalos apropiados.</ext:content>
+      </ext:statement>
+      <ext:statement>
+        <ext:content>“El 20 de mayo de 2019 se puso en vigencia la modificación del Sistema Internacional de Unidades (SI). En el nuevo sistema las unidades de base cambian sus definiciones refiriéndose, en todos los casos, a constantes de referencia. Como Instituto Nacional de Metrología de la República Argentina, el Instituto Nacional de Tecnología Industrial da a conocer a la industria, a las instituciones científicas y a todos los interesados la información de los cambios a través del siguiente enlace https://www.inti.gob.ar/areas/metrologia-y-calidad/si”</ext:content>
+      </ext:statement>
+      <ext:statement>
+        <ext:content>A completar</ext:content>
+      </ext:statement>
+      <ext:statement>
+        <ext:content>A completar</ext:content>
+      </ext:statement>
+    </ext:statements>
+  </dcc:comment>
 </dcc:digitalCalibrationCertificate>

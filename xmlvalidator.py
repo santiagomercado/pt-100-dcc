@@ -12,7 +12,10 @@ def parse(xml_str):
 def validate(xml_str, xsd_str):
     try:
         tree = parse(xml_str)
-        schema = xmlschema.XMLSchema(xsd_str)
+        schema = xmlschema.XMLSchema(xsd_str,build=False)
+        _ = schema.import_schema(namespace="extension",
+                                 location='./schemas/statement/statement.xsd')
+        schema.build()
         schema.validate(tree)
         print('ok')
     except Exception as error:

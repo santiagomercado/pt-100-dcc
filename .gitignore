@@ -1,9 +1,9 @@
 .~*
 /__pycache__
 *.pyc
-*.fls
 *.log
-*.tex
-*.aux
+certificate.*
+/certificate
+!certificate.pdf
 *.fdb_latexmk
 xml_temp.xml

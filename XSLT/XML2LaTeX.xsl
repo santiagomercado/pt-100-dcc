@@ -3,6 +3,7 @@
                 xmlns:dcc="https://ptb.de/dcc"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xmlns:si="https://ptb.de/si"
+                xmlns:ext="extension"
                 version="1.0">
     <xsl:strip-space elements="*"/>
     <xsl:output method="text" encoding="UTF-8" indent="no" omit-xml-declaration="yes"/>
@@ -27,6 +28,11 @@
         \usepackage{datetime2}
         \usepackage[utf8x]{inputenc}
 
+        \usepackage[defaultfam,tabular]{montserrat}
+        \usepackage[T1]{fontenc}
+
+        \usepackage{enumitem}
+        \setlist[enumerate]{label*=\arabic*.}
         \usepackage{array}
         \graphicspath{{./assets/}}
         \DTMsetup{datesep=/}
@@ -60,11 +66,12 @@
         \includegraphics[width=\textwidth]{clause.png}
         \end{center}
         \newpage
+        \pagestyle{style2}
         </xsl:text>
         <xsl:apply-templates select="/dcc:digitalCalibrationCertificate/dcc:measurementResults/dcc:measurementResult/dcc:usedMethods"/>
         <xsl:apply-templates select="/dcc:digitalCalibrationCertificate/dcc:measurementResults/dcc:measurementResult/dcc:influenceConditions"/>
+        <xsl:apply-templates select="/dcc:digitalCalibrationCertificate/dcc:measurementResults/dcc:measurementResult/dcc:results"/>
         <xsl:text>
-        \pagestyle{style2}
         \section*{</xsl:text><xsl:value-of select="/dcc:digitalCalibrationCertificate/dcc:measurementResults/dcc:measurementResult/dcc:results/dcc:result/dcc:name/dcc:content"/><xsl:text>}
         \begin{center}
         \begin{longtable}{|S[table-format=4.4]|S[table-format=4.4]|S[table-format=4.4]|}
@@ -85,7 +92,10 @@
       \end{center}
       </xsl:text>
       <xsl:apply-templates select="/dcc:digitalCalibrationCertificate/dcc:measurementResults/dcc:measurementResult/dcc:results"/>
+      <xsl:apply-templates select="/dcc:digitalCalibrationCertificate/dcc:comment/ext:statements"/>
       <xsl:text>
+        \newpage
+        \input{./assets/lastpage.tex}
       \end{document}
       </xsl:text>
     </xsl:template>
@@ -186,6 +196,7 @@
 </xsl:template>
 
 <xsl:template match="dcc:usedMethods">
+  <xsl:text>\section*{Metodología Empleada}</xsl:text>
   <xsl:apply-templates match="dcc:usedMethod"/>
 </xsl:template>
 
@@ -194,9 +205,11 @@
     \section*{</xsl:text><xsl:value-of select="dcc:name/dcc:content"/><xsl:text>}
   </xsl:text>
   <xsl:value-of select="dcc:description/dcc:content"/>
+  <xsl:value-of select="dcc:description/dcc:formula/dcc:latex"/>
 </xsl:template>
 
 <xsl:template match="dcc:influenceConditions">
+  <xsl:text>\section*{Condiciones de Influencia}</xsl:text>
   <xsl:apply-templates match="dcc:influenceCondition"/>
 </xsl:template>
 
@@ -204,18 +217,25 @@
   <xsl:text>
     \section*{</xsl:text><xsl:value-of select="dcc:name/dcc:content"/><xsl:text>}</xsl:text>
     <xsl:value-of select="dcc:data/dcc:text/dcc:content"/>
-    <xsl:for-each select="dcc:data/dcc:quantity">
-      <xsl:variable name = "name" select="dcc:name/dcc:content"/>
-      <xsl:variable name = "value" select="si:real/si:value"/>
-      <xsl:variable name = "unit" select="si:real/si:unit"/>
-      <xsl:value-of select="$name"/>
-      <xsl:text> \SI{</xsl:text>
-      <xsl:value-of select="$value"/><xsl:text>}{</xsl:text>
-      <xsl:value-of select="$unit"/><xsl:text>} \\</xsl:text>
+    <xsl:for-each select="dcc:data/dcc:list">
+      <xsl:variable name = "quantity" select="dcc:name/dcc:content"/>
+      <xsl:variable name = "from" select = "dcc:quantity/dcc:name/dcc:content[text() = 'Desde']/../../si:real/si:value"/>
+      <xsl:variable name = "to" select = "dcc:quantity/dcc:name/dcc:content[text() = 'Hasta']/../../si:real/si:value"/>
+      <xsl:variable name = "unit" select = "dcc:quantity/si:real/si:unit"/>
+      <xsl:if test="$from">
+        <xsl:value-of select="concat('\SI{',$from,'}{',$unit,'} ')"/>
+        <xsl:text disable-output-escaping="yes">\(<![CDATA[<]]>\)</xsl:text>
+      </xsl:if>
+      <xsl:value-of select="concat(' ',$quantity,' ')"/>
+      <xsl:if test="$to">
+        <xsl:text disable-output-escaping="yes">\(<![CDATA[<]]>\)</xsl:text>
+        <xsl:value-of select="concat(' \SI{',$to,'}{',$unit,'}\\')"/>
+      </xsl:if>
     </xsl:for-each>
 </xsl:template>
 
 <xsl:template match="dcc:results">
+  <xsl:text>\section*{Resultados}</xsl:text>
   <xsl:apply-templates match="dcc:result"/>
 </xsl:template>
 
@@ -232,4 +252,26 @@
       <xsl:value-of select="$var"/><xsl:text> = \SI{</xsl:text><xsl:value-of select="$val"/><xsl:text>}{</xsl:text><xsl:value-of select="$unit"/><xsl:text>} \) \\</xsl:text>
   </xsl:for-each>
 </xsl:template>
+
+
+<xsl:template match="dcc:comment">
+  <xsl:apply-templates select="ext:statements"/>
+</xsl:template>
+
+
+<xsl:template match="ext:statements">
+  <xsl:text>\section*{</xsl:text><xsl:value-of select="ext:title"/><xsl:text>}</xsl:text>
+  <xsl:apply-templates select="ext:statement"/>
+</xsl:template>
+
+<xsl:template match="ext:statement">
+  <xsl:text>
+    \begin{enumerate}
+    \item[]</xsl:text><xsl:value-of select="ext:content"/>
+    <xsl:apply-templates select="ext:statement"/>
+    <xsl:text>
+      \end{enumerate}
+    </xsl:text>
+</xsl:template>
+
 </xsl:stylesheet>
